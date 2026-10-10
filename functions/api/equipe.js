@@ -1,9 +1,8 @@
-// Gestion de l'équipe depuis la page /inscriptions : lister, ajouter (avec e-mail d'invitation), retirer.
+// Gestion de l'équipe depuis la page /inscriptions : lister, ajouter, retirer.
 // Réservé aux membres connectés. Les adresses de ADMIN_EMAILS sont fixes : elles ne se retirent pas d'ici.
 import { EMAIL_RE } from "../../lib/form.js";
 import { base } from "../../lib/alpha.js";
 import { adressesFixes, equipe, membreConnecte } from "../../lib/auth.js";
-import { envoyer, mailjetPret } from "../../lib/mailjet.js";
 
 const headers = { "cache-control": "no-store" };
 const rep = (corps, status = 200) => Response.json(corps, { status, headers });
@@ -43,16 +42,8 @@ export async function onRequestPost({ request, env }) {
   if ((await equipe(env)).has(email)) return rep({ ok: true, membres: await liste(env), message: "Cette personne fait déjà partie de l’équipe." });
 
   await (await base(env.DB)).prepare("INSERT OR IGNORE INTO equipe (email, ajoute_par) VALUES (?, ?)").bind(email, moi).run();
-  let invite = false;
-  if (mailjetPret(env)) {
-    const adresse = new URL("/inscriptions", request.url).toString();
-    invite = await envoyer(env, [{
-      To: [{ Email: email }],
-      Subject: "Vous avez accès aux inscriptions Bras Ouverts",
-      TextPart: `Bonjour,\n\n${moi} vous a ajouté à l’équipe Bras Ouverts : vous pouvez maintenant consulter les inscriptions au Parcours Alpha.\n\nPour vous connecter, ouvrez ${adresse} et saisissez cette adresse e-mail : un lien de connexion vous sera envoyé.\n`,
-    }]);
-  }
-  return rep({ ok: true, membres: await liste(env), message: invite ? "Ajouté. Une invitation vient de lui être envoyée." : "Ajouté, mais l’invitation n’a pas pu être envoyée : prévenez la personne vous-même." });
+  // Pas d'e-mail à envoyer : la personne se connecte avec le compte Google correspondant à cette adresse.
+  return rep({ ok: true, membres: await liste(env), message: `Ajouté. Prévenez ${email} : elle se connecte avec son compte Google sur cette page.` });
 }
 
 export async function onRequestDelete({ request, env }) {

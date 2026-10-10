@@ -11,10 +11,10 @@ Site de l’association Bras Ouverts : les maraudes, la petite boutik et le Parc
 | `src/style.css`, `src/forms.js`, `src/theme.js` | Styles, envoi des formulaires, thème clair/sombre |
 | `public/` | Logo (`logo.png`, `favicon.png`), photos ajoutées depuis l’administration (`uploads/`) |
 | `functions/api/contact.js` | Formulaire de contact, envoyé par e-mail (Mailjet), rien n’est conservé |
-| `functions/api/inscription.js` | Inscription Alpha : enregistrée dans D1, e-mail à l’équipe et confirmation à l’inscrit |
+| `functions/api/inscription.js` | Inscription Alpha : enregistrée dans D1 (e-mails facultatifs via Mailjet) |
 | `functions/api/places.js` | Places restantes par parcours (le formulaire grise les parcours complets) |
-| `functions/api/auth/` | Connexion de l’équipe : lien par e-mail, session par cookie signé |
-| `functions/api/equipe.js` | Liste, ajout (avec invitation) et retrait des membres de l’équipe |
+| `functions/api/auth/` | Connexion de l’équipe avec Google, session par cookie signé |
+| `functions/api/equipe.js` | Liste, ajout et retrait des membres de l’équipe |
 | `functions/api/inscriptions.js`, `src/inscriptions.js` | Page `/inscriptions` : liste des inscrits, réservée à l’équipe |
 | `functions/api/export-inscriptions.js` | Liste des inscrits en CSV, réservée à l’équipe |
 | `lib/` | Code partagé par les fonctions (Mailjet, formulaires, table des inscriptions) |
@@ -53,22 +53,28 @@ Tant que la base n’est pas liée, le formulaire affiche « les inscriptions ne
 
 | Variable | Valeur |
 |---|---|
-| `SESSION_SECRET` | longue chaîne aléatoire (40 caractères ou plus), type « Secret » : signe les liens de connexion et les sessions |
-| `ADMIN_EMAILS` | ton adresse e-mail (et celles des autres responsables, séparées par des virgules) : accès de départ à la liste des inscrits, ces adresses ne se retirent pas depuis le site |
-| `MAILJET_API_KEY` | clé API Mailjet |
-| `MAILJET_API_SECRET` | clé secrète Mailjet |
-| `CONTACT_FROM` | adresse expéditrice **validée** dans Mailjet |
-| `CONTACT_TO` | (formulaire de contact, masqué pour l’instant) adresse(s) qui reçoivent les messages |
-| `ALPHA_TO` | (facultatif) adresse(s) alertées à chaque inscription ; à défaut `CONTACT_TO` |
+| `SESSION_SECRET` | longue chaîne aléatoire (40 caractères ou plus), type « Secret » : signe les sessions de l’équipe |
+| `GOOGLE_CLIENT_ID` | identifiant client Google (voir ci-dessous) : connexion de l’équipe avec un compte Google |
+| `ADMIN_EMAILS` | ton adresse Google (et celles des autres responsables, séparées par des virgules) : accès de départ, ces adresses ne se retirent pas depuis le site |
 | `EXPORT_PASSWORD` | (facultatif, clé de secours) mot de passe pour télécharger l’export sans se connecter |
+| `MAILJET_API_KEY`, `MAILJET_API_SECRET`, `CONTACT_FROM` | (facultatif) pour envoyer un e-mail de confirmation à l’inscrit |
+| `ALPHA_TO` | (facultatif, avec Mailjet) adresse(s) alertées à chaque inscription |
+| `CONTACT_TO` | (facultatif, avec Mailjet) destinataires du formulaire de contact, masqué pour l’instant |
 
-Les inscriptions sont enregistrées même sans Mailjet, mais **Mailjet est nécessaire pour se connecter à la liste des inscrits** (le lien de connexion part par e-mail).
+Aucun e-mail n’est nécessaire pour faire fonctionner le site : les inscriptions sont enregistrées dans la base et consultées sur `/inscriptions`.
+
+### Connexion Google : obtenir `GOOGLE_CLIENT_ID` (une seule fois)
+
+1. https://console.cloud.google.com → créer un projet (par exemple « Bras Ouverts »).
+2. APIs & Services → **OAuth consent screen** : type « External », nom de l’application « Bras Ouverts », ton adresse comme contact. Aucune permission particulière à ajouter. Puis **Publish app** (statut « In production »), sinon seules les adresses listées comme « Test users » peuvent se connecter.
+3. APIs & Services → Credentials → Create credentials → **OAuth client ID** → type « Web application » → *Authorized JavaScript origins* : `https://bras-ouverts.pages.dev` (et ton domaine si tu en as un). Pas d’URI de redirection à renseigner.
+4. Copier l’identifiant client (se termine par `.apps.googleusercontent.com`) dans la variable `GOOGLE_CLIENT_ID`, redéployer.
 
 ### Consulter les inscrits
 
-Ouvrir `https://<site>/inscriptions`, saisir son adresse e-mail : si elle est autorisée, un lien de connexion (valable 15 minutes) arrive par e-mail, et la session dure 12 heures. La page affiche la liste, les places restantes par parcours et un bouton de téléchargement Excel.
+Ouvrir `https://<site>/inscriptions` et cliquer sur « Se connecter avec Google » : seules les adresses de l’équipe sont acceptées, la session dure 12 heures. La page affiche la liste, les places restantes par parcours et un bouton de téléchargement Excel.
 
-Qui est autorisé : les adresses de `ADMIN_EMAILS` (fixes) et celles ajoutées depuis l’onglet **Équipe** de la page : chaque personne ajoutée reçoit une invitation par e-mail, et « Retirer » coupe son accès tout de suite, même si elle est connectée. Tout membre peut ajouter ou retirer les autres (sauf les adresses fixes et soi-même) : n’ajouter que des personnes de confiance. Cette liste est indépendante de celle de Pages CMS, qui ne donne accès qu’aux textes et photos du site.
+Qui est autorisé : les adresses de `ADMIN_EMAILS` (fixes) et celles ajoutées depuis l’onglet **Équipe** de la page. Ajouter une adresse lui donne accès tout de suite (la personne se connecte avec le compte Google de cette adresse ; il faut la prévenir), « Retirer » coupe son accès immédiatement, même si elle est connectée. Tout membre peut ajouter ou retirer les autres (sauf les adresses fixes et soi-même) : n’ajouter que des personnes de confiance. Cette liste est indépendante de celle de Pages CMS, qui ne donne accès qu’aux textes et photos du site.
 
 Les inscriptions sont des données personnelles : les supprimer après le parcours (durée annoncée dans les mentions légales), par exemple dans D1 → Console : `DELETE FROM inscriptions WHERE session = 'alpha-1';`
 

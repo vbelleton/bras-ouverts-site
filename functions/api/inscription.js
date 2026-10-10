@@ -1,5 +1,6 @@
-// Inscription au Parcours Alpha : enregistrée dans D1, puis e-mail à l'équipe et confirmation à l'inscrit.
-// Liaison D1 « DB » et variables Mailjet à configurer dans Cloudflare Pages (voir README).
+// Inscription au Parcours Alpha : enregistrée dans D1. Si Mailjet est configuré (facultatif), e-mail à l'équipe
+// et confirmation à l'inscrit.
+// Liaison D1 « DB » obligatoire, variables Mailjet facultatives (voir README).
 // ALPHA_TO (facultatif) : destinataires des inscriptions ; à défaut, CONTACT_TO.
 import { EMAIL_RE, lire, replier, tableau } from "../../lib/form.js";
 import { destinataires, envoyer, mailjetPret } from "../../lib/mailjet.js";
@@ -57,8 +58,6 @@ export async function onRequestPost({ request, env }) {
         TextPart: merci,
       },
     ]);
-  } else {
-    console.error("inscription: variables Mailjet manquantes, aucun e-mail envoyé");
   }
   return reply(true);
 }

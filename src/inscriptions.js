@@ -13,30 +13,45 @@ async function api(path, options) {
   return { res, data };
 }
 
-function connexion(message) {
-  const email = el("input", { type: "email", required: true, autocomplete: "email", maxLength: 200 });
+// Connexion avec Google : le bouton vient de Google, le site ne voit jamais de mot de passe.
+let scriptGoogle;
+const chargerGoogle = () => (scriptGoogle ||= new Promise((ok, ko) => {
+  const s = el("script", { src: "https://accounts.google.com/gsi/client", async: true });
+  s.onload = ok;
+  s.onerror = () => { scriptGoogle = null; ko(new Error("google")); };
+  document.head.append(s);
+}));
+
+async function connexion(message) {
   const statut = el("p", { className: "status", role: "status" });
-  const bouton = el("button", { className: "btn", type: "submit" }, "Recevoir un lien de connexion");
-  const form = el("form", { className: "js-form eq-login" },
+  const bouton = el("div", { className: "eq-google" });
+  const montrer = (texte, ok) => { statut.textContent = texte; statut.className = "status " + (ok ? "ok" : "err"); };
+  app.replaceChildren(el("div", { className: "js-form eq-login" },
     el("h2", {}, "Espace équipe"),
-    el("p", {}, "Cette page est réservée à l’équipe. Saisissez votre adresse e-mail : si elle est autorisée, vous recevrez un lien de connexion."),
-    el("label", {}, el("span", {}, "Votre e-mail"), email), bouton, statut);
-  if (message) { statut.textContent = message; statut.className = "status err"; }
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    bouton.disabled = true;
-    try {
-      const { res, data } = await api("/api/auth/demande", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: email.value }) });
-      statut.textContent = data.message || data.error || FAIL;
-      statut.className = "status " + (res.ok && data.ok ? "ok" : "err");
-    } catch {
-      statut.textContent = FAIL;
-      statut.className = "status err";
-    } finally {
-      bouton.disabled = false;
-    }
-  });
-  app.replaceChildren(form);
+    el("p", {}, "Cette page est réservée à l’équipe. Connectez-vous avec le compte Google dont l’adresse a été ajoutée à l’équipe."),
+    bouton, statut));
+  if (message) montrer(message, false);
+  try {
+    const { data } = await api("/api/auth/google");
+    if (!data.clientId) return montrer("La connexion Google n’est pas encore configurée.", false);
+    await chargerGoogle();
+    google.accounts.id.initialize({
+      client_id: data.clientId,
+      callback: async ({ credential }) => {
+        montrer("Connexion en cours…", true);
+        try {
+          const r = await api("/api/auth/google", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ credential }) });
+          if (!r.res.ok || !r.data.ok) return montrer(r.data.error || FAIL, false);
+          demarrer();
+        } catch {
+          montrer(FAIL, false);
+        }
+      },
+    });
+    google.accounts.id.renderButton(bouton, { theme: "outline", size: "large", text: "signin_with", locale: "fr", shape: "pill" });
+  } catch {
+    montrer("Impossible de charger la connexion Google. Vérifiez votre connexion et réessayez.", false);
+  }
 }
 
 function liste(data) {
@@ -143,7 +158,7 @@ function vueEquipe(moi) {
   return racine;
 }
 
-(async () => {
+async function demarrer() {
   try {
     const { res, data } = await api("/api/inscriptions");
     if (res.status === 401) return connexion();
@@ -152,4 +167,5 @@ function vueEquipe(moi) {
   } catch {
     connexion(FAIL);
   }
-})();
+}
+demarrer();

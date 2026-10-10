@@ -2,8 +2,10 @@
 /inscriptions
   X-Robots-Tag: noindex, nofollow
   Cache-Control: no-store
+  Cross-Origin-Opener-Policy: same-origin-allow-popups
 /inscriptions/*
   X-Robots-Tag: noindex, nofollow
   Cache-Control: no-store
+  Cross-Origin-Opener-Policy: same-origin-allow-popups
 /api/*
   Cache-Control: no-store
