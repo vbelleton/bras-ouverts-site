@@ -125,7 +125,6 @@ content:
                   - { name: label, label: Nom affiché (ex. Parcours d'automne, le mardi soir), type: string }
                   - { name: capacity, label: Nombre de places (0 = sans limite), type: number }
                   - { name: open, label: Inscriptions ouvertes, type: boolean, default: true }
-              - { name: askDiet, label: Demander le régime alimentaire, type: boolean, default: true }
               - { name: success, label: Message affiché après l'inscription, type: text }
               - { name: full, label: Message quand le parcours est complet, type: string }
 

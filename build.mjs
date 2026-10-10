@@ -76,12 +76,12 @@ const renderers = {
         </div>
         <div class="row">
           ${field("E-mail", `<input name="email" type="email" autocomplete="email" required maxlength="200">`, true)}
-          ${field("Téléphone", `<input name="phone" type="tel" autocomplete="tel" maxlength="40">`)}
+          ${field("Téléphone", `<input name="phone" type="tel" autocomplete="tel" required maxlength="40">`, true)}
         </div>
         ${sessions.length > 1
           ? field("Parcours", `<select name="session" required><option value="">Choisir…</option>${sessions.map((s) => `<option value="${esc(s.id)}">${esc(s.label)}</option>`).join("")}</select>`, true)
           : `<input type="hidden" name="session" value="${esc(sessions[0].id)}"><p class="session-one">${txt(sessions[0].label)}</p>`}
-        ${b.askDiet ? field("Régime alimentaire ou allergies", `<input name="diet" maxlength="200" placeholder="Pour le repas : végétarien, sans gluten…">`) : ""}
+        ${field("Adresse postale (facultatif)", `<input name="address" autocomplete="street-address" maxlength="300" placeholder="Numéro, rue, code postal, ville">`)}
         ${field("Un mot pour nous (facultatif)", `<textarea name="message" rows="3" maxlength="2000"></textarea>`)}
         <label class="consent"><input type="checkbox" name="consent" value="oui" required> <span>J’accepte que mes coordonnées soient utilisées pour organiser le Parcours Alpha. Elles ne sont ni publiées ni transmises. <b class="req" aria-hidden="true">*</b></span></label>
         ${antiSpam}
@@ -138,7 +138,7 @@ const html = `<!doctype html>
 <meta property="og:title" content="${esc(s.title || s.name)}">
 <meta property="og:description" content="${esc(s.description)}">
 <meta property="og:type" content="website">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,400;0,6..12,700;1,6..12,400&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap">
 <link rel="stylesheet" href="/style.css">
 <script>${readFileSync("src/theme.js", "utf8").trim()}</script>
@@ -147,7 +147,7 @@ const html = `<!doctype html>
 <body>
 <header class="top">
   <div class="wrap">
-    <a class="logo" href="#${esc(home)}">${readFileSync("public/favicon.svg", "utf8").replace(/<\?xml[^>]*>/, "").replace("<svg", '<svg aria-hidden="true" width="34" height="34"').trim()}<span>${esc(s.name || "")}</span></a>
+    <a class="logo" href="#${esc(home)}"><img src="/logo.png" alt="${esc(s.name || '')}" width="178" height="34"></a>
     <nav aria-label="Navigation principale">
       ${nav}
     </nav>

@@ -3,7 +3,7 @@
 // ?session=alpha-1 pour un seul parcours.
 import { base } from "../../lib/alpha.js";
 
-const COLS = [["session", "Parcours"], ["first_name", "Prénom"], ["last_name", "Nom"], ["email", "E-mail"], ["phone", "Téléphone"], ["diet", "Régime / allergies"], ["message", "Message"], ["created_at", "Inscrit le (UTC)"]];
+const COLS = [["session", "Parcours"], ["first_name", "Prénom"], ["last_name", "Nom"], ["email", "E-mail"], ["phone", "Téléphone"], ["address", "Adresse postale"], ["message", "Message"], ["created_at", "Inscrit le (UTC)"]];
 
 // Comparaison en temps constant, pour ne pas laisser deviner le mot de passe caractère par caractère.
 async function egal(a, b) {

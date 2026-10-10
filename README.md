@@ -9,7 +9,7 @@ Site de l’association Bras Ouverts : les maraudes, la petite boutik et le Parc
 | `content/site.json` | **Tout le contenu** : textes, blocs et leur ordre, parcours Alpha ouverts, mentions légales |
 | `build.mjs` | Génère `dist/index.html` à partir du contenu (Node, sans dépendance) |
 | `src/style.css`, `src/forms.js`, `src/theme.js` | Styles, envoi des formulaires, thème clair/sombre |
-| `public/` | Logo (`favicon.svg`), photos ajoutées depuis l’administration (`uploads/`) |
+| `public/` | Logo (`logo.png`, `favicon.png`), photos ajoutées depuis l’administration (`uploads/`) |
 | `functions/api/contact.js` | Formulaire de contact, envoyé par e-mail (Mailjet), rien n’est conservé |
 | `functions/api/inscription.js` | Inscription Alpha : enregistrée dans D1, e-mail à l’équipe et confirmation à l’inscrit |
 | `functions/api/places.js` | Places restantes par parcours (le formulaire grise les parcours complets) |

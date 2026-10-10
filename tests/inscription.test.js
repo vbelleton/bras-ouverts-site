@@ -40,16 +40,29 @@ const inscription = async (champs, e = env) => {
   const res = await inscrire({ request: requete(champs), env: e });
   return { status: res.status, ...(await res.json()) };
 };
-const marie = { firstName: "Marie", lastName: "Durand", email: "Marie@Exemple.fr" };
+const marie = { firstName: "Marie", lastName: "Durand", email: "Marie@Exemple.fr", phone: "06 12 34 56 78" };
 
 test("une inscription valide est enregistrée et deux e-mails partent", async () => {
   const r = await inscription(marie);
   assert.equal(r.ok, true);
   assert.equal(envoyes.length, 2);
+  assert.equal((await (await base(env.DB)).prepare("SELECT address FROM inscriptions").all()).results[0].address, null);
   assert.deepEqual(envoyes[0].To, [{ Email: "equipe@exemple.fr" }]);
   assert.equal(envoyes[1].To[0].Email, "marie@exemple.fr");
   const { results } = await env.DB.prepare("SELECT * FROM inscriptions").all();
   assert.equal(results.length, 1);
+});
+
+test("l'adresse postale facultative est enregistrée et exportée", async () => {
+  await inscription({ ...marie, address: "3 rue de Brest, 29600 Morlaix" });
+  const res = await exporter({ env, request: new Request("https://site.test/api/export-inscriptions", { headers: { Authorization: "Basic " + btoa("x:secret") } }) });
+  assert.match(await res.text(), /3 rue de Brest, 29600 Morlaix/);
+});
+
+test("une table créée avant l'ajout de l'adresse est complétée", async () => {
+  const vieille = fausseD1();
+  await vieille.prepare("CREATE TABLE inscriptions (id INTEGER PRIMARY KEY AUTOINCREMENT, session TEXT NOT NULL, first_name TEXT NOT NULL, last_name TEXT NOT NULL, email TEXT NOT NULL, phone TEXT, diet TEXT, message TEXT, created_at TEXT NOT NULL DEFAULT (datetime('now')), UNIQUE (session, email))").run();
+  assert.equal((await inscription({ ...marie, address: "x" }, { ...env, DB: vieille })).ok, true);
 });
 
 test("une deuxième inscription avec la même adresse n'est pas dupliquée", async () => {
@@ -64,6 +77,7 @@ test("une deuxième inscription avec la même adresse n'est pas dupliquée", asy
 test("champs manquants, e-mail invalide, sans accord ou parcours inconnu : refus", async () => {
   assert.equal((await inscription({ ...marie, firstName: "" })).ok, false);
   assert.equal((await inscription({ ...marie, email: "pas-une-adresse" })).ok, false);
+  assert.equal((await inscription({ ...marie, phone: "" })).ok, false);
   assert.equal((await inscription({ ...marie, consent: "" })).ok, false);
   assert.equal((await inscription({ ...marie, session: "inconnu" })).ok, false);
 });
