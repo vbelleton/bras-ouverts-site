@@ -177,3 +177,23 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
 @media (max-width: 600px) {
   .js-form .row { grid-template-columns: 1fr; }
 }
+
+/* Espace équipe : liste des inscrits */
+.equipe-titre { margin-left: auto; font-weight: 700; color: var(--muted); }
+body.equipe section { border-top: 0; }
+.eq-bar { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.eq-bar .qui { color: var(--muted); font-size: 0.95rem; }
+.eq-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.eq-actions select { font: inherit; padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); }
+.btn-clair { background: var(--surface); color: var(--ink); border: 1px solid var(--line); }
+.eq-comptes { display: flex; flex-wrap: wrap; gap: 12px; margin: 0 0 24px; padding: 0; list-style: none; }
+.eq-comptes li { padding: 12px 18px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); }
+.eq-comptes strong { font-family: var(--display); font-size: 1.6rem; color: var(--accent); }
+.eq-table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); }
+.eq-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+.eq-table th, .eq-table td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.eq-table th { font-size: 0.76rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+.eq-table tr:last-child td { border-bottom: 0; }
+.eq-table td.msg { max-width: 22rem; white-space: pre-wrap; color: var(--muted); }
+.eq-vide { padding: 24px; color: var(--muted); }
+.eq-login { max-width: 460px; }

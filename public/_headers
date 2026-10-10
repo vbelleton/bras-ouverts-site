@@ -1,0 +1,9 @@
+# L'espace équipe ne doit être ni indexé ni gardé en cache.
+/inscriptions
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: no-store
+/inscriptions/*
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: no-store
+/api/*
+  Cache-Control: no-store

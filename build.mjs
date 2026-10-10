@@ -203,9 +203,36 @@ ${body}
 </html>
 `;
 
+// Page /inscriptions : coquille vide, remplie par src/inscriptions.js après connexion de l'équipe.
+// Aucune donnée personnelle dans la page elle-même.
+const equipePage = `<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Inscriptions · ${esc(s.name)}</title>
+<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,400;0,6..12,700;1,6..12,400&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap">
+<link rel="stylesheet" href="/style.css">
+<script>${readFileSync("src/theme.js", "utf8").trim()}</script>
+<script src="/inscriptions.js" defer></script>
+</head>
+<body class="equipe">
+<header class="top"><div class="wrap">
+  <a class="logo" href="/"><img src="/logo.png" alt="${esc(s.name || "")}" width="178" height="34"></a>
+  <span class="equipe-titre">Espace équipe</span>
+</div></header>
+<main><section><div class="wrap" id="app"><p>Chargement…</p></div></section></main>
+</body>
+</html>
+`;
+
 rmSync(OUT, { recursive: true, force: true });
 mkdirSync(OUT, { recursive: true });
 if (existsSync("public")) cpSync("public", OUT, { recursive: true });
 cpSync("src", OUT, { recursive: true });
 writeFileSync(`${OUT}/index.html`, html);
+mkdirSync(`${OUT}/inscriptions`, { recursive: true });
+writeFileSync(`${OUT}/inscriptions/index.html`, equipePage);
 console.log(`dist/index.html généré (${blocks.length} blocs).`);

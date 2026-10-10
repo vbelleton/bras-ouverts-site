@@ -1,22 +1,11 @@
 // Tests des Pages Functions d'inscription, avec une fausse base D1 (SQLite en mémoire) et un faux Mailjet.
 import { test, beforeEach } from "node:test";
 import assert from "node:assert/strict";
-import { DatabaseSync } from "node:sqlite";
+import { fausseD1 } from "./helpers.js";
 import { onRequestPost as inscrire } from "../functions/api/inscription.js";
 import { onRequestGet as places } from "../functions/api/places.js";
 import { onRequestGet as exporter } from "../functions/api/export-inscriptions.js";
 import { base, sessions } from "../lib/alpha.js";
-
-// Imite l'API D1 utilisée par le site : prepare().bind().run() / .all()
-function fausseD1() {
-  const db = new DatabaseSync(":memory:");
-  const stmt = (sql, args = []) => ({
-    bind: (...a) => stmt(sql, a),
-    all: async () => ({ results: db.prepare(sql).all(...args) }),
-    run: async () => ({ meta: { changes: Number(db.prepare(sql).run(...args).changes) } }),
-  });
-  return { prepare: (sql) => stmt(sql) };
-}
 
 let envoyes;
 globalThis.fetch = async (_url, init) => {

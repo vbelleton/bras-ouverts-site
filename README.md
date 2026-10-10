@@ -13,7 +13,9 @@ Site de l’association Bras Ouverts : les maraudes, la petite boutik et le Parc
 | `functions/api/contact.js` | Formulaire de contact, envoyé par e-mail (Mailjet), rien n’est conservé |
 | `functions/api/inscription.js` | Inscription Alpha : enregistrée dans D1, e-mail à l’équipe et confirmation à l’inscrit |
 | `functions/api/places.js` | Places restantes par parcours (le formulaire grise les parcours complets) |
-| `functions/api/export-inscriptions.js` | Liste des inscrits en CSV, protégée par mot de passe |
+| `functions/api/auth/` | Connexion de l’équipe : lien par e-mail, session par cookie signé |
+| `functions/api/inscriptions.js`, `src/inscriptions.js` | Page `/inscriptions` : liste des inscrits, réservée à l’équipe |
+| `functions/api/export-inscriptions.js` | Liste des inscrits en CSV, réservée à l’équipe |
 | `lib/` | Code partagé par les fonctions (Mailjet, formulaires, table des inscriptions) |
 | `.pages.yml` | Interface d’administration (Pages CMS) |
 
@@ -48,20 +50,24 @@ Tant que la base n’est pas liée, le formulaire affiche « les inscriptions ne
 
 ### Variables (Settings → Variables and secrets), puis redéployer
 
-Seul `EXPORT_PASSWORD` est indispensable. Les inscriptions sont enregistrées même sans Mailjet ; les variables Mailjet servent aux e-mails (confirmation à l’inscrit, alerte à l’équipe) et au formulaire de contact. Ce dernier est masqué pour l’instant, la section « Nous trouver » le remplace : pour le remettre, administration → bloc « Formulaire de contact » → « Afficher ce bloc » (et renseigner les variables Mailjet).
-
 | Variable | Valeur |
 |---|---|
+| `SESSION_SECRET` | longue chaîne aléatoire (40 caractères ou plus), type « Secret » : signe les liens de connexion et les sessions |
+| `ADMIN_EMAILS` | ton adresse e-mail (et celles des autres responsables, séparées par des virgules) : accès à la liste des inscrits |
 | `MAILJET_API_KEY` | clé API Mailjet |
 | `MAILJET_API_SECRET` | clé secrète Mailjet |
 | `CONTACT_FROM` | adresse expéditrice **validée** dans Mailjet |
-| `CONTACT_TO` | adresse(s) qui reçoivent les messages, séparées par des virgules |
-| `ALPHA_TO` | (facultatif) adresse(s) qui reçoivent les inscriptions ; à défaut `CONTACT_TO` |
-| `EXPORT_PASSWORD` | mot de passe de l’export des inscrits (type « Secret ») |
+| `CONTACT_TO` | (formulaire de contact, masqué pour l’instant) adresse(s) qui reçoivent les messages |
+| `ALPHA_TO` | (facultatif) adresse(s) alertées à chaque inscription ; à défaut `CONTACT_TO` |
+| `EXPORT_PASSWORD` | (facultatif, clé de secours) mot de passe pour télécharger l’export sans se connecter |
 
-### Récupérer la liste des inscrits
+Les inscriptions sont enregistrées même sans Mailjet, mais **Mailjet est nécessaire pour se connecter à la liste des inscrits** (le lien de connexion part par e-mail).
 
-Ouvrir `https://<site>/api/export-inscriptions` : le navigateur demande un identifiant (n’importe lequel) et le mot de passe `EXPORT_PASSWORD`. Le fichier CSV s’ouvre directement dans Excel. `?session=alpha-1` pour un seul parcours.
+### Consulter les inscrits
+
+Ouvrir `https://<site>/inscriptions`, saisir son adresse e-mail : si elle est autorisée, un lien de connexion (valable 15 minutes) arrive par e-mail, et la session dure 12 heures. La page affiche la liste, les places restantes par parcours et un bouton de téléchargement Excel.
+
+Qui est autorisé : les adresses de `ADMIN_EMAILS` plus celles de l’administration (Pages CMS → « Équipe (accès à la liste des inscrits) »). Ajouter ou retirer une adresse prend effet au déploiement suivant (1 à 2 minutes) et coupe aussi les sessions déjà ouvertes. Toute personne qui peut modifier le contenu dans Pages CMS peut donc donner accès aux inscrits : n’inviter que des gens de confiance.
 
 Les inscriptions sont des données personnelles : les supprimer après le parcours (durée annoncée dans les mentions légales), par exemple dans D1 → Console : `DELETE FROM inscriptions WHERE session = 'alpha-1';`
 

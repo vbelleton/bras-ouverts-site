@@ -1,7 +1,9 @@
-// GET /api/export-inscriptions : liste des inscrits en CSV (ouvrable dans Excel), protégée par mot de passe.
-// Le navigateur demande un identifiant (au choix) et le mot de passe EXPORT_PASSWORD défini dans Cloudflare Pages.
+// GET /api/export-inscriptions : liste des inscrits en CSV (ouvrable dans Excel).
+// Réservé à l'équipe connectée (voir lib/auth.js). Clé de secours facultative : si EXPORT_PASSWORD est défini,
+// le navigateur demande un identifiant (au choix) et ce mot de passe.
 // ?session=alpha-1 pour un seul parcours.
 import { base } from "../../lib/alpha.js";
+import { membreConnecte } from "../../lib/auth.js";
 
 const COLS = [["session", "Parcours"], ["first_name", "Prénom"], ["last_name", "Nom"], ["email", "E-mail"], ["phone", "Téléphone"], ["address", "Adresse postale"], ["message", "Message"], ["created_at", "Inscrit le (UTC)"]];
 
@@ -14,6 +16,17 @@ async function egal(a, b) {
   return diff === 0;
 }
 
+async function motDePasseValide(request, env) {
+  const auth = request.headers.get("authorization") || "";
+  if (!env.EXPORT_PASSWORD || !auth.startsWith("Basic ")) return false;
+  try {
+    const pass = new TextDecoder().decode(Uint8Array.from(atob(auth.slice(6)), (c) => c.charCodeAt(0))).split(":").slice(1).join(":");
+    return await egal(pass, env.EXPORT_PASSWORD);
+  } catch {
+    return false;
+  }
+}
+
 // Point-virgule et BOM UTF-8 : Excel en français ouvre le fichier directement avec les accents.
 const cell = (v) => {
   let s = String(v ?? "");
@@ -22,18 +35,13 @@ const cell = (v) => {
 };
 
 export async function onRequestGet({ request, env }) {
-  const refus = () => new Response("Mot de passe requis.", { status: 401, headers: { "WWW-Authenticate": 'Basic realm="Inscriptions Bras Ouverts", charset="UTF-8"' } });
-  if (!env.EXPORT_PASSWORD || !env.DB) return new Response("Export non configuré.", { status: 503 });
-
-  const auth = request.headers.get("authorization") || "";
-  if (!auth.startsWith("Basic ")) return refus();
-  let pass = "";
-  try {
-    pass = new TextDecoder().decode(Uint8Array.from(atob(auth.slice(6)), (c) => c.charCodeAt(0))).split(":").slice(1).join(":");
-  } catch {
-    return refus();
+  if (!env.DB) return new Response("Base des inscriptions non liée.", { status: 503 });
+  if (!(await membreConnecte(request, env)) && !(await motDePasseValide(request, env))) {
+    return new Response("Connexion requise.", {
+      status: 401,
+      headers: env.EXPORT_PASSWORD ? { "WWW-Authenticate": 'Basic realm="Inscriptions Bras Ouverts", charset="UTF-8"' } : {},
+    });
   }
-  if (!(await egal(pass, env.EXPORT_PASSWORD))) return refus();
 
   const session = new URL(request.url).searchParams.get("session");
   const sql = `SELECT ${COLS.map(([c]) => c).join(", ")} FROM inscriptions ${session ? "WHERE session = ?" : ""} ORDER BY session, created_at`;
