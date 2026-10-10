@@ -122,6 +122,20 @@ section { padding-block: clamp(48px, 7vw, 88px); border-top: 1px solid var(--lin
 .faq details[open] summary { margin-bottom: 8px; color: var(--accent); }
 .more-link { margin-top: 28px; font-weight: 700; }
 
+/* Nous trouver */
+.find { display: grid; grid-template-columns: 1fr 1.4fr; gap: 32px; align-items: start; }
+.find > * { min-width: 0; }
+.find-list { display: grid; gap: 16px; margin: 0; }
+.find-list > div { padding: 18px 20px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); }
+.find-list dt { display: flex; align-items: center; gap: 10px; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+.find-list dd { margin: 6px 0 0 34px; font-size: 1.1rem; font-weight: 700; }
+.find-list a { text-decoration: none; }
+.find-list a:hover { text-decoration: underline; }
+.map { display: grid; gap: 10px; }
+.map iframe { width: 100%; height: 360px; border: 1px solid var(--line); border-radius: var(--r); background: var(--soft); }
+.map a { font-weight: 700; }
+@media (max-width: 900px) { .find { grid-template-columns: 1fr; } .map iframe { height: 300px; } }
+
 /* Formulaires */
 .js-form { display: grid; gap: 16px; padding: clamp(18px, 4vw, 30px); background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); max-width: 760px; }
 .js-form .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }

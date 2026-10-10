@@ -107,6 +107,18 @@ const renderers = {
       ${safeUrl(b.link) ? `<p class="more-link"><a href="${esc(safeUrl(b.link))}" rel="noopener">${esc(b.linkLabel || "En savoir plus sur Alpha")}</a></p>` : ""}`, "alpha");
   },
 
+  find: (b) => section(b, `${secHead(b, b.intro ? `\n        <p>${txt(b.intro)}</p>` : "")}
+      <div class="find">
+        <dl class="find-list">
+          ${list(b.items).filter(visible).map((i) => {
+            const href = safeUrl(i.href);
+            return `<div><dt><span class="ico" aria-hidden="true">${esc(i.icon || "")}</span>${esc(i.label)}</dt><dd>${href ? `<a href="${esc(href)}">${txt(i.value)}</a>` : txt(i.value)}</dd></div>`;
+          }).join("\n          ")}
+        </dl>
+        ${b.mapQuery ? `<div class="map"><iframe title="Carte : ${esc(b.mapQuery)}" src="https://www.google.com/maps?q=${encodeURIComponent(b.mapQuery)}&amp;output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+          <a href="https://www.google.com/maps/search/?api=1&amp;query=${encodeURIComponent(b.mapQuery)}" rel="noopener">${esc(b.mapLinkLabel || "Ouvrir l’itinéraire")}</a></div>` : ""}
+      </div>`),
+
   text: (b) => section(b, `${secHead(b)}
       <div class="prose">${paras(b.text)}</div>`),
 

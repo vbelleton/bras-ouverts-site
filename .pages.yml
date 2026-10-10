@@ -149,6 +149,27 @@ content:
               - { name: success, label: Message affiché après l'inscription, type: text }
               - { name: full, label: Message quand le parcours est complet, type: string }
 
+          - name: find
+            label: Nous trouver (adresse, téléphone, carte)
+            fields:
+              - { name: visible, component: visible }
+              - { name: anchor, component: anchor }
+              - { name: menu, component: menu }
+              - { name: label, component: label }
+              - { name: title, component: title }
+              - { name: intro, label: Introduction, type: text }
+              - name: items
+                label: Informations (adresse, téléphone, parking…)
+                type: object
+                list: true
+                fields:
+                  - { name: icon, label: Pictogramme (un emoji, ex. 📍), type: string }
+                  - { name: label, label: Intitulé, type: string }
+                  - { name: value, label: Valeur, type: string }
+                  - { name: href, label: Lien (facultatif, ex. tel:+33620705496), type: string }
+              - { name: mapQuery, label: Adresse pour la carte (laisser vide pour ne pas afficher de carte), type: string }
+              - { name: mapLinkLabel, label: Texte du lien d'itinéraire, type: string }
+
           - name: text
             label: Texte libre
             fields:

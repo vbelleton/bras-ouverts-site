@@ -48,6 +48,8 @@ Tant que la base n’est pas liée, le formulaire affiche « les inscriptions ne
 
 ### Variables (Settings → Variables and secrets), puis redéployer
 
+Seul `EXPORT_PASSWORD` est indispensable. Les inscriptions sont enregistrées même sans Mailjet ; les variables Mailjet servent aux e-mails (confirmation à l’inscrit, alerte à l’équipe) et au formulaire de contact. Ce dernier est masqué pour l’instant, la section « Nous trouver » le remplace : pour le remettre, administration → bloc « Formulaire de contact » → « Afficher ce bloc » (et renseigner les variables Mailjet).
+
 | Variable | Valeur |
 |---|---|
 | `MAILJET_API_KEY` | clé API Mailjet |

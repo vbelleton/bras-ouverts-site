@@ -51,7 +51,7 @@
             },
             {
               "label": "Adresse",
-              "value": "[à compléter : adresse à Morlaix]"
+              "value": "2 rue Jean-Monnet, 29600 Morlaix"
             }
           ],
           "help": "Vous avez des vêtements d’enfants ou de la puériculture à donner ? Contactez-nous avant de passer."
@@ -85,7 +85,7 @@
           "open": true
         }
       ],
-      "success": "Merci, votre inscription est bien enregistrée. Un e-mail de confirmation vient de partir.",
+      "success": "Merci, votre inscription est bien enregistrée. Nous vous recontactons très vite.",
       "full": "Ce parcours est complet.",
       "questionsTitle": "Des questions pour y réfléchir",
       "questions": [
@@ -121,11 +121,39 @@
         },
         {
           "question": "Que se passe-t-il après mon inscription ?",
-          "answer": "Vous recevez un e-mail de confirmation, puis nous vous contactons avec les informations pratiques avant la première rencontre."
+          "answer": "Nous vous contactons avec les informations pratiques avant la première rencontre."
         }
       ],
       "link": "https://www.parcoursalpha.fr/",
       "linkLabel": "En savoir plus sur Alpha (parcoursalpha.fr)"
+    },
+    {
+      "type": "find",
+      "anchor": "trouver",
+      "menu": "Nous trouver",
+      "label": "Nous trouver",
+      "title": "Où nous trouver ?",
+      "intro": "",
+      "items": [
+        {
+          "icon": "📍",
+          "label": "Localisation",
+          "value": "2 rue Jean-Monnet, 29600 Morlaix"
+        },
+        {
+          "icon": "📞",
+          "label": "Téléphone",
+          "value": "06 20 70 54 96",
+          "href": "tel:+33620705496"
+        },
+        {
+          "icon": "🅿️",
+          "label": "Parking",
+          "value": "Disponible sur place"
+        }
+      ],
+      "mapQuery": "2 Rue Jean Monnet, 29600 Morlaix, France",
+      "mapLinkLabel": "Ouvrir l’itinéraire"
     },
     {
       "type": "contact",
@@ -142,12 +170,13 @@
       ],
       "success": "Merci, votre message est bien parti. Nous vous répondons rapidement.",
       "email": "",
-      "social": []
+      "social": [],
+      "visible": false
     }
   ],
   "legal": {
     "association": "Bras Ouverts, association loi 1901",
-    "address": "[à compléter : adresse, Morlaix]",
+    "address": "2 rue Jean-Monnet, 29600 Morlaix",
     "siret": "",
     "publisher": "[à compléter]",
     "host": "Cloudflare, Inc., 101 Townsend St, San Francisco, CA 94107, États-Unis",
