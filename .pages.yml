@@ -201,16 +201,6 @@ content:
                   - { name: label, label: Nom (ex. Facebook), type: string }
                   - { name: url, label: Adresse, type: string }
 
-      - name: team
-        label: Équipe (accès à la liste des inscrits)
-        type: object
-        fields:
-          - name: emails
-            label: Adresses e-mail autorisées à consulter les inscrits
-            description: Chaque personne se connecte sur /inscriptions avec un lien envoyé à son adresse. Retirer une adresse coupe son accès au prochain déploiement (1 à 2 minutes). Ne mettre que des personnes de confiance.
-            type: string
-            list: true
-
       - name: legal
         label: Mentions légales
         type: object

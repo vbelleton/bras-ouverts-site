@@ -39,15 +39,35 @@ function connexion(message) {
   app.replaceChildren(form);
 }
 
-function liste({ membre, sessions, inscrits }) {
-  const choix = el("select", { ariaLabel: "Parcours" }, el("option", { value: "" }, "Tous les parcours"),
-    ...sessions.map((s) => el("option", { value: s.id }, s.label)));
-  const export_ = el("a", { className: "btn", href: "/api/export-inscriptions" }, "Télécharger (Excel)");
+function liste(data) {
+  const { membre } = data;
   const sortir = el("button", { className: "btn btn-clair", type: "button" }, "Se déconnecter");
   sortir.addEventListener("click", async () => {
     await api("/api/auth/deconnexion", { method: "POST" }).catch(() => {});
     connexion();
   });
+  const contenu = el("div");
+  const onglets = [["inscrits", "Inscrits", () => vueInscrits(data)], ["equipe", "Équipe", () => vueEquipe(membre)]].map(([id, titre, vue]) => {
+    const b = el("button", { type: "button", className: "eq-onglet", role: "tab" }, titre);
+    b.addEventListener("click", () => ouvrir(id));
+    b.dataset.id = id;
+    b.vue = vue;
+    return b;
+  });
+  const ouvrir = (id) => {
+    for (const b of onglets) b.setAttribute("aria-selected", String(b.dataset.id === id));
+    contenu.replaceChildren(onglets.find((b) => b.dataset.id === id).vue());
+  };
+  app.replaceChildren(
+    el("div", { className: "eq-bar" }, el("div", { className: "eq-onglets", role: "tablist" }, ...onglets), el("div", { className: "eq-actions" }, el("span", { className: "qui" }, membre), sortir)),
+    contenu);
+  ouvrir("inscrits");
+}
+
+function vueInscrits({ sessions, inscrits }) {
+  const choix = el("select", { ariaLabel: "Parcours" }, el("option", { value: "" }, "Tous les parcours"),
+    ...sessions.map((s) => el("option", { value: s.id }, s.label)));
+  const export_ = el("a", { className: "btn", href: "/api/export-inscriptions" }, "Télécharger (Excel)");
   const comptes = el("ul", { className: "eq-comptes" });
   const tableau = el("div", { className: "eq-table-wrap" });
 
@@ -75,10 +95,52 @@ function liste({ membre, sessions, inscrits }) {
   };
   choix.addEventListener("change", dessiner);
   dessiner();
-  app.replaceChildren(
-    el("div", { className: "eq-bar" }, el("h2", {}, "Inscrits"), el("div", { className: "eq-actions" }, choix, export_, sortir)),
-    el("p", { className: "qui" }, `Connecté : ${membre}`),
-    comptes, tableau);
+  return el("div", {}, el("div", { className: "eq-actions eq-filtres" }, choix, export_), comptes, tableau);
+}
+
+// Onglet « Équipe » : qui a accès à cette page. Ajouter envoie une invitation par e-mail.
+function vueEquipe(moi) {
+  const racine = el("div", { className: "eq-equipe" });
+  const statut = el("p", { className: "status", role: "status" });
+  const montrer = (texte, ok) => { statut.textContent = texte; statut.className = "status " + (ok ? "ok" : "err"); };
+  const appel = async (methode, email) => {
+    const { res, data } = await api("/api/equipe", { method: methode, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) });
+    if (res.status === 401) return connexion("Votre session a expiré.");
+    montrer(data.message || data.error || FAIL, res.ok && data.ok);
+    if (data.membres) dessiner(data.membres);
+  };
+
+  const champ = el("input", { type: "email", required: true, autocomplete: "off", maxLength: 200, placeholder: "prenom@exemple.fr" });
+  const ajout = el("form", { className: "js-form eq-ajout" }, el("h3", {}, "Ajouter une personne"),
+    el("p", {}, "Elle recevra une invitation par e-mail et pourra se connecter avec cette adresse."),
+    el("label", {}, el("span", {}, "Adresse e-mail"), champ), el("button", { className: "btn", type: "submit" }, "Ajouter et inviter"));
+  ajout.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const bouton = ajout.querySelector("button");
+    bouton.disabled = true;
+    try { await appel("POST", champ.value); champ.value = ""; } catch { montrer(FAIL, false); } finally { bouton.disabled = false; }
+  });
+
+  const tableau = el("div", { className: "eq-table-wrap" });
+  const dessiner = (membres) => {
+    tableau.replaceChildren(el("table", { className: "eq-table" },
+      el("thead", {}, el("tr", {}, ...["Adresse e-mail", "Ajouté par", ""].map((t) => el("th", { scope: "col" }, t)))),
+      el("tbody", {}, ...membres.map((m) => {
+        const retirer = el("button", { className: "btn btn-clair", type: "button" }, "Retirer");
+        retirer.addEventListener("click", async () => {
+          if (!confirm(`Retirer ${m.email} ? Son accès sera coupé immédiatement.`)) return;
+          retirer.disabled = true;
+          try { await appel("DELETE", m.email); } catch { montrer(FAIL, false); retirer.disabled = false; }
+        });
+        return el("tr", {},
+          el("td", {}, m.email, m.email === moi ? " (vous)" : ""),
+          el("td", {}, m.fixe ? "Réglages Cloudflare (fixe)" : (m.ajoute_par || "")),
+          el("td", {}, m.fixe || m.email === moi ? "" : retirer));
+      }))));
+  };
+  racine.append(el("p", {}, "Les personnes ci-dessous peuvent consulter les inscrits et gérer cette liste. N’ajoutez que des personnes de confiance."), tableau, ajout, statut);
+  api("/api/equipe").then(({ data }) => (data.membres ? dessiner(data.membres) : montrer(data.error || FAIL, false))).catch(() => montrer(FAIL, false));
+  return racine;
 }
 
 (async () => {

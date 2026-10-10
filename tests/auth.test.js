@@ -6,6 +6,7 @@ import { onRequestPost as demande } from "../functions/api/auth/demande.js";
 import { onRequestGet as pageLien, onRequestPost as ouvrir } from "../functions/api/auth/connexion.js";
 import { onRequestPost as deconnexion } from "../functions/api/auth/deconnexion.js";
 import { onRequestGet as liste } from "../functions/api/inscriptions.js";
+import { onRequestGet as equipeListe, onRequestPost as equipeAjout, onRequestDelete as equipeRetrait } from "../functions/api/equipe.js";
 import { onRequestGet as exporter } from "../functions/api/export-inscriptions.js";
 import { onRequestPost as inscrire } from "../functions/api/inscription.js";
 import { base, sessions } from "../lib/alpha.js";
@@ -68,7 +69,7 @@ test("jeton falsifié, expiré ou d'un autre type : refus", async () => {
   assert.equal(await verifier(env.SESSION_SECRET, bon, "login"), "chef@exemple.fr");
   assert.equal(await verifier(env.SESSION_SECRET, bon, "session"), null);
   assert.equal(await verifier("autre-secret", bon, "login"), null);
-  assert.equal(await verifier(env.SESSION_SECRET, bon.replace(/.$/, (c) => (c === "A" ? "B" : "A")), "login"), null);
+  assert.equal(await verifier(env.SESSION_SECRET, bon.slice(0, 8) + (bon[8] === "Z" ? "Y" : "Z") + bon.slice(9), "login"), null);
   assert.equal(await verifier(env.SESSION_SECRET, await signer(env.SESSION_SECRET, "login", "chef@exemple.fr", -1), "login"), null);
   assert.equal((await ouvrir({ request: formJeton("n'importe quoi"), env })).status, 400);
 });
@@ -106,4 +107,42 @@ test("la liste contient les inscrits et les places, et l'export marche avec la s
 test("déconnexion : le cookie est effacé", async () => {
   const res = await deconnexion();
   assert.match(res.headers.get("set-cookie"), /Max-Age=0/);
+});
+
+const appelEquipe = (fn, cookie, email, type = "application/json") =>
+  fn({ env, request: new Request("https://site.test/api/equipe", { method: fn === equipeAjout ? "POST" : "DELETE", headers: { cookie, "Content-Type": type }, body: JSON.stringify({ email }) }) });
+
+test("équipe : ajouter envoie une invitation, la personne peut se connecter, la retirer coupe son accès", async () => {
+  const cookie = await seConnecter("chef@exemple.fr");
+  envoyes = [];
+  const res = await appelEquipe(equipeAjout, cookie, "Nouvelle@Exemple.fr");
+  const data = await res.json();
+  assert.equal(data.ok, true);
+  assert.ok(data.membres.some((m) => m.email === "nouvelle@exemple.fr" && m.ajoute_par === "chef@exemple.fr"));
+  assert.equal(envoyes.length, 1);
+  assert.deepEqual(envoyes[0].To, [{ Email: "nouvelle@exemple.fr" }]);
+  assert.match(envoyes[0].TextPart, /chef@exemple\.fr vous a ajouté/);
+
+  const sienne = await seConnecter("nouvelle@exemple.fr");
+  assert.equal((await liste({ request: avec(sienne), env })).status, 200);
+  assert.equal((await (await appelEquipe(equipeRetrait, cookie, "nouvelle@exemple.fr")).json()).ok, true);
+  assert.equal((await liste({ request: avec(sienne), env })).status, 401);
+  await demander("nouvelle@exemple.fr");
+  assert.equal(envoyes.filter((m) => m.To[0].Email === "nouvelle@exemple.fr").length, 2, "aucun nouveau lien après le retrait");
+});
+
+test("équipe : on ne se retire pas soi-même, les adresses fixes restent, les inconnus sont refusés", async () => {
+  const cookie = await seConnecter("chef@exemple.fr");
+  assert.equal((await appelEquipe(equipeRetrait, cookie, "chef@exemple.fr")).status, 400);
+  assert.equal((await appelEquipe(equipeRetrait, cookie, "aide@exemple.fr")).status, 400);
+  assert.equal((await appelEquipe(equipeAjout, undefined, "x@exemple.fr")).status, 401);
+  assert.equal((await equipeListe({ env, request: avec(null) })).status, 401);
+  const liste_ = await (await equipeListe({ env, request: avec(cookie) })).json();
+  assert.deepEqual(liste_.membres.map((m) => m.fixe), [true, true]);
+});
+
+test("équipe : les écritures n'acceptent que du JSON (pas de formulaire venu d'un autre site)", async () => {
+  const cookie = await seConnecter("chef@exemple.fr");
+  assert.equal((await appelEquipe(equipeAjout, cookie, "x@exemple.fr", "application/x-www-form-urlencoded")).status, 400);
+  assert.equal((await appelEquipe(equipeAjout, cookie, "pas-une-adresse")).status, 400);
 });

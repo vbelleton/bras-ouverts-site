@@ -22,7 +22,7 @@ export async function onRequestPost({ request, env }) {
     return erreur("La connexion par e-mail n’est pas encore configurée.", 503);
   }
   const ok = Response.json({ ok: true, message: REPONSE });
-  if (!equipe(env).has(email)) return ok;
+  if (!(await equipe(env)).has(email)) return ok;
 
   // Au plus 5 liens par heure et par adresse, pour qu'on ne puisse pas noyer la boîte d'un membre.
   const db = await base(env.DB);

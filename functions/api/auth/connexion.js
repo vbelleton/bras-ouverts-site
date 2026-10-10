@@ -14,7 +14,7 @@ const bouton = "background:#137c74;color:#fff;border:0;border-radius:999px;paddi
 export async function onRequestGet({ request, env }) {
   const jeton = new URL(request.url).searchParams.get("jeton") || "";
   const email = await verifier(env.SESSION_SECRET, jeton, "login");
-  if (!email || !equipe(env).has(email)) {
+  if (!email || !(await equipe(env)).has(email)) {
     return page("Lien expiré ou invalide", `<p>Demandez un nouveau lien depuis <a href="/inscriptions">la page des inscriptions</a>.</p>`, 400);
   }
   return page("Liste des inscrits", `<p>Connexion en tant que <strong>${escHtml(email)}</strong>.</p>
@@ -27,7 +27,7 @@ export async function onRequestPost({ request, env }) {
     jeton = String((await request.formData()).get("jeton") ?? "");
   } catch {}
   const email = await verifier(env.SESSION_SECRET, jeton, "login");
-  if (!email || !equipe(env).has(email)) {
+  if (!email || !(await equipe(env)).has(email)) {
     return page("Lien expiré ou invalide", `<p>Demandez un nouveau lien depuis <a href="/inscriptions">la page des inscriptions</a>.</p>`, 400);
   }
   return new Response(null, {

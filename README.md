@@ -14,6 +14,7 @@ Site de l’association Bras Ouverts : les maraudes, la petite boutik et le Parc
 | `functions/api/inscription.js` | Inscription Alpha : enregistrée dans D1, e-mail à l’équipe et confirmation à l’inscrit |
 | `functions/api/places.js` | Places restantes par parcours (le formulaire grise les parcours complets) |
 | `functions/api/auth/` | Connexion de l’équipe : lien par e-mail, session par cookie signé |
+| `functions/api/equipe.js` | Liste, ajout (avec invitation) et retrait des membres de l’équipe |
 | `functions/api/inscriptions.js`, `src/inscriptions.js` | Page `/inscriptions` : liste des inscrits, réservée à l’équipe |
 | `functions/api/export-inscriptions.js` | Liste des inscrits en CSV, réservée à l’équipe |
 | `lib/` | Code partagé par les fonctions (Mailjet, formulaires, table des inscriptions) |
@@ -53,7 +54,7 @@ Tant que la base n’est pas liée, le formulaire affiche « les inscriptions ne
 | Variable | Valeur |
 |---|---|
 | `SESSION_SECRET` | longue chaîne aléatoire (40 caractères ou plus), type « Secret » : signe les liens de connexion et les sessions |
-| `ADMIN_EMAILS` | ton adresse e-mail (et celles des autres responsables, séparées par des virgules) : accès à la liste des inscrits |
+| `ADMIN_EMAILS` | ton adresse e-mail (et celles des autres responsables, séparées par des virgules) : accès de départ à la liste des inscrits, ces adresses ne se retirent pas depuis le site |
 | `MAILJET_API_KEY` | clé API Mailjet |
 | `MAILJET_API_SECRET` | clé secrète Mailjet |
 | `CONTACT_FROM` | adresse expéditrice **validée** dans Mailjet |
@@ -67,7 +68,7 @@ Les inscriptions sont enregistrées même sans Mailjet, mais **Mailjet est néce
 
 Ouvrir `https://<site>/inscriptions`, saisir son adresse e-mail : si elle est autorisée, un lien de connexion (valable 15 minutes) arrive par e-mail, et la session dure 12 heures. La page affiche la liste, les places restantes par parcours et un bouton de téléchargement Excel.
 
-Qui est autorisé : les adresses de `ADMIN_EMAILS` plus celles de l’administration (Pages CMS → « Équipe (accès à la liste des inscrits) »). Ajouter ou retirer une adresse prend effet au déploiement suivant (1 à 2 minutes) et coupe aussi les sessions déjà ouvertes. Toute personne qui peut modifier le contenu dans Pages CMS peut donc donner accès aux inscrits : n’inviter que des gens de confiance.
+Qui est autorisé : les adresses de `ADMIN_EMAILS` (fixes) et celles ajoutées depuis l’onglet **Équipe** de la page : chaque personne ajoutée reçoit une invitation par e-mail, et « Retirer » coupe son accès tout de suite, même si elle est connectée. Tout membre peut ajouter ou retirer les autres (sauf les adresses fixes et soi-même) : n’ajouter que des personnes de confiance. Cette liste est indépendante de celle de Pages CMS, qui ne donne accès qu’aux textes et photos du site.
 
 Les inscriptions sont des données personnelles : les supprimer après le parcours (durée annoncée dans les mentions légales), par exemple dans D1 → Console : `DELETE FROM inscriptions WHERE session = 'alpha-1';`
 

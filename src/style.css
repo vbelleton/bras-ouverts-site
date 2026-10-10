@@ -197,3 +197,11 @@ body.equipe section { border-top: 0; }
 .eq-table td.msg { max-width: 22rem; white-space: pre-wrap; color: var(--muted); }
 .eq-vide { padding: 24px; color: var(--muted); }
 .eq-login { max-width: 460px; }
+.eq-onglets { display: flex; gap: 6px; }
+.eq-onglet { font: inherit; font-weight: 700; padding: 8px 18px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); cursor: pointer; }
+.eq-onglet[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.eq-filtres { margin-bottom: 20px; }
+.eq-equipe { display: grid; gap: 24px; }
+.eq-ajout { max-width: 460px; }
+.eq-ajout h3 { font-size: 1.15rem; }
+.eq-table .btn { padding: 6px 14px; font-size: 0.9rem; }

@@ -180,8 +180,5 @@
     "publisher": "Bras Ouverts",
     "host": "Cloudflare, Inc., 101 Townsend St, San Francisco, CA 94107, États-Unis",
     "retention": "Les inscriptions au Parcours Alpha (nom, e-mail, téléphone et, si vous la donnez, adresse postale) sont conservées jusqu’à la fin du parcours, puis supprimées dans les trois mois. Pour consulter ou supprimer vos données, écrivez-nous via le formulaire de contact."
-  },
-  "team": {
-    "emails": []
   }
 }
