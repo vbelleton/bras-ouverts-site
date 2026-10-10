@@ -1,0 +1,172 @@
+# Interface d'administration Pages CMS (https://app.pagescms.org).
+# Chaque enregistrement crée un commit sur GitHub, et Cloudflare Pages republie le site.
+media:
+  input: public/uploads
+  output: /uploads
+  categories: [image]
+
+components:
+  anchor:
+    type: string
+    label: Ancre (identifiant dans l'adresse, ex. maraudes)
+    description: Lettres minuscules et tirets. Sert aux liens du menu.
+    pattern:
+      regex: "^[a-z0-9-]*$"
+      message: Lettres minuscules, chiffres et tirets uniquement.
+  menu:
+    type: string
+    label: Libellé dans le menu
+    description: Laisser vide pour ne pas afficher ce bloc dans le menu.
+  visible:
+    type: boolean
+    label: Afficher ce bloc
+    default: true
+  label:
+    type: string
+    label: Surtitre
+  title:
+    type: string
+    label: Titre
+    description: Entourez un mot d'astérisques (*mot*) pour le mettre en couleur. Un texte entre crochets [ainsi] s'affiche en gris, comme « à compléter ».
+  facts:
+    type: object
+    list: true
+    label: Informations pratiques
+    fields:
+      - { name: label, label: Intitulé (ex. Horaires), type: string }
+      - { name: value, label: Valeur, type: string }
+
+content:
+  - name: site
+    label: Contenu du site
+    type: file
+    path: content/site.json
+    format: json
+    fields:
+      - name: site
+        label: Informations générales
+        type: object
+        fields:
+          - { name: name, label: Nom affiché, type: string, required: true }
+          - { name: title, label: Titre de l'onglet et des moteurs de recherche, type: string }
+          - { name: description, label: Description pour les moteurs de recherche, type: text }
+          - { name: tagline, label: Phrase du pied de page, type: string }
+
+      - name: blocks
+        label: Blocs de la page (glisser pour changer l'ordre)
+        type: block
+        blockKey: type
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{fields.title}"
+        blocks:
+          - name: hero
+            label: Bandeau d'accueil
+            fields:
+              - { name: visible, component: visible }
+              - { name: anchor, component: anchor }
+              - { name: menu, component: menu }
+              - { name: kicker, label: Surtitre, type: string }
+              - { name: title, component: title }
+              - { name: lead, label: Texte d'introduction, type: text }
+              - { name: cta, label: Texte du bouton (laisser vide pour le masquer), type: string }
+              - { name: ctaTarget, label: Ancre visée par le bouton (ex. alpha), type: string }
+
+          - name: actions
+            label: Nos actions (maraudes, petite boutik…)
+            fields:
+              - { name: visible, component: visible }
+              - { name: anchor, component: anchor }
+              - { name: menu, component: menu }
+              - { name: label, component: label }
+              - { name: title, component: title }
+              - { name: intro, label: Introduction, type: text }
+              - name: items
+                label: Actions (glisser pour changer l'ordre)
+                type: object
+                list:
+                  collapsible:
+                    collapsed: true
+                    summary: "{fields.title}"
+                fields:
+                  - { name: visible, component: visible }
+                  - { name: anchor, component: anchor }
+                  - { name: title, label: Titre, type: string }
+                  - { name: image, label: Photo (facultatif), type: image }
+                  - { name: text, label: Présentation, type: text, description: Laissez une ligne vide entre deux paragraphes. }
+                  - { name: infos, component: facts }
+                  - { name: help, label: Phrase d'appel (ex. comment aider), type: string }
+
+          - name: alpha
+            label: Parcours Alpha et inscription
+            fields:
+              - { name: visible, component: visible }
+              - { name: anchor, component: anchor }
+              - { name: menu, component: menu }
+              - { name: label, component: label }
+              - { name: title, component: title }
+              - { name: text, label: Présentation, type: text, description: Laissez une ligne vide entre deux paragraphes. }
+              - { name: facts, component: facts }
+              - { name: formTitle, label: Titre du formulaire, type: string }
+              - name: sessions
+                label: Parcours proposés à l'inscription
+                description: Un seul parcours ouvert = pas de menu de choix. Aucun parcours ouvert = message « inscriptions bientôt ouvertes ».
+                type: object
+                list: true
+                fields:
+                  - name: id
+                    label: Identifiant (ne plus le changer une fois les inscriptions commencées)
+                    type: string
+                    required: true
+                    pattern:
+                      regex: "^[a-z0-9-]+$"
+                      message: Lettres minuscules, chiffres et tirets uniquement.
+                  - { name: label, label: Nom affiché (ex. Parcours d'automne, le mardi soir), type: string }
+                  - { name: capacity, label: Nombre de places (0 = sans limite), type: number }
+                  - { name: open, label: Inscriptions ouvertes, type: boolean, default: true }
+              - { name: askDiet, label: Demander le régime alimentaire, type: boolean, default: true }
+              - { name: success, label: Message affiché après l'inscription, type: text }
+              - { name: full, label: Message quand le parcours est complet, type: string }
+
+          - name: text
+            label: Texte libre
+            fields:
+              - { name: visible, component: visible }
+              - { name: anchor, component: anchor }
+              - { name: menu, component: menu }
+              - { name: label, component: label }
+              - { name: title, component: title }
+              - { name: text, label: Texte, type: text, description: Laissez une ligne vide entre deux paragraphes. }
+
+          - name: contact
+            label: Formulaire de contact
+            fields:
+              - { name: visible, component: visible }
+              - { name: anchor, component: anchor }
+              - { name: menu, component: menu }
+              - { name: label, component: label }
+              - { name: title, component: title }
+              - { name: intro, label: Introduction, type: text }
+              - { name: subjects, label: Choix du menu « Sujet », type: string, list: true }
+              - { name: success, label: Message affiché après l'envoi, type: text }
+              - { name: email, label: E-mail de l'association affiché sous le formulaire (laisser vide pour le masquer), type: string }
+              - { name: emailText, label: Phrase avant l'e-mail, type: string }
+              - name: social
+                label: Réseaux sociaux
+                type: object
+                list: true
+                fields:
+                  - { name: label, label: Nom (ex. Facebook), type: string }
+                  - { name: url, label: Adresse, type: string }
+
+      - name: legal
+        label: Mentions légales
+        type: object
+        fields:
+          - { name: association, label: Nom de l'association, type: string }
+          - { name: address, label: Adresse du siège, type: string }
+          - { name: siret, label: SIRET, type: string }
+          - { name: publisher, label: Directeur de la publication, type: string }
+          - { name: host, label: Hébergeur, type: string }
+          - { name: retention, label: Durée de conservation des inscriptions, type: text }

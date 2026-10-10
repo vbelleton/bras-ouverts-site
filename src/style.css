@@ -1,0 +1,144 @@
+/* Identité Bras Ouverts : terre cuite (accueil, chaleur) et vert sapin (solidarité), sur fond crème. */
+:root {
+  --bg: #fbf6ef;
+  --surface: #ffffff;
+  --ink: #2a211b;
+  --muted: #6b5d52;
+  --line: #e8dccd;
+  --accent: #b5471f;      /* terre cuite */
+  --accent-ink: #ffffff;
+  --green: #2f6b4f;       /* vert sapin */
+  --soft: #f4e4d3;        /* fond des encadrés */
+  --ok: #2f6b4f;
+  --ph: #9a8b7e;          /* contenus à compléter */
+  --display: "Fraunces", Georgia, serif;
+  --body: "Nunito Sans", "Segoe UI", system-ui, sans-serif;
+  --r: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1a1512; --surface: #241d18; --ink: #f5ece3; --muted: #c2b3a5; --line: #3a2f27;
+    --accent: #ec8a62; --accent-ink: #1a1512; --green: #7cc29e; --soft: #2e241d; --ok: #7cc29e; --ph: #8f8073; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1a1512; --surface: #241d18; --ink: #f5ece3; --muted: #c2b3a5; --line: #3a2f27;
+  --accent: #ec8a62; --accent-ink: #1a1512; --green: #7cc29e; --soft: #2e241d; --ok: #7cc29e; --ph: #8f8073; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.65 var(--body); }
+a { color: var(--accent); }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px solid var(--green); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.15; text-wrap: balance; margin: 0; font-weight: 700; }
+h2 { font-size: clamp(1.7rem, 4vw, 2.5rem); }
+h3 { font-size: 1.3rem; }
+p { margin: 0; max-width: 65ch; }
+
+.wrap { max-width: 1120px; margin: 0 auto; padding-inline: 20px; }
+
+/* En-tête */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+.top .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px; padding-block: 10px; }
+.logo { display: flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 700; font-size: 1.35rem; color: var(--ink); text-decoration: none; }
+.top nav { display: flex; flex-wrap: wrap; gap: 4px 20px; margin-left: auto; }
+.top nav a { color: var(--muted); text-decoration: none; font-weight: 700; font-size: 0.95rem; }
+.top nav a:hover { color: var(--accent); }
+
+/* Bouton thème clair / sombre : la lune s'affiche en clair, le soleil en sombre */
+.theme-toggle { display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); cursor: pointer; }
+.theme-toggle:hover { color: var(--accent); border-color: var(--accent); }
+.theme-toggle .i-sun { display: none; }
+:root[data-theme="dark"] .theme-toggle .i-sun { display: block; }
+:root[data-theme="dark"] .theme-toggle .i-moon { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-toggle .i-sun { display: block; }
+  :root:not([data-theme="light"]) .theme-toggle .i-moon { display: none; }
+}
+@media (max-width: 700px) {
+  .theme-toggle { margin-left: auto; width: 36px; height: 36px; }
+  .top nav { order: 3; flex-basis: 100%; margin-left: 0; }
+}
+
+/* Accueil */
+.hero { padding-block: clamp(56px, 10vw, 120px) clamp(48px, 8vw, 96px); background: radial-gradient(120% 90% at 100% 0%, var(--soft), transparent 60%); }
+.hero .kicker { font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; color: var(--green); margin-bottom: 18px; }
+.hero h1 { font-size: clamp(2.4rem, 7.5vw, 4.8rem); letter-spacing: -0.02em; max-width: 15ch; }
+.hero h1 em, h2 em { font-style: italic; color: var(--accent); }
+.hero .lead { font-size: 1.2rem; color: var(--muted); margin-top: 22px; }
+.hero .btn { margin-top: 32px; }
+
+section { padding-block: clamp(48px, 7vw, 88px); border-top: 1px solid var(--line); }
+.sec-head { display: grid; gap: 14px; margin-bottom: 36px; }
+.sec-head .lab { font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; color: var(--green); }
+.sec-head p { color: var(--muted); }
+
+.btn { display: inline-block; justify-self: start; background: var(--accent); color: var(--accent-ink); text-decoration: none; font-weight: 700; padding: 10px 22px; border-radius: 999px; border: 0; font: inherit; font-weight: 700; cursor: pointer; }
+.btn:hover { filter: brightness(1.08); }
+.btn-lg { font-size: 1.1rem; padding: 14px 28px; }
+.btn[disabled] { opacity: 0.6; cursor: progress; }
+
+/* Nos actions */
+.actions { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.action { display: grid; gap: 14px; align-content: start; padding: clamp(20px, 3vw, 30px); background: var(--surface); border: 1px solid var(--line); border-top: 6px solid var(--accent); border-radius: var(--r); min-width: 0; }
+.action:nth-child(2n) { border-top-color: var(--green); }
+.action img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 10px; }
+.action .help { font-weight: 700; color: var(--green); }
+
+.facts { display: grid; gap: 12px; margin: 0; padding: 18px 20px; background: var(--soft); border-radius: 12px; }
+.facts div { display: grid; gap: 2px; }
+.facts dt { font-size: 0.76rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+.facts dd { margin: 0; font-weight: 700; }
+
+/* Parcours Alpha */
+.alpha { background: var(--soft); }
+.alpha .facts { background: var(--surface); }
+.two { display: grid; grid-template-columns: 1fr 1.1fr; gap: 40px; align-items: start; }
+.two > * { min-width: 0; }
+.two .text { display: grid; gap: 18px; }
+.session-one { font-weight: 700; padding: 10px 14px; border-radius: 10px; background: var(--soft); }
+.closed { padding: 22px; background: var(--surface); border-radius: var(--r); border: 1px dashed var(--line); font-weight: 700; }
+
+/* Formulaires */
+.js-form { display: grid; gap: 16px; padding: clamp(18px, 4vw, 30px); background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); max-width: 760px; }
+.js-form .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.js-form label { display: grid; gap: 6px; font-weight: 700; font-size: 0.92rem; }
+.js-form .req { color: var(--accent); }
+.js-form input, .js-form select, .js-form textarea {
+  font: inherit; font-weight: 400; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; width: 100%; min-width: 0;
+}
+.js-form textarea { resize: vertical; }
+.js-form input:focus-visible, .js-form select:focus-visible, .js-form textarea:focus-visible { outline: 3px solid var(--green); outline-offset: 1px; }
+.js-form .consent { display: flex; gap: 10px; align-items: flex-start; font-weight: 400; font-size: 0.9rem; color: var(--muted); }
+.js-form .consent input { width: auto; margin-top: 4px; accent-color: var(--accent); }
+.js-form .note { font-size: 0.85rem; color: var(--muted); }
+.js-form .status:empty { display: none; }
+.js-form .status { font-weight: 700; }
+.js-form .status.ok { color: var(--ok); }
+.js-form .status.err { color: var(--accent); }
+.hp { position: absolute !important; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.mail-alt { margin-top: 18px; font-weight: 700; }
+.mail-alt a { word-break: break-word; }
+.social { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 22px 0 0; padding: 0; list-style: none; font-weight: 700; }
+
+.prose { display: grid; gap: 16px; }
+
+/* Contenu à compléter */
+.ph { color: var(--ph); font-style: italic; font-weight: 400; }
+
+/* Pied de page */
+footer { border-top: 1px solid var(--line); padding-block: 40px; color: var(--muted); font-size: 0.95rem; }
+footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; }
+.legal summary { cursor: pointer; font-weight: 700; }
+.legal dl { display: grid; gap: 10px; margin: 14px 0 0; max-width: 60ch; }
+.legal dt { font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 700; }
+.legal dd { margin: 0; }
+
+@media (max-width: 900px) {
+  .actions, .two { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .js-form .row { grid-template-columns: 1fr; }
+}

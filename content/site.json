@@ -1,0 +1,101 @@
+{
+  "site": {
+    "name": "Bras Ouverts",
+    "title": "Bras Ouverts · Maraudes, la petite boutik et Parcours Alpha",
+    "description": "Bras Ouverts, association culturelle : maraudes, la petite boutik solidaire et le Parcours Alpha. Inscrivez-vous en ligne au prochain parcours.",
+    "tagline": "Association culturelle"
+  },
+  "blocks": [
+    {
+      "type": "hero",
+      "anchor": "accueil",
+      "menu": "",
+      "kicker": "Association culturelle",
+      "title": "Accueillir, partager, *aller vers*",
+      "lead": "Bras Ouverts va à la rencontre des personnes de la rue, fait vivre la petite boutik et propose le Parcours Alpha, un lieu ouvert pour parler de la vie et de la foi autour d’un repas.",
+      "cta": "S’inscrire au Parcours Alpha",
+      "ctaTarget": "alpha"
+    },
+    {
+      "type": "actions",
+      "anchor": "actions",
+      "menu": "Nos actions",
+      "label": "Nos actions",
+      "title": "Ce que nous faisons",
+      "intro": "",
+      "items": [
+        {
+          "anchor": "maraudes",
+          "title": "Les maraudes",
+          "text": "Des équipes de bénévoles vont à la rencontre des personnes qui vivent à la rue : un café, un repas chaud, du temps pour discuter, et une orientation vers les structures d’aide quand c’est utile.",
+          "infos": [
+            { "label": "Quand", "value": "[à compléter : jours et horaires]" },
+            { "label": "Où", "value": "[à compléter : lieu de départ]" }
+          ],
+          "help": "Vous voulez participer ? Écrivez-nous via le formulaire de contact."
+        },
+        {
+          "anchor": "petite-boutik",
+          "title": "La petite boutik",
+          "text": "Une boutique solidaire où chacun peut trouver des vêtements et des objets du quotidien à petit prix, et où l’on prend le temps de se parler.",
+          "infos": [
+            { "label": "Horaires", "value": "[à compléter]" },
+            { "label": "Adresse", "value": "[à compléter]" }
+          ],
+          "help": "Vous avez des dons à déposer ? Contactez-nous avant de passer."
+        }
+      ]
+    },
+    {
+      "type": "alpha",
+      "anchor": "alpha",
+      "menu": "Parcours Alpha",
+      "label": "Parcours Alpha",
+      "title": "Le Parcours *Alpha*",
+      "text": "Le Parcours Alpha, c’est une série de soirées pour explorer les grandes questions de la vie et découvrir la foi chrétienne, sans pression et sans engagement.\n\nChaque soirée commence par un repas, se poursuit par un court exposé et se termine par un temps d’échange en petits groupes, où chacun peut s’exprimer librement. C’est gratuit et ouvert à tous.",
+      "facts": [
+        { "label": "Prochain parcours", "value": "[à compléter : date de début]" },
+        { "label": "Lieu", "value": "[à compléter]" },
+        { "label": "Prix", "value": "Gratuit, participation libre au repas" }
+      ],
+      "formTitle": "S’inscrire",
+      "sessions": [
+        {
+          "id": "alpha-1",
+          "label": "[à compléter : ex. Parcours d’automne, le mardi soir]",
+          "capacity": 30,
+          "open": true
+        }
+      ],
+      "askDiet": true,
+      "success": "Merci, votre inscription est bien enregistrée. Un e-mail de confirmation vient de partir.",
+      "full": "Ce parcours est complet."
+    },
+    {
+      "type": "contact",
+      "anchor": "contact",
+      "menu": "Contact",
+      "label": "Contact",
+      "title": "Nous écrire",
+      "intro": "Une question, une envie de rejoindre les maraudes, un don pour la petite boutik : écrivez-nous.",
+      "subjects": [
+        "Rejoindre les maraudes",
+        "La petite boutik",
+        "Faire un don",
+        "Le Parcours Alpha",
+        "Autre"
+      ],
+      "success": "Merci, votre message est bien parti. Nous vous répondons rapidement.",
+      "email": "",
+      "social": []
+    }
+  ],
+  "legal": {
+    "association": "Bras Ouverts, association loi 1901",
+    "address": "[à compléter]",
+    "siret": "",
+    "publisher": "[à compléter]",
+    "host": "Cloudflare, Inc., 101 Townsend St, San Francisco, CA 94107, États-Unis",
+    "retention": "Les inscriptions au Parcours Alpha sont conservées jusqu’à la fin du parcours, puis supprimées dans les trois mois. Pour consulter ou supprimer vos données, écrivez-nous via le formulaire de contact."
+  }
+}
