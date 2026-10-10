@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
-    "test": "node build.mjs && node --test tests/*.test.js",
+    "test": "node build.mjs && node --import ./tests/json-loader.mjs --test tests/*.test.js",
     "dev": "node build.mjs && volta run --node 22 npx wrangler pages dev dist --compatibility-date=2026-05-01 --port 8788 --d1 DB=bras-ouverts"
   },
   "volta": {
