@@ -43,18 +43,18 @@
         {
           "anchor": "petite-boutik",
           "title": "La petite boutik",
-          "text": "Une boutique solidaire où chacun peut trouver des vêtements et des objets du quotidien à petit prix, et où l’on prend le temps de se parler.",
+          "text": "Une boutique de seconde main à prix mini, avec des vêtements pour enfants de 0 à 10 ans, des chaussures et de la puériculture. C’est aussi un lieu où l’on prend le temps de se parler.",
           "infos": [
             {
-              "label": "Horaires",
-              "value": "[à compléter]"
+              "label": "Ouverture",
+              "value": "Mercredi et samedi [à compléter : heures]"
             },
             {
               "label": "Adresse",
-              "value": "[à compléter]"
+              "value": "[à compléter : adresse à Morlaix]"
             }
           ],
-          "help": "Vous avez des dons à déposer ? Contactez-nous avant de passer."
+          "help": "Vous avez des vêtements d’enfants ou de la puériculture à donner ? Contactez-nous avant de passer."
         }
       ]
     },
