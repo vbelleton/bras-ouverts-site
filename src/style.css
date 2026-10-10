@@ -105,6 +105,23 @@ section { padding-block: clamp(48px, 7vw, 88px); border-top: 1px solid var(--lin
 .session-one { font-weight: 700; padding: 10px 14px; border-radius: 10px; background: var(--soft); }
 .closed { padding: 22px; background: var(--surface); border-radius: var(--r); border: 1px dashed var(--line); font-weight: 700; }
 
+/* Parcours Alpha : questions, déroulement, FAQ */
+.questions h3, .steps-wrap h3, .faq h3 { font-size: 1.15rem; margin-bottom: 12px; }
+.questions ul { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.questions li { padding: 8px 14px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); font-family: var(--display); font-style: italic; }
+.reassure { font-weight: 700; color: var(--accent); }
+.steps-wrap, .faq { margin-top: clamp(32px, 5vw, 56px); }
+.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin: 0; padding: 0; list-style: none; counter-reset: pas; }
+.steps li { position: relative; display: grid; gap: 8px; align-content: start; padding: 22px 20px 20px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); counter-increment: pas; }
+.steps li::before { content: counter(pas); display: grid; place-items: center; width: 34px; height: 34px; border-radius: 999px; background: var(--accent); color: var(--accent-ink); font-weight: 700; }
+.steps h4 { margin: 0; font-family: var(--display); font-size: 1.1rem; }
+.steps p { color: var(--muted); font-size: 0.97rem; }
+.faq { max-width: 760px; }
+.faq details { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 18px; margin-top: 10px; }
+.faq summary { cursor: pointer; font-weight: 700; }
+.faq details[open] summary { margin-bottom: 8px; color: var(--accent); }
+.more-link { margin-top: 28px; font-weight: 700; }
+
 /* Formulaires */
 .js-form { display: grid; gap: 16px; padding: clamp(18px, 4vw, 30px); background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); max-width: 760px; }
 .js-form .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }

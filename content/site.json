@@ -1,8 +1,8 @@
 {
   "site": {
     "name": "Bras Ouverts",
-    "title": "Bras Ouverts · Morlaix · Maraudes, la petite boutik et Parcours Alpha",
-    "description": "Bras Ouverts, association de Morlaix : maraudes, la petite boutik solidaire et le Parcours Alpha. Inscrivez-vous en ligne au prochain parcours.",
+    "title": "Bras Ouverts · Morlaix · Parcours Alpha",
+    "description": "Bras Ouverts, association de Morlaix : le Parcours Alpha, une série de rencontres pour explorer librement la foi chrétienne en petits groupes. Gratuit, inscription en ligne.",
     "tagline": "Association · Morlaix"
   },
   "blocks": [
@@ -12,7 +12,7 @@
       "menu": "",
       "kicker": "Association · Morlaix",
       "title": "Accueillir, partager, *créer du lien*",
-      "lead": "Bras Ouverts va à la rencontre des personnes de la rue, fait vivre la petite boutik et propose le Parcours Alpha, un lieu ouvert pour parler de la vie et de la foi.",
+      "lead": "Bras Ouverts, association de Morlaix, vous invite à explorer librement les grandes questions de la vie et la foi chrétienne, en petits groupes, dans un cadre bienveillant.",
       "cta": "S’inscrire au Parcours Alpha",
       "ctaTarget": "alpha"
     },
@@ -56,7 +56,8 @@
           ],
           "help": "Vous avez des vêtements d’enfants ou de la puériculture à donner ? Contactez-nous avant de passer."
         }
-      ]
+      ],
+      "visible": false
     },
     {
       "type": "alpha",
@@ -64,7 +65,7 @@
       "menu": "Parcours Alpha",
       "label": "Parcours Alpha",
       "title": "Le Parcours *Alpha*",
-      "text": "Le Parcours Alpha, c’est une série de rencontres pour explorer les grandes questions de la vie et découvrir la foi chrétienne, sans pression et sans engagement.\n\nChaque rencontre propose un court exposé suivi d’un temps d’échange en petits groupes, où chacun peut s’exprimer librement. C’est gratuit et ouvert à tous.",
+      "text": "Alpha est une série de rencontres qui permet d’explorer librement, en petits groupes, les bases de la foi chrétienne.\n\nQue vous soyez croyant, curieux ou sceptique, vous êtes bienvenu : chacun peut dire ce qu’il pense, ou ne rien dire du tout.",
       "facts": [
         {
           "label": "Prochain parcours",
@@ -73,10 +74,6 @@
         {
           "label": "Lieu",
           "value": "[à compléter]"
-        },
-        {
-          "label": "Prix",
-          "value": "Gratuit"
         }
       ],
       "formTitle": "S’inscrire",
@@ -89,7 +86,46 @@
         }
       ],
       "success": "Merci, votre inscription est bien enregistrée. Un e-mail de confirmation vient de partir.",
-      "full": "Ce parcours est complet."
+      "full": "Ce parcours est complet.",
+      "questionsTitle": "Des questions pour y réfléchir",
+      "questions": [
+        "Qui est Jésus ?",
+        "Comment pouvons-nous avoir la foi ?",
+        "Comment Dieu nous guide-t-il ?"
+      ],
+      "reassurance": "Gratuit, sans engagement, sans aucune pression.",
+      "stepsTitle": "Comment se passe une rencontre",
+      "steps": [
+        {
+          "title": "Un exposé",
+          "text": "Un temps pour présenter les bases de la foi chrétienne, à l’oral ou en vidéo."
+        },
+        {
+          "title": "Un échange en petits groupes",
+          "text": "Chacun partage ses idées et ses questions. Vous pouvez dire tout ce que vous voulez, ou rien du tout. Un animateur aide à guider la conversation."
+        }
+      ],
+      "faqTitle": "Questions fréquentes",
+      "faq": [
+        {
+          "question": "À qui s’adresse le parcours ?",
+          "answer": "À tous, quelles que soient vos croyances ou vos expériences."
+        },
+        {
+          "question": "Combien ça coûte ?",
+          "answer": "Rien : c’est offert."
+        },
+        {
+          "question": "Suis-je obligé de revenir ?",
+          "answer": "Non. Il n’y a ni suivi ni pression : si vous ne souhaitez pas revenir, ce n’est pas un problème."
+        },
+        {
+          "question": "Que se passe-t-il après mon inscription ?",
+          "answer": "Vous recevez un e-mail de confirmation, puis nous vous contactons avec les informations pratiques avant la première rencontre."
+        }
+      ],
+      "link": "https://www.parcoursalpha.fr/",
+      "linkLabel": "En savoir plus sur Alpha (parcoursalpha.fr)"
     },
     {
       "type": "contact",
@@ -97,12 +133,11 @@
       "menu": "Contact",
       "label": "Contact",
       "title": "Nous écrire",
-      "intro": "Une question, une envie de rejoindre les maraudes, un don pour la petite boutik : écrivez-nous.",
+      "intro": "Une question sur le Parcours Alpha ou sur l’association ? Écrivez-nous.",
       "subjects": [
-        "Rejoindre les maraudes",
-        "La petite boutik",
-        "Faire un don",
         "Le Parcours Alpha",
+        "Devenir bénévole",
+        "Faire un don",
         "Autre"
       ],
       "success": "Merci, votre message est bien parti. Nous vous répondons rapidement.",

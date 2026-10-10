@@ -17,6 +17,8 @@ Site de l’association Bras Ouverts : les maraudes, la petite boutik et le Parc
 | `lib/` | Code partagé par les fonctions (Mailjet, formulaires, table des inscriptions) |
 | `.pages.yml` | Interface d’administration (Pages CMS) |
 
+Les maraudes et la petite boutik sont prêtes mais masquées : dans l’administration, bloc « Nos actions », cocher « Afficher ce bloc » pour les montrer.
+
 Un texte entre crochets dans le contenu, comme `[à compléter]`, s’affiche en gris italique : c’est ce qu’il reste à remplir avant la mise en ligne.
 
 ## Modifier le contenu (administration)
@@ -29,6 +31,7 @@ Pour ouvrir un nouveau Parcours Alpha : bloc « Parcours Alpha et inscription »
 
 Workers & Pages → Create → Pages → Connect to Git → ce dépôt, puis :
 
+- Nom du projet Pages : `bras-ouverts` (il donne l’adresse `bras-ouverts.pages.dev` et ne peut plus être changé ensuite)
 - Build command : `npm run build`
 - Build output directory : `dist`
 - Branche de production : `main`

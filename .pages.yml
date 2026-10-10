@@ -107,7 +107,28 @@ content:
               - { name: label, component: label }
               - { name: title, component: title }
               - { name: text, label: Présentation, type: text, description: Laissez une ligne vide entre deux paragraphes. }
+              - { name: questionsTitle, label: Titre de la liste de questions, type: string }
+              - { name: questions, label: Questions abordées pendant le parcours, type: string, list: true }
               - { name: facts, component: facts }
+              - { name: reassurance, label: Phrase de réassurance (ex. gratuit, sans engagement), type: string }
+              - { name: stepsTitle, label: Titre du déroulement, type: string }
+              - name: steps
+                label: Déroulement d'une rencontre
+                type: object
+                list: true
+                fields:
+                  - { name: title, label: Étape, type: string }
+                  - { name: text, label: Description, type: text }
+              - { name: faqTitle, label: Titre de la FAQ, type: string }
+              - name: faq
+                label: Questions fréquentes
+                type: object
+                list: true
+                fields:
+                  - { name: question, label: Question, type: string }
+                  - { name: answer, label: Réponse, type: text }
+              - { name: link, label: Lien « en savoir plus » (adresse), type: string }
+              - { name: linkLabel, label: Texte du lien, type: string }
               - { name: formTitle, label: Titre du formulaire, type: string }
               - name: sessions
                 label: Parcours proposés à l'inscription

@@ -89,13 +89,22 @@ const renderers = {
         ${status}
       </form>`
       : `<p class="closed">Les inscriptions ne sont pas encore ouvertes. Revenez bientôt, ou écrivez-nous pour être prévenu.</p>`;
+    const steps = list(b.steps).filter(visible);
+    const faq = list(b.faq).filter((q) => q.question);
     return section(b, `${secHead(b)}
       <div class="two">
         <div class="text">${paras(b.text)}
+        ${list(b.questions).length ? `<div class="questions"><h3>${esc(b.questionsTitle || "Des questions pour y réfléchir")}</h3><ul>${list(b.questions).map((q) => `<li>${txt(q)}</li>`).join("")}</ul></div>` : ""}
         ${facts(b.facts)}
+        ${b.reassurance ? `<p class="reassure">${txt(b.reassurance)}</p>` : ""}
         </div>
         ${form}
-      </div>`, "alpha");
+      </div>
+      ${steps.length ? `<div class="steps-wrap"><h3>${esc(b.stepsTitle || "Comment ça se passe")}</h3>
+        <ol class="steps">${steps.map((st) => `<li><h4>${txt(st.title)}</h4>${st.text ? `<p>${txt(st.text)}</p>` : ""}</li>`).join("")}</ol></div>` : ""}
+      ${faq.length ? `<div class="faq"><h3>${esc(b.faqTitle || "Questions fréquentes")}</h3>
+        ${faq.map((q) => `<details><summary>${txt(q.question)}</summary>${paras(q.answer)}</details>`).join("\n        ")}</div>` : ""}
+      ${safeUrl(b.link) ? `<p class="more-link"><a href="${esc(safeUrl(b.link))}" rel="noopener">${esc(b.linkLabel || "En savoir plus sur Alpha")}</a></p>` : ""}`, "alpha");
   },
 
   text: (b) => section(b, `${secHead(b)}
