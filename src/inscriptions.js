@@ -98,7 +98,7 @@ function vueInscrits({ sessions, inscrits }) {
     const nom = (i) => `${i.first_name} ${i.last_name}`;
     const parcours = (i) => (sessions.find((s) => s.id === i.session) || {}).label || i.session;
     tableau.replaceChildren(el("table", { className: "eq-table" },
-      el("thead", {}, el("tr", {}, ...["Nom", "Téléphone", "E-mail", "Adresse", "Message", ...(id ? [] : ["Parcours"]), "Inscrit le"].map((t) => el("th", { scope: "col" }, t)))),
+      el("thead", {}, el("tr", {}, ...["Nom", "Téléphone", "E-mail", "Adresse", "Message", ...(id ? [] : ["Parcours"]), "Inscrit le", ""].map((t) => el("th", { scope: "col" }, t)))),
       el("tbody", {}, ...lignes.map((i) => el("tr", {},
         el("td", {}, nom(i)),
         el("td", {}, el("a", { href: `tel:${i.phone || ""}` }, i.phone || "")),
@@ -106,11 +106,38 @@ function vueInscrits({ sessions, inscrits }) {
         el("td", {}, i.address || ""),
         el("td", { className: "msg" }, i.message || ""),
         ...(id ? [] : [el("td", {}, parcours(i))]),
-        el("td", {}, (i.created_at || "").slice(0, 16).replace("T", " ")))))));
+        el("td", {}, (i.created_at || "").slice(0, 16).replace("T", " ")),
+        el("td", {}, supprimerBouton(i, `l’inscription de ${nom(i)}`, { id: i.id }, (r) => r.id === i.id)))))));
+    toutSupprimer.hidden = !id;
+    toutSupprimer.textContent = `Supprimer les ${lignes.length} inscrits de ce parcours`;
   };
+  // Supprime côté serveur, puis retire les lignes de la liste affichée.
+  const supprimer = async (corps, retirer) => {
+    const { res, data } = await api("/api/inscriptions", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify(corps) });
+    if (res.status === 401) return connexion("Votre session a expiré.");
+    if (!res.ok || !data.ok) return alert(data.error || FAIL);
+    for (let k = inscrits.length - 1; k >= 0; k--) if (retirer(inscrits[k])) inscrits.splice(k, 1);
+    dessiner();
+  };
+  const supprimerBouton = (_i, quoi, corps, retirer) => {
+    const b = el("button", { className: "btn btn-clair", type: "button" }, "Supprimer");
+    b.addEventListener("click", async () => {
+      if (!confirm(`Supprimer définitivement ${quoi} ? Cette action est irréversible.`)) return;
+      b.disabled = true;
+      try { await supprimer(corps, retirer); } catch { alert(FAIL); b.disabled = false; }
+    });
+    return b;
+  };
+  const toutSupprimer = el("button", { className: "btn btn-clair", type: "button", hidden: true });
+  toutSupprimer.addEventListener("click", async () => {
+    const id = choix.value;
+    const n = inscrits.filter((i) => i.session === id).length;
+    if (!n || !confirm(`Supprimer définitivement les ${n} inscrits de ce parcours ? Cette action est irréversible.`)) return;
+    try { await supprimer({ session: id }, (r) => r.session === id); } catch { alert(FAIL); }
+  });
   choix.addEventListener("change", dessiner);
   dessiner();
-  return el("div", {}, el("div", { className: "eq-actions eq-filtres" }, choix, export_), comptes, tableau);
+  return el("div", {}, el("div", { className: "eq-actions eq-filtres" }, choix, export_, toutSupprimer), comptes, tableau);
 }
 
 // Onglet « Équipe » : qui a accès à cette page. Ajouter envoie une invitation par e-mail.

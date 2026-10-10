@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { fausseD1 } from "./helpers.js";
 import { onRequestGet as configGoogle, onRequestPost as google } from "../functions/api/auth/google.js";
 import { onRequestPost as deconnexion } from "../functions/api/auth/deconnexion.js";
-import { onRequestGet as liste } from "../functions/api/inscriptions.js";
+import { onRequestGet as liste, onRequestDelete as supprimerInscription } from "../functions/api/inscriptions.js";
 import { onRequestGet as equipeListe, onRequestPost as equipeAjout, onRequestDelete as equipeRetrait } from "../functions/api/equipe.js";
 import { onRequestGet as exporter } from "../functions/api/export-inscriptions.js";
 import { onRequestPost as inscrire } from "../functions/api/inscription.js";
@@ -153,4 +153,33 @@ test("équipe : les écritures n'acceptent que du JSON (pas de formulaire venu d
   const cookie = await seConnecter("chef@exemple.fr");
   assert.equal((await appelEquipe(equipeAjout, cookie, "x@exemple.fr", "application/x-www-form-urlencoded")).status, 400);
   assert.equal((await appelEquipe(equipeAjout, cookie, "pas-une-adresse")).status, 400);
+});
+
+async function inscrit(email) {
+  const body = new FormData();
+  for (const [k, v] of Object.entries({ firstName: "Test", lastName: email, email, phone: "0612345678", consent: "oui", session: sessions()[0].id, t: String(Date.now() - 9000) })) body.set(k, v);
+  await inscrire({ request: new Request("https://site.test/api/inscription", { method: "POST", headers: { Accept: "application/json" }, body }), env });
+}
+const suppression = (cookie, corps, type = "application/json") =>
+  supprimerInscription({ env, request: new Request("https://site.test/api/inscriptions", { method: "DELETE", headers: { cookie, "Content-Type": type }, body: JSON.stringify(corps) }) });
+
+test("supprimer une inscription, ou tout un parcours, libère les places ; réservé à l'équipe", async () => {
+  for (const e of ["a@exemple.fr", "b@exemple.fr", "c@exemple.fr"]) await inscrit(e);
+  assert.equal((await suppression(undefined, { id: 1 })).status, 401);
+  const cookie = await seConnecter();
+  const avant = await (await liste({ request: avec(cookie), env })).json();
+  assert.equal(avant.inscrits.length, 3);
+  assert.equal((await (await suppression(cookie, { id: avant.inscrits[0].id })).json()).supprimes, 1);
+  const milieu = await (await liste({ request: avec(cookie), env })).json();
+  assert.equal(milieu.inscrits.length, 2);
+  assert.equal(milieu.sessions[0].restantes, milieu.sessions[0].capacity - 2);
+  assert.equal((await (await suppression(cookie, { session: sessions()[0].id })).json()).supprimes, 2);
+  assert.equal((await (await liste({ request: avec(cookie), env })).json()).inscrits.length, 0);
+});
+
+test("suppression : JSON obligatoire, corps précis obligatoire", async () => {
+  const cookie = await seConnecter();
+  assert.equal((await suppression(cookie, { id: 1 }, "application/x-www-form-urlencoded")).status, 400);
+  assert.equal((await suppression(cookie, {})).status, 400);
+  assert.equal((await suppression(cookie, { id: "1 OR 1=1" })).status, 400);
 });

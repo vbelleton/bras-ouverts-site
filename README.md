@@ -76,7 +76,7 @@ Ouvrir `https://<site>/inscriptions` et cliquer sur « Se connecter avec Google 
 
 Qui est autorisé : les adresses de `ADMIN_EMAILS` (fixes) et celles ajoutées depuis l’onglet **Équipe** de la page. Ajouter une adresse lui donne accès tout de suite (la personne se connecte avec le compte Google de cette adresse ; il faut la prévenir), « Retirer » coupe son accès immédiatement, même si elle est connectée. Tout membre peut ajouter ou retirer les autres (sauf les adresses fixes et soi-même) : n’ajouter que des personnes de confiance. Cette liste est indépendante de celle de Pages CMS, qui ne donne accès qu’aux textes et photos du site.
 
-Les inscriptions sont des données personnelles : les supprimer après le parcours (durée annoncée dans les mentions légales), par exemple dans D1 → Console : `DELETE FROM inscriptions WHERE session = 'alpha-1';`
+Les inscriptions sont des données personnelles : les supprimer après le parcours (durée annoncée dans les mentions légales). Sur la page, « Supprimer » retire une inscription (ce qui libère la place) et, en filtrant sur un parcours, « Supprimer les N inscrits de ce parcours » les retire toutes, par exemple pour effacer des tests. La suppression est définitive.
 
 ## Travailler en local
 
