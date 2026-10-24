@@ -1,9 +1,8 @@
-// Inscription au Parcours Alpha : enregistrée dans D1. Si Mailjet est configuré (facultatif), e-mail à l'équipe
-// et confirmation à l'inscrit.
-// Liaison D1 « DB » obligatoire, variables Mailjet facultatives (voir README).
-// ALPHA_TO (facultatif) : destinataires des inscriptions ; à défaut, CONTACT_TO.
+// Inscription au Parcours Alpha : enregistrée dans D1. Aucun e-mail par défaut ; facultatifs :
+// ALPHA_TO (alerte à l'équipe) et ALPHA_CONFIRMATION="oui" (confirmation à l'inscrit), si l'envoi est configuré.
+// Liaison D1 « DB » obligatoire.
 import { EMAIL_RE, lire, replier, tableau } from "../../lib/form.js";
-import { destinataires, envoyer, mailjetPret } from "../../lib/mailjet.js";
+import { destinataires, envoyer, mailPret } from "../../lib/mail.js";
 import { base, placesRestantes, sessions } from "../../lib/alpha.js";
 
 const MAX = { firstName: 80, lastName: 80, email: 200, phone: 40, address: 300, session: 80, message: 2000, consent: 10 };
@@ -38,25 +37,15 @@ export async function onRequestPost({ request, env }) {
   if (!meta.changes) return reply(true, null, 200, "Vous êtes déjà inscrit à ce parcours avec cette adresse. À bientôt !");
 
   // L'inscription est enregistrée : un échec d'e-mail est journalisé mais ne la remet pas en cause.
-  if (mailjetPret(env)) {
+  const equipe = destinataires(env.ALPHA_TO);
+  const confirmer = env.ALPHA_CONFIRMATION === "oui";
+  if (mailPret(env) && (equipe.length || confirmer)) {
     const nom = `${f.firstName} ${f.lastName}`;
-    const equipe = destinataires(env.ALPHA_TO || env.CONTACT_TO);
     const infos = tableau([["Parcours", session.label], ["Nom", nom], ["E-mail", f.email], ["Téléphone", f.phone], ["Adresse", f.address]], f.message);
-    const merci = `Bonjour ${f.firstName},\n\nMerci pour votre inscription au Parcours Alpha (${session.label}). Nous avons hâte de vous accueillir !\n\nNous reviendrons vers vous avec les informations pratiques avant la première soirée. Pour toute question, répondez simplement à cet e-mail.\n\nL’équipe Bras Ouverts\n`;
+    const merci = `Bonjour ${f.firstName},\n\nMerci pour votre inscription au Parcours Alpha (${session.label}). Nous avons hâte de vous accueillir !\n\nNous reviendrons vers vous avec les informations pratiques avant la première soirée.\n\nL’équipe Bras Ouverts\n`;
     await envoyer(env, [
-      ...(equipe.length ? [{
-        To: equipe.map((Email) => ({ Email })),
-        ReplyTo: { Email: f.email, Name: nom },
-        Subject: `Inscription Alpha : ${nom}`,
-        TextPart: infos.text,
-        HTMLPart: infos.html,
-      }] : []),
-      {
-        To: [{ Email: f.email, Name: nom }],
-        ...(equipe.length ? { ReplyTo: { Email: equipe[0] } } : {}),
-        Subject: "Votre inscription au Parcours Alpha",
-        TextPart: merci,
-      },
+      ...(equipe.length ? [{ to: equipe, replyTo: f.email, subject: `Inscription Alpha : ${nom}`, text: infos.text, html: infos.html }] : []),
+      ...(confirmer ? [{ to: [f.email], ...(equipe.length ? { replyTo: equipe[0] } : {}), subject: "Votre inscription au Parcours Alpha", text: merci }] : []),
     ]);
   }
   return reply(true);

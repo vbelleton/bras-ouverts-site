@@ -1,4 +1,4 @@
-// Tests des Pages Functions d'inscription, avec une fausse base D1 (SQLite en mémoire) et un faux Mailjet.
+// Tests des Pages Functions d'inscription, avec une fausse base D1 (SQLite en mémoire) et un faux Apps Script.
 import { test, beforeEach } from "node:test";
 import assert from "node:assert/strict";
 import { fausseD1 } from "./helpers.js";
@@ -9,15 +9,15 @@ import { base, sessions } from "../lib/alpha.js";
 
 let envoyes;
 globalThis.fetch = async (_url, init) => {
-  envoyes.push(...JSON.parse(init.body).Messages);
-  return { ok: true, json: async () => ({ Messages: JSON.parse(init.body).Messages.map(() => ({ Status: "success" })) }) };
+  envoyes.push(...JSON.parse(init.body).messages);
+  return { ok: true, json: async () => ({ ok: true }) };
 };
 
 const SESSION = sessions()[0];
 let env;
 beforeEach(() => {
   envoyes = [];
-  env = { DB: fausseD1(), MAILJET_API_KEY: "k", MAILJET_API_SECRET: "s", CONTACT_FROM: "site@exemple.fr", CONTACT_TO: "equipe@exemple.fr", EXPORT_PASSWORD: "secret" };
+  env = { DB: fausseD1(), APPS_SCRIPT_URL: "https://script.test/exec", APPS_SCRIPT_SECRET: "s", CONTACT_TO: "equipe@exemple.fr", EXPORT_PASSWORD: "secret" };
 });
 
 const requete = (champs) => {
@@ -31,15 +31,20 @@ const inscription = async (champs, e = env) => {
 };
 const marie = { firstName: "Marie", lastName: "Durand", email: "Marie@Exemple.fr", phone: "06 12 34 56 78" };
 
-test("une inscription valide est enregistrée et deux e-mails partent", async () => {
+test("une inscription valide est enregistrée sans aucun e-mail par défaut", async () => {
   const r = await inscription(marie);
   assert.equal(r.ok, true);
-  assert.equal(envoyes.length, 2);
+  assert.equal(envoyes.length, 0);
   assert.equal((await (await base(env.DB)).prepare("SELECT address FROM inscriptions").all()).results[0].address, null);
-  assert.deepEqual(envoyes[0].To, [{ Email: "equipe@exemple.fr" }]);
-  assert.equal(envoyes[1].To[0].Email, "marie@exemple.fr");
   const { results } = await env.DB.prepare("SELECT * FROM inscriptions").all();
   assert.equal(results.length, 1);
+});
+
+test("alerte et confirmation seulement si on les demande", async () => {
+  await inscription(marie, { ...env, ALPHA_TO: "alerte@exemple.fr", ALPHA_CONFIRMATION: "oui" });
+  assert.equal(envoyes.length, 2);
+  assert.deepEqual(envoyes[0].to, ["alerte@exemple.fr"]);
+  assert.deepEqual(envoyes[1].to, ["marie@exemple.fr"]);
 });
 
 test("l'adresse postale facultative est enregistrée et exportée", async () => {

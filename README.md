@@ -10,14 +10,14 @@ Site de l’association Bras Ouverts : les maraudes, la petite boutik et le Parc
 | `build.mjs` | Génère `dist/index.html` à partir du contenu (Node, sans dépendance) |
 | `src/style.css`, `src/forms.js`, `src/theme.js` | Styles, envoi des formulaires, thème clair/sombre |
 | `public/` | Logo (`logo.png`, `favicon.png`), photos ajoutées depuis l’administration (`uploads/`) |
-| `functions/api/contact.js` | Formulaire de contact, envoyé par e-mail (Mailjet), rien n’est conservé |
-| `functions/api/inscription.js` | Inscription Alpha : enregistrée dans D1 (e-mails facultatifs via Mailjet) |
+| `functions/api/contact.js` | Formulaire de contact, envoyé par e-mail (Gmail via Apps Script), rien n’est conservé |
+| `functions/api/inscription.js` | Inscription Alpha : enregistrée dans D1 (aucun e-mail par défaut) |
 | `functions/api/places.js` | Places restantes par parcours (le formulaire grise les parcours complets) |
 | `functions/api/auth/` | Connexion de l’équipe avec Google, session par cookie signé |
 | `functions/api/equipe.js` | Liste, ajout et retrait des membres de l’équipe |
 | `functions/api/inscriptions.js`, `src/inscriptions.js` | Page `/inscriptions` : liste des inscrits, réservée à l’équipe |
 | `functions/api/export-inscriptions.js` | Liste des inscrits en CSV, réservée à l’équipe |
-| `lib/` | Code partagé par les fonctions (Mailjet, formulaires, table des inscriptions) |
+| `lib/` | Code partagé par les fonctions (envoi d’e-mails, formulaires, table des inscriptions) |
 | `.pages.yml` | Interface d’administration (Pages CMS) |
 
 Les maraudes et la petite boutik sont prêtes mais masquées : dans l’administration, bloc « Nos actions », cocher « Afficher ce bloc » pour les montrer.
@@ -57,11 +57,25 @@ Tant que la base n’est pas liée, le formulaire affiche « les inscriptions ne
 | `GOOGLE_CLIENT_ID` | identifiant client Google (voir ci-dessous) : connexion de l’équipe avec un compte Google |
 | `ADMIN_EMAILS` | ton adresse Google (et celles des autres responsables, séparées par des virgules) : accès de départ, ces adresses ne se retirent pas depuis le site |
 | `EXPORT_PASSWORD` | (facultatif, clé de secours) mot de passe pour télécharger l’export sans se connecter |
-| `MAILJET_API_KEY`, `MAILJET_API_SECRET`, `CONTACT_FROM` | (facultatif) pour envoyer un e-mail de confirmation à l’inscrit |
-| `ALPHA_TO` | (facultatif, avec Mailjet) adresse(s) alertées à chaque inscription |
-| `CONTACT_TO` | (facultatif, avec Mailjet) destinataires du formulaire de contact, masqué pour l’instant |
+| `APPS_SCRIPT_URL`, `APPS_SCRIPT_SECRET` | envoi des e-mails du formulaire de contact depuis le Gmail de l’association (voir ci-dessous) |
+| `CONTACT_TO` | destinataires du formulaire de contact (séparés par des virgules) |
+| `ALPHA_TO` | (facultatif, désactivé) adresse(s) alertées à chaque inscription |
+| `ALPHA_CONFIRMATION` | (facultatif, désactivé) `oui` pour envoyer une confirmation à l’inscrit |
+| `MAILJET_API_KEY`, `MAILJET_API_SECRET`, `CONTACT_FROM` | (facultatif, à la place d’Apps Script) envoi par Mailjet |
 
-Aucun e-mail n’est nécessaire pour faire fonctionner le site : les inscriptions sont enregistrées dans la base et consultées sur `/inscriptions`.
+Les inscriptions n’envoient aucun e-mail : elles sont enregistrées dans la base et consultées sur `/inscriptions`.
+
+### E-mails du formulaire de contact (une seule fois)
+
+Gratuit, sans Mailjet : un petit script Google envoie les messages depuis le Gmail de l’association (environ 100 e-mails par jour au maximum, très largement suffisant ici).
+
+1. Connecté au Gmail de l’association, ouvrir https://script.google.com → **Nouveau projet**, coller le contenu de `docs/envoi-mail.gs`.
+2. Paramètres du projet (roue dentée) → **Propriétés du script** → ajouter `SECRET` avec une longue phrase au hasard.
+3. **Déployer** → Nouveau déploiement → type « Application Web » → *Exécuter en tant que* : moi ; *Qui a accès* : tout le monde. Accepter les autorisations (envoi d’e-mails). Copier l’URL qui se termine par `/exec`.
+4. Dans Cloudflare (Production) : `APPS_SCRIPT_URL` = cette URL, `APPS_SCRIPT_SECRET` = la même phrase que `SECRET`, `CONTACT_TO` = l’adresse qui reçoit les messages. Redéployer.
+
+Les messages arrivent avec l’adresse du visiteur en « Répondre à » : il suffit de répondre. Si le script est modifié plus tard, refaire **Déployer → Gérer les déploiements → modifier → nouvelle version**.
+
 
 ### Connexion Google : obtenir `GOOGLE_CLIENT_ID` (une seule fois)
 
@@ -81,7 +95,7 @@ Les inscriptions sont des données personnelles : les supprimer après le parcou
 ## Travailler en local
 
 ```sh
-npm test        # build + tests des fonctions (fausse base, faux Mailjet)
+npm test        # build + tests des fonctions (fausse base, faux Apps Script)
 npm run dev     # build + serveur local sur http://localhost:8788 avec une base D1 locale
 ```
 

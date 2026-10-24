@@ -10,4 +10,4 @@ Site de l’association Bras Ouverts (maraudes, la petite boutik, Parcours Alpha
 - Le contenu (`content/site.json`) est modifié par des bénévoles via Pages CMS : tout nouveau champ doit être déclaré dans `.pages.yml`, et le build doit tolérer un champ vide ou absent.
 - `npm test` avant chaque commit.
 - Accès à la liste des inscrits : connexion Google (`lib/google.js`, aucun e-mail à envoyer) + équipe gérée dans l'onglet « Équipe » (table D1 `equipe`) et `ADMIN_EMAILS` (`lib/auth.js`). Toute nouvelle route qui renvoie des inscrits ou modifie l'équipe doit passer par `membreConnecte()`, et les écritures n'acceptent que du JSON. Les données des inscrits s'affichent avec `textContent`, jamais en HTML.
-- Le site ne doit pas dépendre de Mailjet : les e-mails (confirmation d'inscription, formulaire de contact masqué) restent facultatifs.
+- Le site ne doit pas dépendre de Mailjet : les e-mails passent par Google Apps Script (`lib/mail.js`, `docs/envoi-mail.gs`) et restent facultatifs. Aucun e-mail n'est envoyé aux inscrits tant que `ALPHA_TO` / `ALPHA_CONFIRMATION` ne sont pas définis (décision de l'association).
