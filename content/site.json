@@ -7,10 +7,38 @@
     "navLinks": [
       {
         "label": "La P’tite Boutik",
-        "url": "/boutik/"
+        "url": "/boutik/",
+        "apres": "actions"
       }
     ],
-    "url": "https://bras-ouverts.pages.dev"
+    "url": "https://bras-ouverts.pages.dev",
+    "barre": [
+      {
+        "label": "Accueil",
+        "url": "#accueil",
+        "icon": "accueil"
+      },
+      {
+        "label": "Actions",
+        "url": "#actions",
+        "icon": "coeur"
+      },
+      {
+        "label": "Boutik",
+        "url": "/boutik/",
+        "icon": "boutique"
+      },
+      {
+        "label": "Agenda",
+        "url": "#agenda",
+        "icon": "agenda"
+      },
+      {
+        "label": "Contact",
+        "url": "#contact",
+        "icon": "contact"
+      }
+    ]
   },
   "blocks": [
     {

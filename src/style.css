@@ -30,7 +30,9 @@
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+html { scroll-behavior: smooth; scroll-padding-top: 80px; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+/* Pas de zoom au double-tap sur téléphone (le pincement reste possible, pour qui en a besoin). */
+html, button, a, input, select, textarea, label, summary { touch-action: manipulation; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.65 var(--body); }
 a { color: var(--accent); }
@@ -53,7 +55,6 @@ p { margin: 0; max-width: 65ch; }
 .top nav { display: flex; flex-wrap: wrap; gap: 4px 20px; margin-left: auto; }
 .top nav a { color: var(--muted); text-decoration: none; font-weight: 700; font-size: 0.95rem; }
 .top nav a:hover { color: var(--accent); }
-.top nav a.nav-ext { color: var(--corail); }
 
 /* Bouton thème clair / sombre : la lune s'affiche en clair, le soleil en sombre */
 .theme-toggle { display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); cursor: pointer; }
@@ -82,10 +83,15 @@ p { margin: 0; max-width: 65ch; }
   .top nav { order: 3; flex-basis: 100%; margin-left: 0; }
   /* Avec JavaScript : menu replié derrière le bouton */
   .js .menu-toggle { display: inline-flex; margin-left: auto; }
-  .js .top nav { display: none; flex-direction: column; gap: 0; padding: 6px 0 10px; border-top: 1px solid var(--line); }
+  /* Ouvert, le menu occupe tout l'écran sous l'en-tête : toutes les rubriques sont visibles d'un coup. */
+  .js .top nav { display: none; position: absolute; top: 100%; left: 0; right: 0; height: calc(100vh - 61px); height: calc(100dvh - 61px - env(safe-area-inset-top, 0px));
+    flex-direction: column; gap: 0; padding: 8px max(20px, env(safe-area-inset-left)) calc(24px + env(safe-area-inset-bottom)); overflow-y: auto; overscroll-behavior: contain;
+    background: var(--bg); border-top: 1px solid var(--line); }
   .js.menu-ouvert .top nav { display: flex; }
-  .js .top nav a { padding: 12px 4px; font-size: 1.05rem; border-bottom: 1px solid var(--line); }
+  .js.menu-ouvert body { overflow: hidden; }
+  .js .top nav a { padding: 16px 4px; font-family: var(--display); font-size: 1.45rem; color: var(--ink); border-bottom: 1px solid var(--line); }
   .js .top nav a:last-child { border-bottom: 0; }
+  .js .top nav a:hover, .js .top nav a:active { color: var(--accent); }
 }
 /* Sans JavaScript : le thème reste à droite, le menu complet passe dessous */
 @media (max-width: 700px) { :root:not(.js) .theme-toggle { margin-left: auto; } }
@@ -168,6 +174,7 @@ section { padding-block: clamp(48px, 7vw, 88px); border-top: 1px solid var(--lin
 .js-form .req { color: var(--accent); }
 .js-form input, .js-form select, .js-form textarea {
   font: inherit; font-weight: 400; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; width: 100%; min-width: 0;
+  font-size: max(16px, 1rem); /* sous 16 px, l'iPhone zoome sur la page dès qu'on touche le champ */
 }
 .js-form textarea { resize: vertical; }
 .js-form input:focus-visible, .js-form select:focus-visible, .js-form textarea:focus-visible { outline: 3px solid var(--green); outline-offset: 1px; }
@@ -209,7 +216,7 @@ body.equipe section { border-top: 0; }
 .eq-bar { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; justify-content: space-between; margin-bottom: 24px; }
 .eq-bar .qui { color: var(--muted); font-size: 0.95rem; }
 .eq-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-.eq-actions select { font: inherit; padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); }
+.eq-actions select { font: inherit; font-size: max(16px, 1rem); padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); }
 .btn-clair { background: var(--surface); color: var(--ink); border: 1px solid var(--line); }
 .eq-comptes { display: flex; flex-wrap: wrap; gap: 12px; margin: 0 0 24px; padding: 0; list-style: none; }
 .eq-comptes li { padding: 12px 18px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); }
@@ -282,3 +289,30 @@ body.equipe section { border-top: 0; }
 @media (max-width: 480px) {
   .ag-item { grid-template-columns: 58px 1fr; gap: 12px; padding: 14px; }
 }
+
+/* Barre de boutons en bas de l'écran, sur téléphone seulement */
+.barre { display: none; }
+@media (max-width: 700px) {
+  body.avec-barre { padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
+  .barre { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; position: fixed; z-index: 9; left: 0; right: 0; bottom: 0;
+    padding: 4px max(4px, env(safe-area-inset-left)) env(safe-area-inset-bottom, 0px); background: color-mix(in srgb, var(--surface) 94%, transparent);
+    backdrop-filter: blur(10px); border-top: 1px solid var(--line); box-shadow: 0 -4px 18px rgb(0 0 0 / 0.06); }
+  .barre a { display: grid; justify-items: center; gap: 2px; min-height: 56px; padding: 7px 2px 6px; color: var(--muted); text-decoration: none; font-size: 0.72rem; font-weight: 700; line-height: 1.2; border-radius: 12px; }
+  .barre a[aria-current="true"] { color: var(--accent); }
+  .barre a[aria-current="true"] svg { transform: translateY(-1px); stroke-width: 2.2; }
+  .barre a:active { background: var(--soft); }
+  /* Clavier ouvert ou menu déplié : la barre s'efface */
+  .clavier .barre, .menu-ouvert .barre { display: none; }
+}
+
+/* Onglet Messages de l'espace équipe */
+.eq-messages { display: grid; gap: 14px; }
+.eq-intro { color: var(--muted); margin: 0; }
+.eq-message { display: grid; gap: 8px; padding: 18px 20px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); }
+.eq-message.non-lu { border-left: 5px solid var(--accent); }
+.eq-message header { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+.eq-message .eq-date { margin-left: auto; color: var(--muted); font-size: 0.9rem; }
+.eq-badge { padding: 2px 10px; border-radius: 999px; background: var(--accent); color: var(--accent-ink); font-size: 0.78rem; font-weight: 700; }
+.eq-coord { margin: 0; color: var(--muted); font-size: 0.95rem; overflow-wrap: anywhere; }
+.eq-message .msg { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.eq-message .btn { padding: 6px 14px; font-size: 0.9rem; }

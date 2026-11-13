@@ -11,7 +11,8 @@ Site de l’association Bras Ouverts, en deux côtés : la P’tite Boutik Solid
 | `src/style.css`, `src/forms.js`, `src/theme.js` | Styles, envoi des formulaires, thème clair/sombre |
 | `public/` | Logo (`logo.png`, `favicon.png`), photos ajoutées depuis l’administration (`uploads/`) |
 | `src/agenda.js`, `src/agenda-moteur.js` | Agenda : événements Bras Ouverts lus dans le navigateur depuis le Worker `eglise-app` (le moteur est une copie de celui du site de l’église) |
-| `functions/api/contact.js` | Formulaire de contact, envoyé par e-mail (Gmail via Apps Script), rien n’est conservé |
+| `functions/api/contact.js`, `functions/api/messages.js` | Formulaire de contact : le message est enregistré dans D1 (comme sur le site de l’église) et lu dans l’onglet « Messages » de `/inscriptions` ; une notification part par e-mail si l’envoi est configuré |
+| `src/sw.js`, `public/icons/` | Appli installable (PWA) : manifeste généré par `build.mjs`, copie de la page pour l’usage hors connexion |
 | `functions/api/inscription.js` | Inscription Alpha : enregistrée dans D1 (aucun e-mail par défaut) |
 | `functions/api/places.js` | Places restantes par parcours (le formulaire grise les parcours complets) |
 | `functions/api/auth/` | Connexion de l’équipe avec Google, session par cookie signé |
@@ -68,7 +69,7 @@ Tant que la base n’est pas liée, le formulaire affiche « les inscriptions ne
 | `GOOGLE_CLIENT_ID` | identifiant client Google (voir ci-dessous) : connexion de l’équipe avec un compte Google |
 | `ADMIN_EMAILS` | ton adresse Google (et celles des autres responsables, séparées par des virgules) : accès de départ, ces adresses ne se retirent pas depuis le site |
 | `EXPORT_PASSWORD` | (facultatif, clé de secours) mot de passe pour télécharger l’export sans se connecter |
-| `APPS_SCRIPT_URL`, `APPS_SCRIPT_SECRET` | envoi des e-mails du formulaire de contact depuis le Gmail de l’association (voir ci-dessous) |
+| `APPS_SCRIPT_URL`, `APPS_SCRIPT_SECRET` | envoi des e-mails du formulaire de contact depuis le Gmail de l’association (voir ci-dessous), facultatifs : sans eux, les messages sont simplement lus dans l’espace équipe |
 | `CONTACT_TO` | destinataires du formulaire de contact (séparés par des virgules) |
 | `ALPHA_TO` | (facultatif, désactivé) adresse(s) alertées à chaque inscription |
 | `ALPHA_CONFIRMATION` | (facultatif, désactivé) `oui` pour envoyer une confirmation à l’inscrit |
@@ -111,3 +112,10 @@ npm run dev     # build + serveur local sur http://localhost:8788 avec une base 
 ```
 
 Pour tester l’envoi réel en local, créer un fichier `.dev.vars` (ignoré par git) avec les variables ci-dessus.
+
+## Menu du bas, appli installable, formulaire de contact
+
+- **Barre du bas (téléphone)** : `site.barre` dans Pages CMS (5 boutons au plus, icône au choix). Le bouton de la rubrique affichée est mis en avant ; la barre s'efface pendant la saisie.
+- **Place de la P’tite Boutik dans le menu** : `site.navLinks`, champ « Placer après le bloc » (ancre, ex. `actions`).
+- **Appli installable** : « Ajouter à l’écran d’accueil ». Le manifeste couvre tout le domaine, `/boutik/` compris.
+- **Contact** : la base D1 `DB` doit être liée (voir « Base des inscriptions ») pour que les messages soient conservés ; la table `messages` se crée toute seule. Les messages se lisent, se marquent lus et se suppriment dans l’onglet « Messages » de `/inscriptions`. Penser à supprimer ceux qui sont traités (mentions légales).

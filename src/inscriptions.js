@@ -1,4 +1,4 @@
-// Espace équipe : liste des inscrits. Les données sont affichées avec textContent, jamais en HTML.
+// Espace équipe : messages du formulaire de contact, inscrits, équipe. Les données sont affichées avec textContent, jamais en HTML.
 const app = document.getElementById("app");
 const el = (tag, props = {}, ...kids) => {
   const n = Object.assign(document.createElement(tag), props);
@@ -62,7 +62,13 @@ function liste(data) {
     connexion();
   });
   const contenu = el("div");
-  const onglets = [["inscrits", "Inscrits", () => vueInscrits(data)], ["equipe", "Équipe", () => vueEquipe(membre)]].map(([id, titre, vue]) => {
+  // L'onglet Inscrits n'apparaît que s'il y a des parcours (le Parcours Alpha est masqué pour l'instant).
+  const avecInscrits = data.sessions.length > 0 || data.inscrits.length > 0;
+  const onglets = [
+    ["messages", "Messages", () => vueMessages()],
+    ...(avecInscrits ? [["inscrits", "Inscrits", () => vueInscrits(data)]] : []),
+    ["equipe", "Équipe", () => vueEquipe(membre)],
+  ].map(([id, titre, vue]) => {
     const b = el("button", { type: "button", className: "eq-onglet", role: "tab" }, titre);
     b.addEventListener("click", () => ouvrir(id));
     b.dataset.id = id;
@@ -76,7 +82,68 @@ function liste(data) {
   app.replaceChildren(
     el("div", { className: "eq-bar" }, el("div", { className: "eq-onglets", role: "tablist" }, ...onglets), el("div", { className: "eq-actions" }, el("span", { className: "qui" }, membre), sortir)),
     contenu);
-  ouvrir("inscrits");
+  ouvrir("messages");
+}
+
+// Onglet « Messages » : ce que les visiteurs ont envoyé par le formulaire de contact, le plus récent d'abord.
+function vueMessages() {
+  const racine = el("div", { className: "eq-messages" }, el("p", {}, "Chargement…"));
+  const statut = el("p", { className: "status", role: "status" });
+  const montrer = (texte) => { statut.textContent = texte; statut.className = "status err"; };
+  const appel = async (methode, corps) => {
+    const { res, data } = await api("/api/messages", { method: methode, headers: { "Content-Type": "application/json" }, body: JSON.stringify(corps) });
+    if (res.status === 401) { connexion("Votre session a expiré."); return false; }
+    if (!res.ok || !data.ok) { montrer(data.error || FAIL); return false; }
+    return true;
+  };
+  const date = (d) => {
+    const x = new Date(String(d).replace(" ", "T") + "Z");
+    return Number.isNaN(x.getTime()) ? String(d || "") : x.toLocaleString("fr-FR", { dateStyle: "long", timeStyle: "short" });
+  };
+  const carte = (m, messages, dessiner) => {
+    const nom = [m.first_name, m.last_name].filter(Boolean).join(" ");
+    const lu = el("button", { className: "btn btn-clair", type: "button" }, m.lu ? "Marquer non lu" : "Marquer lu");
+    lu.addEventListener("click", async () => {
+      lu.disabled = true;
+      if (await appel("PATCH", { id: m.id, lu: !m.lu }).catch(() => (montrer(FAIL), false))) m.lu = m.lu ? 0 : 1;
+      dessiner();
+    });
+    const suppr = el("button", { className: "btn btn-clair", type: "button" }, "Supprimer");
+    suppr.addEventListener("click", async () => {
+      if (!confirm(`Supprimer définitivement le message de ${nom} ? Cette action est irréversible.`)) return;
+      suppr.disabled = true;
+      if (await appel("DELETE", { id: m.id }).catch(() => (montrer(FAIL), false))) messages.splice(messages.indexOf(m), 1);
+      dessiner();
+    });
+    const repondre = el("a", { className: "btn", href: `mailto:${m.email}?subject=${encodeURIComponent("Re : votre message à Bras Ouverts")}` }, "Répondre");
+    return el("article", { className: "eq-message" + (m.lu ? "" : " non-lu") },
+      el("header", {},
+        el("strong", {}, nom),
+        m.lu ? "" : el("span", { className: "eq-badge" }, "Nouveau"),
+        el("span", { className: "eq-date" }, date(m.created_at))),
+      el("p", { className: "eq-coord" },
+        el("a", { href: `mailto:${m.email}` }, m.email),
+        m.phone ? " · " : "", m.phone ? el("a", { href: `tel:${m.phone}` }, m.phone) : "",
+        m.subject ? ` · ${m.subject}` : ""),
+      el("p", { className: "msg" }, m.message),
+      el("div", { className: "eq-actions" }, repondre, lu, suppr));
+  };
+  api("/api/messages").then(({ res, data }) => {
+    if (res.status === 401) return connexion("Votre session a expiré.");
+    if (!res.ok || !data.ok) return racine.replaceChildren(el("p", { className: "status err" }, data.error || FAIL));
+    const messages = data.messages;
+    const dessiner = () => {
+      const nouveaux = messages.filter((m) => !m.lu).length;
+      racine.replaceChildren(
+        el("p", { className: "eq-intro" }, messages.length
+          ? `${messages.length} message${messages.length > 1 ? "s" : ""}${nouveaux ? `, dont ${nouveaux} nouveau${nouveaux > 1 ? "x" : ""}` : ""}. Pensez à supprimer ceux qui sont traités.`
+          : "Aucun message pour le moment."),
+        statut,
+        ...messages.map((m) => carte(m, messages, dessiner)));
+    };
+    dessiner();
+  }).catch(() => racine.replaceChildren(el("p", { className: "status err" }, FAIL)));
+  return racine;
 }
 
 function vueInscrits({ sessions, inscrits }) {
@@ -180,7 +247,7 @@ function vueEquipe(moi) {
           el("td", {}, m.fixe || m.email === moi ? "" : retirer));
       }))));
   };
-  racine.append(el("p", {}, "Les personnes ci-dessous peuvent consulter les inscrits et gérer cette liste. N’ajoutez que des personnes de confiance."), tableau, ajout, statut);
+  racine.append(el("p", {}, "Les personnes ci-dessous peuvent lire les messages, consulter les inscrits et gérer cette liste. N’ajoutez que des personnes de confiance."), tableau, ajout, statut);
   api("/api/equipe").then(({ data }) => (data.membres ? dessiner(data.membres) : montrer(data.error || FAIL, false))).catch(() => montrer(FAIL, false));
   return racine;
 }

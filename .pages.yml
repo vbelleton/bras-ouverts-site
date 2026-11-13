@@ -59,6 +59,26 @@ content:
             fields:
               - { name: label, label: Libellé, type: string }
               - { name: url, label: "Adresse (ex. /boutik/)", type: string }
+              - { name: apres, label: "Placer après le bloc (son ancre, ex. actions). Vide : en fin de menu", type: string }
+          - name: barre
+            label: Boutons du bas de l'écran sur téléphone (5 au plus)
+            type: object
+            list: true
+            fields:
+              - { name: label, label: "Libellé court (un mot)", type: string }
+              - { name: url, label: "Lien (ex. #agenda ou /boutik/)", type: string }
+              - name: icon
+                label: Icône
+                type: select
+                options:
+                  values:
+                    - { value: accueil, label: Maison }
+                    - { value: mains, label: Main tendue }
+                    - { value: coeur, label: Cœur }
+                    - { value: boutique, label: Sac (boutique) }
+                    - { value: agenda, label: Calendrier }
+                    - { value: carte, label: Repère sur une carte }
+                    - { value: contact, label: Enveloppe }
 
       - name: blocks
         label: Blocs de la page (glisser pour changer l'ordre)
