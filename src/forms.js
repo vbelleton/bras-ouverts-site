@@ -30,8 +30,34 @@ document.addEventListener("DOMContentLoaded", () => {
       if (params.get("envoi") === "erreur") show(params.get("msg") || FAIL, false);
     }
 
+    // Champ par champ, comme sur le formulaire de l'église : le champ fautif est signalé
+    // (aria-invalid) et reçoit le focus, au lieu d'une bulle du navigateur.
+    const verifier = () => {
+      let premier = null;
+      for (const champ of form.querySelectorAll("input, select, textarea")) {
+        if (champ.type === "hidden" || champ.closest(".hp")) continue;
+        const v = champ.value.trim();
+        const ko = (champ.required && (champ.type === "checkbox" ? !champ.checked : !v))
+          || (champ.type === "email" && v && !/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(v))
+          || (champ.minLength > 0 && v && v.length < champ.minLength);
+        if (ko) { champ.setAttribute("aria-invalid", "true"); premier ||= champ; }
+        else champ.removeAttribute("aria-invalid");
+      }
+      return premier;
+    };
+    form.addEventListener("input", (e) => { if (e.target.getAttribute("aria-invalid")) verifier(); });
+
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
+      const fautif = verifier();
+      if (fautif) {
+        const nom = fautif.closest("label")?.querySelector("span")?.textContent.replace("*", "").trim() || "ce champ";
+        show(fautif.minLength > 0 && fautif.value.trim()
+          ? `« ${nom} » : au moins ${fautif.minLength} caractères, s’il vous plaît.`
+          : fautif.type === "email" && fautif.value.trim() ? "L’adresse e-mail semble incorrecte." : `Merci de remplir « ${nom} ».`, false);
+        fautif.focus();
+        return;
+      }
       button.disabled = true;
       show("Envoi en cours…", true);
       try {

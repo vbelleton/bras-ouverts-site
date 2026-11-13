@@ -1,28 +1,67 @@
 {
   "site": {
     "name": "Bras Ouverts",
-    "title": "Bras Ouverts · Morlaix · Parcours Alpha",
-    "description": "Bras Ouverts, association de Morlaix : le Parcours Alpha, une série de rencontres pour explorer librement la foi chrétienne en petits groupes. Gratuit, inscription en ligne.",
-    "tagline": "Association · Morlaix"
+    "title": "Bras Ouverts · Association solidaire à Morlaix",
+    "description": "Bras Ouverts, association solidaire de Morlaix : la P’tite Boutik Solidaire (vêtements enfants de seconde main à prix mini) et les maraudes auprès des personnes à la rue. Agenda, bénévolat, contact.",
+    "tagline": "Association solidaire · Morlaix"
   },
   "blocks": [
     {
       "type": "hero",
       "visible": true,
       "anchor": "accueil",
-      "kicker": "Association · Morlaix",
-      "title": "Accueillir, partager, *créer du lien*",
-      "lead": "Bras Ouverts, association de Morlaix, vous invite à explorer librement les grandes questions de la vie et la foi chrétienne, en petits groupes, dans un cadre bienveillant.",
-      "cta": "S’inscrire au Parcours Alpha",
-      "ctaTarget": "alpha"
+      "kicker": "Association solidaire · Morlaix",
+      "title": "Ouvrir les bras, *créer du lien*",
+      "lead": "Bras Ouverts est une association de Morlaix qui va à la rencontre de celles et ceux qui en ont besoin : une boutique solidaire pour les familles, des maraudes auprès des personnes qui vivent à la rue, et des bénévoles qui prennent le temps.",
+      "cta": "Découvrir l’association",
+      "ctaTarget": "deux-cotes"
+    },
+    {
+      "type": "portes",
+      "visible": true,
+      "anchor": "deux-cotes",
+      "menu": "",
+      "label": "L’association",
+      "title": "Deux façons de *tendre la main*",
+      "intro": "D’un côté, une boutique solidaire pour les familles. De l’autre, des actions de terrain auprès des plus fragiles. Les deux portent le même esprit : accueillir chacun tel qu’il est.",
+      "items": [
+        {
+          "visible": true,
+          "style": "corail",
+          "kicker": "Boutique solidaire",
+          "title": "La P’tite Boutik *Solidaire*",
+          "text": "Au 2, rue Jean-Monnet à Morlaix, la P’tite Boutik propose des vêtements d’enfants de seconde main à prix mini. Elle encourage le recyclage, aide les familles et fait de chaque passage un moment convivial.",
+          "points": [
+            "Vêtements enfants de 0 à 10 ans",
+            "Chaussures, puériculture, vêtements de maternité",
+            "Dons de vêtements en bon état bienvenus"
+          ],
+          "link": "https://petite-boutik-solidaire.pages.dev",
+          "linkLabel": "Horaires, dons et photos de la boutique"
+        },
+        {
+          "visible": true,
+          "style": "lagon",
+          "kicker": "Actions solidaires",
+          "title": "Maraudes et *entraide*",
+          "text": "Des bénévoles vont à la rencontre des personnes qui vivent à la rue : un café, un repas chaud, du temps pour discuter, et une orientation vers les structures d’aide quand c’est utile.",
+          "points": [
+            "Maraudes dans Morlaix",
+            "Écoute et orientation",
+            "Toujours besoin de bénévoles"
+          ],
+          "link": "#actions",
+          "linkLabel": "Voir nos actions"
+        }
+      ]
     },
     {
       "type": "actions",
-      "visible": false,
+      "visible": true,
       "anchor": "actions",
       "menu": "Nos actions",
       "label": "Nos actions",
-      "title": "Ce que nous faisons",
+      "title": "Sur le *terrain*",
       "items": [
         {
           "visible": true,
@@ -43,6 +82,36 @@
         },
         {
           "visible": true,
+          "anchor": "benevoles",
+          "title": "Devenir *bénévole*",
+          "text": "Maraudes, tri des dons, accueil à la boutique, coups de main ponctuels : il y a une place pour chacun, même pour une heure de temps en temps.\n\nOn commence toujours accompagné d’un bénévole qui connaît déjà l’association.",
+          "infos": [
+            {
+              "label": "Pour qui",
+              "value": "Toute personne qui a envie d’aider"
+            },
+            {
+              "label": "Engagement",
+              "value": "Selon vos disponibilités, sans obligation de régularité"
+            }
+          ],
+          "help": "Envie de nous rejoindre ? Choisissez « Devenir bénévole » dans le formulaire de contact."
+        },
+        {
+          "visible": true,
+          "anchor": "soutenir",
+          "title": "Soutenir *l’association*",
+          "text": "Les dons de vêtements font vivre la boutique ; les dons en nature (café, gâteaux, couvertures, produits d’hygiène neufs) font vivre les maraudes.",
+          "infos": [
+            {
+              "label": "Dons pour les maraudes",
+              "value": "[à compléter : ce dont l’équipe a besoin en ce moment]"
+            }
+          ],
+          "help": "Avant de déposer un don, contactez-nous pour savoir ce qui manque."
+        },
+        {
+          "visible": false,
           "anchor": "petite-boutik",
           "title": "La petite boutik",
           "text": "Une boutique de seconde main à prix mini, avec des vêtements pour enfants de 0 à 10 ans, des chaussures et de la puériculture. C’est aussi un lieu où l’on prend le temps de se parler.",
@@ -58,13 +127,72 @@
           ],
           "help": "Vous avez des vêtements d’enfants ou de la puériculture à donner ? Contactez-nous avant de passer."
         }
-      ]
+      ],
+      "intro": "Tout ce que fait l’association en dehors de la boutique. Chacun peut donner un peu de temps, selon ses disponibilités."
+    },
+    {
+      "type": "agenda",
+      "visible": true,
+      "anchor": "agenda",
+      "menu": "Agenda",
+      "label": "Agenda",
+      "title": "Nos prochains *rendez-vous*",
+      "intro": "Maraudes, collectes, ouvertures exceptionnelles de la boutique : toutes les dates de l’association.",
+      "empty": "Pas de rendez-vous annoncé pour le moment. Revenez bientôt, ou écrivez-nous pour être prévenu.",
+      "max": 8
+    },
+    {
+      "type": "find",
+      "visible": true,
+      "anchor": "trouver",
+      "menu": "Nous trouver",
+      "label": "Nous trouver",
+      "title": "Où nous trouver ?",
+      "items": [
+        {
+          "icon": "📍",
+          "label": "Localisation",
+          "value": "2 rue Jean-Monnet, 29600 Morlaix"
+        },
+        {
+          "icon": "📞",
+          "label": "Téléphone",
+          "value": "06 20 70 54 96",
+          "href": "tel:+33620705496"
+        },
+        {
+          "icon": "🅿️",
+          "label": "Parking",
+          "value": "Disponible sur place"
+        }
+      ],
+      "mapQuery": "2 Rue Jean Monnet, 29600 Morlaix, France",
+      "mapLinkLabel": "Ouvrir l’itinéraire"
+    },
+    {
+      "type": "contact",
+      "visible": true,
+      "anchor": "contact",
+      "menu": "Contact",
+      "label": "Contact",
+      "title": "Nous *écrire*",
+      "intro": "Une question sur la boutique, envie de participer aux maraudes ou de faire un don ? Écrivez-nous, un bénévole vous répond.",
+      "subjects": [
+        "La P’tite Boutik (dons, horaires)",
+        "Les maraudes",
+        "Devenir bénévole",
+        "Faire un don",
+        "Autre"
+      ],
+      "success": "Merci, votre message est bien parti. Nous vous répondons rapidement.",
+      "email": "brasouverts.morlaix@gmail.com",
+      "emailText": "Vous préférez l’e-mail ? Écrivez-nous :"
     },
     {
       "type": "alpha",
-      "visible": true,
+      "visible": false,
       "anchor": "alpha",
-      "menu": "Parcours Alpha",
+      "menu": "",
       "label": "Parcours Alpha",
       "title": "Le Parcours *Alpha*",
       "text": "Alpha est une série de rencontres qui permet d’explorer librement, en petits groupes, les bases de la foi chrétienne.\n\nQue vous soyez croyant, curieux ou sceptique, vous êtes bienvenu : chacun peut dire ce qu’il pense, ou ne rien dire du tout.",
@@ -128,50 +256,6 @@
       ],
       "success": "Merci, votre inscription est bien enregistrée. Nous vous recontactons très vite.",
       "full": "Ce parcours est complet."
-    },
-    {
-      "type": "find",
-      "visible": true,
-      "anchor": "trouver",
-      "menu": "Nous trouver",
-      "label": "Nous trouver",
-      "title": "Où nous trouver ?",
-      "items": [
-        {
-          "icon": "📍",
-          "label": "Localisation",
-          "value": "2 rue Jean-Monnet, 29600 Morlaix"
-        },
-        {
-          "icon": "📞",
-          "label": "Téléphone",
-          "value": "06 20 70 54 96",
-          "href": "tel:+33620705496"
-        },
-        {
-          "icon": "🅿️",
-          "label": "Parking",
-          "value": "Disponible sur place"
-        }
-      ],
-      "mapQuery": "2 Rue Jean Monnet, 29600 Morlaix, France",
-      "mapLinkLabel": "Ouvrir l’itinéraire"
-    },
-    {
-      "type": "contact",
-      "visible": true,
-      "anchor": "contact",
-      "menu": "Contact",
-      "label": "Contact",
-      "title": "Nous écrire",
-      "intro": "Une question sur le Parcours Alpha ou sur l’association ? Écrivez-nous.",
-      "subjects": [
-        "Le Parcours Alpha",
-        "Devenir bénévole",
-        "Faire un don",
-        "Autre"
-      ],
-      "success": "Merci, votre message est bien parti. Nous vous répondons rapidement."
     }
   ],
   "legal": {

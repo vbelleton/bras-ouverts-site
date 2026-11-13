@@ -73,8 +73,53 @@ content:
               - { name: cta, label: Texte du bouton (laisser vide pour le masquer), type: string }
               - { name: ctaTarget, label: Ancre visée par le bouton (ex. alpha), type: string }
 
+          - name: portes
+            label: Les deux côtés de l'association (P'tite Boutik / actions)
+            fields:
+              - { name: visible, component: visible }
+              - { name: anchor, component: anchor }
+              - { name: menu, component: menu }
+              - { name: label, component: label }
+              - { name: title, component: title }
+              - { name: intro, label: Introduction, type: text }
+              - name: items
+                label: Cartes (glisser pour changer l'ordre)
+                type: object
+                list:
+                  collapsible:
+                    collapsed: true
+                    summary: "{fields.title}"
+                fields:
+                  - { name: visible, component: visible }
+                  - name: style
+                    label: Couleur
+                    type: select
+                    options:
+                      values:
+                        - { value: corail, label: Corail (boutique) }
+                        - { value: lagon, label: Turquoise (actions) }
+                  - { name: kicker, label: Surtitre, type: string }
+                  - { name: title, label: Titre, type: string, description: "Entourez un mot d'astérisques (*mot*) pour le mettre en couleur." }
+                  - { name: image, label: Photo (facultatif), type: image }
+                  - { name: text, label: Présentation, type: text }
+                  - { name: points, label: Points clés, type: string, list: true }
+                  - { name: link, label: "Lien du bouton (adresse d'un site ou #ancre de la page)", type: string }
+                  - { name: linkLabel, label: Texte du bouton, type: string }
+
+          - name: agenda
+            label: Agenda (dates gérées dans l'admin des événements)
+            fields:
+              - { name: visible, component: visible }
+              - { name: anchor, component: anchor }
+              - { name: menu, component: menu }
+              - { name: label, component: label }
+              - { name: title, component: title }
+              - { name: intro, label: Introduction, type: text, description: "Les dates elles-mêmes se saisissent dans l'écran des événements de l'admin du site de l'église, avec « Publier sur : site Bras Ouverts »." }
+              - { name: empty, label: Message quand aucune date n'est prévue, type: string }
+              - { name: max, label: Nombre maximum de dates affichées, type: number }
+
           - name: actions
-            label: Nos actions (maraudes, petite boutik…)
+            label: Nos actions (maraudes, bénévolat…)
             fields:
               - { name: visible, component: visible }
               - { name: anchor, component: anchor }
@@ -193,6 +238,15 @@ content:
               - { name: success, label: Message affiché après l'envoi, type: text }
               - { name: email, label: E-mail de l'association affiché sous le formulaire (laisser vide pour le masquer), type: string }
               - { name: emailText, label: Phrase avant l'e-mail, type: string }
+              - name: details
+                label: Coordonnées à côté du formulaire (facultatif)
+                type: object
+                list: true
+                fields:
+                  - { name: icon, label: Pictogramme (un emoji, ex. 📍), type: string }
+                  - { name: label, label: Intitulé, type: string }
+                  - { name: value, label: Valeur, type: string }
+                  - { name: href, label: Lien (facultatif, ex. tel:+33620705496), type: string }
               - name: social
                 label: Réseaux sociaux
                 type: object

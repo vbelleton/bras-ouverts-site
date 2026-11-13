@@ -1,6 +1,6 @@
 # Site Bras Ouverts
 
-Site de l’association Bras Ouverts : les maraudes, la petite boutik et le Parcours Alpha, avec inscription en ligne. Site statique généré à partir d’un seul fichier de contenu, sur le même modèle que kapitou-site.
+Site de l’association Bras Ouverts, en deux côtés : la P’tite Boutik Solidaire (lien vers son propre site) et les actions solidaires (maraudes, bénévolat, dons), avec un agenda et un formulaire de contact. Le Parcours Alpha est prêt mais masqué. Site statique généré à partir d’un seul fichier de contenu, sur le même modèle que kapitou-site.
 
 ## Organisation
 
@@ -10,6 +10,7 @@ Site de l’association Bras Ouverts : les maraudes, la petite boutik et le Parc
 | `build.mjs` | Génère `dist/index.html` à partir du contenu (Node, sans dépendance) |
 | `src/style.css`, `src/forms.js`, `src/theme.js` | Styles, envoi des formulaires, thème clair/sombre |
 | `public/` | Logo (`logo.png`, `favicon.png`), photos ajoutées depuis l’administration (`uploads/`) |
+| `src/agenda.js`, `src/agenda-moteur.js` | Agenda : événements Bras Ouverts lus dans le navigateur depuis le Worker `eglise-app` (le moteur est une copie de celui du site de l’église) |
 | `functions/api/contact.js` | Formulaire de contact, envoyé par e-mail (Gmail via Apps Script), rien n’est conservé |
 | `functions/api/inscription.js` | Inscription Alpha : enregistrée dans D1 (aucun e-mail par défaut) |
 | `functions/api/places.js` | Places restantes par parcours (le formulaire grise les parcours complets) |
@@ -20,7 +21,9 @@ Site de l’association Bras Ouverts : les maraudes, la petite boutik et le Parc
 | `lib/` | Code partagé par les fonctions (envoi d’e-mails, formulaires, table des inscriptions) |
 | `.pages.yml` | Interface d’administration (Pages CMS) |
 
-Les maraudes et la petite boutik sont prêtes mais masquées : dans l’administration, bloc « Nos actions », cocher « Afficher ce bloc » pour les montrer.
+## Agenda
+
+Les dates ne se saisissent pas ici mais dans l’administration du site de l’église (bouton des événements) : à la création, choisir **« Publier sur : site Bras Ouverts »**. Ces événements n’apparaissent jamais sur le site de l’église, et ceux de l’église jamais ici. Un rendez-vous régulier (ex. maraude chaque jeudi) n’occupe qu’une carte, avec sa prochaine date. Dans Pages CMS, le bloc « Agenda » ne règle que le titre, l’introduction, le message sans date et le nombre de dates affichées.
 
 Un texte entre crochets dans le contenu, comme `[à compléter]`, s’affiche en gris italique : c’est ce qu’il reste à remplir avant la mise en ligne.
 
