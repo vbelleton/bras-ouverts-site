@@ -3,7 +3,13 @@
     "name": "Bras Ouverts",
     "title": "Bras Ouverts · Association solidaire à Morlaix",
     "description": "Bras Ouverts, association solidaire de Morlaix : la P’tite Boutik Solidaire (vêtements enfants de seconde main à prix mini) et les maraudes auprès des personnes à la rue. Agenda, bénévolat, contact.",
-    "tagline": "Association solidaire · Morlaix"
+    "tagline": "Association solidaire · Morlaix",
+    "navLinks": [
+      {
+        "label": "La P’tite Boutik",
+        "url": "/boutik/"
+      }
+    ]
   },
   "blocks": [
     {
@@ -36,7 +42,7 @@
             "Chaussures, puériculture, vêtements de maternité",
             "Dons de vêtements en bon état bienvenus"
           ],
-          "link": "https://petite-boutik-solidaire.pages.dev",
+          "link": "/boutik/",
           "linkLabel": "Horaires, dons et photos de la boutique"
         },
         {

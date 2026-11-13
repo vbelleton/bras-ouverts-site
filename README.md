@@ -21,6 +21,14 @@ Site de l’association Bras Ouverts, en deux côtés : la P’tite Boutik Solid
 | `lib/` | Code partagé par les fonctions (envoi d’e-mails, formulaires, table des inscriptions) |
 | `.pages.yml` | Interface d’administration (Pages CMS) |
 
+## La P’tite Boutik sous /boutik/
+
+Sur le même domaine (prévu : `brasouverts.bzh`), `/boutik/…` affiche le site de la P’tite Boutik : `functions/boutik/[[path]].js` relaie chaque requête vers son propre projet Pages (`petite-boutik-solidaire.pages.dev/boutik/…`, dépôt `vbelleton/petite_boutik_solidaire`). La boutique garde donc tout : admin (`/boutik/admin`), agenda des ouvertures, photos, appli installable. Variable facultative `BOUTIK_ORIGIN` pour viser une préversion. Chaque fichier de la boutique compte comme un appel de fonction (100 000 gratuits par jour, très au-delà des besoins).
+
+Adresses courtes (`public/_redirects`) : `/maraudes`, `/agenda`, `/contact`, `/benevole`, `/petite-boutik`.
+
+Le jour où le domaine est branché sur ce projet (Custom domains) : l’ajouter aussi dans Firebase de la boutique (Authentication → Authorized domains) et dans `ALLOWED_ORIGINS` du Worker photos de la boutique, sinon la connexion et l’envoi de photos depuis `brasouverts.bzh/boutik/admin` échouent.
+
 ## Agenda
 
 Les dates ne se saisissent pas ici mais dans l’administration du site de l’église (bouton des événements) : à la création, choisir **« Publier sur : site Bras Ouverts »**. Ces événements n’apparaissent jamais sur le site de l’église, et ceux de l’église jamais ici. Un rendez-vous régulier (ex. maraude chaque jeudi) n’occupe qu’une carte, avec sa prochaine date. Dans Pages CMS, le bloc « Agenda » ne règle que le titre, l’introduction, le message sans date et le nombre de dates affichées.

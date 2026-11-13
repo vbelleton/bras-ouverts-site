@@ -51,6 +51,13 @@ content:
           - { name: title, label: Titre de l'onglet et des moteurs de recherche, type: string }
           - { name: description, label: Description pour les moteurs de recherche, type: text }
           - { name: tagline, label: Phrase du pied de page, type: string }
+          - name: navLinks
+            label: Liens du menu vers d'autres pages (ex. la P'tite Boutik)
+            type: object
+            list: true
+            fields:
+              - { name: label, label: Libellé, type: string }
+              - { name: url, label: "Adresse (ex. /boutik/)", type: string }
 
       - name: blocks
         label: Blocs de la page (glisser pour changer l'ordre)
