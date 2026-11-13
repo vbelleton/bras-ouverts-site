@@ -51,6 +51,7 @@ content:
           - { name: title, label: Titre de l'onglet et des moteurs de recherche, type: string }
           - { name: description, label: Description pour les moteurs de recherche, type: text }
           - { name: tagline, label: Phrase du pied de page, type: string }
+          - { name: url, label: "Adresse du site (ex. https://brasouverts.bzh), pour Google et les partages", type: string }
           - name: navLinks
             label: Liens du menu vers d'autres pages (ex. la P'tite Boutik)
             type: object

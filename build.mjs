@@ -201,6 +201,7 @@ const html = `<!doctype html>
 <meta property="og:title" content="${esc(s.title || s.name)}">
 <meta property="og:description" content="${esc(s.description)}">
 <meta property="og:type" content="website">
+${s.url ? `<link rel="canonical" href="${esc(String(s.url).replace(/\/+$/, ""))}/">\n<meta property="og:url" content="${esc(String(s.url).replace(/\/+$/, ""))}/">\n<meta property="og:image" content="${esc(String(s.url).replace(/\/+$/, ""))}/logo.png">` : ""}
 <link rel="icon" href="/favicon.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,400;0,6..12,700;1,6..12,400&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap">
 <link rel="stylesheet" href="/style.css">
@@ -212,7 +213,10 @@ ${blocks.some((b) => b.type === "agenda") ? `<script type="module" src="/agenda.
 <header class="top">
   <div class="wrap">
     <a class="logo" href="#${esc(home)}"><img src="/logo.png" alt="${esc(s.name || '')}" width="178" height="34"></a>
-    <nav aria-label="Navigation principale">
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="menu-principal">
+      <span class="menu-ico" aria-hidden="true"><span></span><span></span><span></span></span><span class="menu-txt">Menu</span>
+    </button>
+    <nav id="menu-principal" aria-label="Navigation principale">
       ${nav}
     </nav>
     <button class="theme-toggle" type="button" aria-label="Changer de thème" aria-pressed="false">
@@ -237,7 +241,7 @@ ${body}
         ${l.siret ? `<div><dt>SIRET</dt><dd>${esc(l.siret)}</dd></div>` : ""}
         ${l.publisher ? `<div><dt>Directeur de la publication</dt><dd>${txt(l.publisher)}</dd></div>` : ""}
         ${l.host ? `<div><dt>Hébergement</dt><dd>${esc(l.host)}</dd></div>` : ""}
-        <div><dt>Données personnelles</dt><dd>Les messages du formulaire de contact servent uniquement à vous répondre et ne sont pas conservés sur le site. ${txt(l.retention || "")}</dd></div>
+        <div><dt>Données personnelles</dt><dd>Les messages du formulaire de contact servent uniquement à vous répondre et ne sont pas conservés sur le site.${blocks.some((b) => b.type === "alpha") ? ` ${txt(l.retention || "")}` : ""}</dd></div>
       </dl>
     </details>
   </div>
@@ -276,6 +280,10 @@ mkdirSync(OUT, { recursive: true });
 if (existsSync("public")) cpSync("public", OUT, { recursive: true });
 cpSync("src", OUT, { recursive: true });
 writeFileSync(`${OUT}/index.html`, html);
+// Le domaine sert aussi la boutique sous /boutik/ : robots et plan du site couvrent les deux.
+const SITE_URL = String(s.url || "").replace(/\/+$/, "");
+writeFileSync(`${OUT}/robots.txt`, `User-agent: *\nAllow: /\nDisallow: /inscriptions\nDisallow: /boutik/admin\n${SITE_URL ? `\nSitemap: ${SITE_URL}/sitemap.xml\n` : ""}`);
+if (SITE_URL) writeFileSync(`${OUT}/sitemap.xml`, `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>${esc(SITE_URL)}/</loc></url>\n  <url><loc>${esc(SITE_URL)}/boutik/</loc></url>\n</urlset>\n`);
 mkdirSync(`${OUT}/inscriptions`, { recursive: true });
 writeFileSync(`${OUT}/inscriptions/index.html`, equipePage);
 console.log(`dist/index.html généré (${blocks.length} blocs).`);
