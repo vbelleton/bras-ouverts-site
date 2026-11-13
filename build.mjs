@@ -183,7 +183,9 @@ const renderers = {
 };
 
 const blocks = list(data.blocks).filter(visible);
-const nav = blocks.filter((b) => b.menu && b.type !== "hero").map((b) => `<a href="#${esc(b.anchor || slug(b.title))}">${esc(b.menu)}</a>`).join("\n      ");
+// Liens du menu vers d'autres pages du domaine (ex. la P'tite Boutik sous /boutik/), puis les blocs.
+const navLinks = list((data.site || {}).navLinks).filter((l) => l.label && safeUrl(l.url)).map((l) => `<a class="nav-ext" href="${esc(safeUrl(l.url))}">${esc(l.label)}</a>`);
+const nav = [...navLinks, ...blocks.filter((b) => b.menu && b.type !== "hero").map((b) => `<a href="#${esc(b.anchor || slug(b.title))}">${esc(b.menu)}</a>`)].join("\n      ");
 const body = blocks.map((b) => (renderers[b.type] ? renderers[b.type](b) : "")).join("\n");
 const s = data.site || {};
 const l = data.legal || {};

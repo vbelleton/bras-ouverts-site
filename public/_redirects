@@ -1,2 +1,10 @@
 # Raccourci vers l administration (Pages CMS)
 /admin https://app.pagescms.org/vbelleton/bras-ouverts-site/main 302
+# Adresses courtes de l'association
+/maraudes /#maraudes 302
+/maraude /#maraudes 302
+/agenda /#agenda 302
+/contact /#contact 302
+/benevole /#benevoles 302
+/petite-boutik /boutik/ 301
+/ptite-boutik /boutik/ 301

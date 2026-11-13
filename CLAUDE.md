@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Site de l’association Bras Ouverts, en deux côtés : la P’tite Boutik Solidaire (qui garde son propre site, `vbelleton/petite_boutik_solidaire`, simplement relié) et les actions non cultuelles (maraudes, bénévolat, dons), plus un agenda. Le Parcours Alpha (cultuel) reste dans le code mais masqué. Voir `README.md` pour l’organisation et la mise en ligne.
+Site de l’association Bras Ouverts, en deux côtés : la P’tite Boutik Solidaire (son propre dépôt `vbelleton/petite_boutik_solidaire`, servi sous `/boutik/` du même domaine par `functions/boutik/[[path]].js` : ne jamais recopier son code ici) et les actions non cultuelles (maraudes, bénévolat, dons), plus un agenda. Le Parcours Alpha (cultuel) reste dans le code mais masqué. Voir `README.md` pour l’organisation et la mise en ligne.
 
 - Tout en français : textes, commits, README, messages d’erreur.
 - **Ne jamais reprendre l’identité, les textes ou les visuels de Cieux Ouverts.** Identité propre : bleu marine + turquoise du logo (public/logo.png), Fraunces + Nunito Sans.

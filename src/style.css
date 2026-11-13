@@ -53,6 +53,7 @@ p { margin: 0; max-width: 65ch; }
 .top nav { display: flex; flex-wrap: wrap; gap: 4px 20px; margin-left: auto; }
 .top nav a { color: var(--muted); text-decoration: none; font-weight: 700; font-size: 0.95rem; }
 .top nav a:hover { color: var(--accent); }
+.top nav a.nav-ext { color: var(--corail); }
 
 /* Bouton thème clair / sombre : la lune s'affiche en clair, le soleil en sombre */
 .theme-toggle { display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); cursor: pointer; }
