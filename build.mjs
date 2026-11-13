@@ -183,9 +183,34 @@ const renderers = {
 };
 
 const blocks = list(data.blocks).filter(visible);
-// Liens du menu vers d'autres pages du domaine (ex. la P'tite Boutik sous /boutik/), puis les blocs.
-const navLinks = list((data.site || {}).navLinks).filter((l) => l.label && safeUrl(l.url)).map((l) => `<a class="nav-ext" href="${esc(safeUrl(l.url))}">${esc(l.label)}</a>`);
-const nav = [...navLinks, ...blocks.filter((b) => b.menu && b.type !== "hero").map((b) => `<a href="#${esc(b.anchor || slug(b.title))}">${esc(b.menu)}</a>`)].join("\n      ");
+const ancre = (b) => b.anchor || slug(b.title);
+// Menu : les blocs qui ont un libellé, et les liens vers d'autres pages du domaine (ex. la P'tite Boutik
+// sous /boutik/) glissés après le bloc choisi (« apres » = ancre du bloc ; vide = en fin de menu).
+const navLinks = list((data.site || {}).navLinks).filter((l) => l.label && safeUrl(l.url));
+const lienNav = (l) => `<a href="${esc(safeUrl(l.url))}">${esc(l.label)}</a>`;
+const nav = [
+  ...blocks.filter((b) => b.menu && b.type !== "hero").flatMap((b) => [
+    `<a href="#${esc(ancre(b))}">${esc(b.menu)}</a>`,
+    ...navLinks.filter((l) => l.apres && l.apres === ancre(b)).map(lienNav),
+  ]),
+  ...navLinks.filter((l) => !l.apres || !blocks.some((b) => b.menu && b.type !== "hero" && ancre(b) === l.apres)).map(lienNav),
+].join("\n      ");
+
+// Barre de boutons en bas de l'écran sur téléphone (site.barre dans Pages CMS) : 5 boutons au plus.
+const ICONES = {
+  accueil: '<path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/>',
+  boutique: '<path d="M5 8h14l-1.2 11.5H6.2z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/>',
+  coeur: '<path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10C19.5 15.4 12 20 12 20z"/>',
+  agenda: '<rect x="4" y="5.5" width="16" height="14.5" rx="2"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/>',
+  carte: '<path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/>',
+  contact: '<rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="m4 7 8 6 8-6"/>',
+  mains: '<path d="M7 11.5V6.8a1.4 1.4 0 0 1 2.8 0v4.2M9.8 10V5.4a1.4 1.4 0 0 1 2.8 0V10M12.6 10V6.2a1.4 1.4 0 0 1 2.8 0v6.3l1.4-1.6a1.4 1.4 0 0 1 2.1 1.9L15.6 17a5 5 0 0 1-3.8 2H11a5 5 0 0 1-5-5v-2.5a1.4 1.4 0 0 1 2.8 0"/>',
+};
+const barre = list((data.site || {}).barre).filter((x) => x.label && safeUrl(x.url)).slice(0, 5);
+const barreHtml = barre.length ? `
+<nav class="barre" aria-label="Accès rapide">
+  ${barre.map((x) => `<a href="${esc(safeUrl(x.url))}"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONES[x.icon] || ICONES.coeur}</svg><span>${esc(x.label)}</span></a>`).join("\n  ")}
+</nav>` : "";
 const body = blocks.map((b) => (renderers[b.type] ? renderers[b.type](b) : "")).join("\n");
 const s = data.site || {};
 const l = data.legal || {};
@@ -203,13 +228,18 @@ const html = `<!doctype html>
 <meta property="og:type" content="website">
 ${s.url ? `<link rel="canonical" href="${esc(String(s.url).replace(/\/+$/, ""))}/">\n<meta property="og:url" content="${esc(String(s.url).replace(/\/+$/, ""))}/">\n<meta property="og:image" content="${esc(String(s.url).replace(/\/+$/, ""))}/logo.png">` : ""}
 <link rel="icon" href="/favicon.png" type="image/png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="theme-color" content="#f6efe3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#131a22" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="${esc(s.name || "Bras Ouverts")}">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,400;0,6..12,700;1,6..12,400&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap">
 <link rel="stylesheet" href="/style.css">
 <script>${readFileSync("src/theme.js", "utf8").trim()}</script>
 <script src="/forms.js" defer></script>
 ${blocks.some((b) => b.type === "agenda") ? `<script type="module" src="/agenda.js"></script>` : ""}
 </head>
-<body>
+<body${barre.length ? ' class="avec-barre"' : ""}>
 <header class="top">
   <div class="wrap">
     <a class="logo" href="#${esc(home)}"><img src="/logo.png" alt="${esc(s.name || '')}" width="178" height="34"></a>
@@ -241,11 +271,11 @@ ${body}
         ${l.siret ? `<div><dt>SIRET</dt><dd>${esc(l.siret)}</dd></div>` : ""}
         ${l.publisher ? `<div><dt>Directeur de la publication</dt><dd>${txt(l.publisher)}</dd></div>` : ""}
         ${l.host ? `<div><dt>Hébergement</dt><dd>${esc(l.host)}</dd></div>` : ""}
-        <div><dt>Données personnelles</dt><dd>Les messages du formulaire de contact servent uniquement à vous répondre et ne sont pas conservés sur le site.${blocks.some((b) => b.type === "alpha") ? ` ${txt(l.retention || "")}` : ""}</dd></div>
+        <div><dt>Données personnelles</dt><dd>Les messages du formulaire de contact servent uniquement à vous répondre. Ils ne sont lus que par l’équipe de l’association et sont supprimés une fois traités.${blocks.some((b) => b.type === "alpha") ? ` ${txt(l.retention || "")}` : ""}</dd></div>
       </dl>
     </details>
   </div>
-</footer>
+</footer>${barreHtml}
 </body>
 </html>
 `;
@@ -258,7 +288,7 @@ const equipePage = `<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<title>Inscriptions · ${esc(s.name)}</title>
+<title>Espace équipe · ${esc(s.name)}</title>
 <link rel="icon" href="/favicon.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,400;0,6..12,700;1,6..12,400&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap">
 <link rel="stylesheet" href="/style.css">
@@ -284,6 +314,24 @@ writeFileSync(`${OUT}/index.html`, html);
 const SITE_URL = String(s.url || "").replace(/\/+$/, "");
 writeFileSync(`${OUT}/robots.txt`, `User-agent: *\nAllow: /\nDisallow: /inscriptions\nDisallow: /boutik/admin\n${SITE_URL ? `\nSitemap: ${SITE_URL}/sitemap.xml\n` : ""}`);
 if (SITE_URL) writeFileSync(`${OUT}/sitemap.xml`, `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>${esc(SITE_URL)}/</loc></url>\n  <url><loc>${esc(SITE_URL)}/boutik/</loc></url>\n</urlset>\n`);
+// Appli installable (PWA). La portée « / » englobe /boutik/ : installée, l'appli Bras Ouverts ouvre aussi la boutique.
+writeFileSync(`${OUT}/manifest.webmanifest`, JSON.stringify({
+  name: s.name || "Bras Ouverts",
+  short_name: s.shortName || s.name || "Bras Ouverts",
+  description: s.description || "",
+  lang: "fr",
+  start_url: "/",
+  scope: "/",
+  display: "standalone",
+  background_color: "#f6efe3",
+  theme_color: "#f6efe3",
+  icons: [
+    { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+    { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+    { src: "/icons/icon-maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
+  ],
+  shortcuts: barre.filter((x) => /^\/[^/]/.test(safeUrl(x.url))).map((x) => ({ name: x.label, url: safeUrl(x.url) })),
+}, null, 2));
 mkdirSync(`${OUT}/inscriptions`, { recursive: true });
 writeFileSync(`${OUT}/inscriptions/index.html`, equipePage);
 console.log(`dist/index.html généré (${blocks.length} blocs).`);
