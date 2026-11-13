@@ -5,14 +5,14 @@
   --ink: #1f2a3a;
   --muted: #546071;
   --line: #e0dbd1;
-  --accent: #137c74;      /* turquoise du logo, assombri pour le contraste du texte */
+  --accent: #0f6e67;      /* turquoise du logo, assombri : contraste AA sur le sable et les dégradés */
   --accent-ink: #ffffff;
   --green: #1f2a3a;       /* bleu marine du logo */
   --soft: #e6efec;        /* fond des encadrés */
-  --corail: #c2553f;      /* la P'tite Boutik (texte sur clair : contraste AA) */
+  --corail: #a94631;      /* la P'tite Boutik (contraste AA sur sable et dégradé) */
   --corail-doux: #fbe3d9;
   --lagon-doux: #d9efec;
-  --ok: #137c74;
+  --ok: #0f6e67;
   --ph: #8a929d;          /* contenus à compléter */
   --display: "Fraunces", Georgia, serif;
   --body: "Nunito Sans", "Segoe UI", system-ui, sans-serif;
@@ -65,10 +65,30 @@ p { margin: 0; max-width: 65ch; }
   :root:not([data-theme="light"]) .theme-toggle .i-sun { display: block; }
   :root:not([data-theme="light"]) .theme-toggle .i-moon { display: none; }
 }
+/* Bouton du menu mobile : caché sur ordinateur */
+.menu-toggle { display: none; align-items: center; gap: 8px; height: 40px; padding: 0 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); font: inherit; font-weight: 700; font-size: 0.95rem; cursor: pointer; }
+.menu-toggle:hover { color: var(--accent); border-color: var(--accent); }
+.menu-ico { display: grid; gap: 4px; width: 18px; }
+.menu-ico span { display: block; height: 2px; border-radius: 2px; background: currentColor; transition: transform .2s, opacity .2s; }
+.menu-ouvert .menu-ico span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.menu-ouvert .menu-ico span:nth-child(2) { opacity: 0; }
+.menu-ouvert .menu-ico span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+@media (prefers-reduced-motion: reduce) { .menu-ico span { transition: none; } }
+
 @media (max-width: 700px) {
-  .theme-toggle { margin-left: auto; width: 36px; height: 36px; }
+  .top .wrap { gap: 8px 10px; }
+  .logo img { height: 30px; }
+  .theme-toggle { width: 40px; height: 40px; }
   .top nav { order: 3; flex-basis: 100%; margin-left: 0; }
+  /* Avec JavaScript : menu replié derrière le bouton */
+  .js .menu-toggle { display: inline-flex; margin-left: auto; }
+  .js .top nav { display: none; flex-direction: column; gap: 0; padding: 6px 0 10px; border-top: 1px solid var(--line); }
+  .js.menu-ouvert .top nav { display: flex; }
+  .js .top nav a { padding: 12px 4px; font-size: 1.05rem; border-bottom: 1px solid var(--line); }
+  .js .top nav a:last-child { border-bottom: 0; }
 }
+/* Sans JavaScript : le thème reste à droite, le menu complet passe dessous */
+@media (max-width: 700px) { :root:not(.js) .theme-toggle { margin-left: auto; } }
 
 /* Accueil */
 .hero { padding-block: clamp(56px, 10vw, 120px) clamp(48px, 8vw, 96px);
