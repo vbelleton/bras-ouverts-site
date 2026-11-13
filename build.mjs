@@ -42,6 +42,8 @@ const antiSpam = `<label class="hp" aria-hidden="true">Ne pas remplir<input name
 const field = (label, input, req = false) =>
   `<label><span>${label}${req ? ` <b class="req" aria-hidden="true">*</b>` : ""}</span>${input}</label>`;
 const status = `<p class="status" role="status" aria-live="polite"></p>`;
+// Worker des événements (le même que l'agenda de l'église, événements distincts).
+const AGENDA_API = "https://eglise-app.belletonv.workers.dev";
 
 const renderers = {
   hero: (b) => `
@@ -53,6 +55,30 @@ const renderers = {
       ${b.cta ? `<a class="btn btn-lg" href="#${esc(b.ctaTarget || "alpha")}">${esc(b.cta)}</a>` : ""}
     </div>
   </div>`,
+
+  // Les deux côtés de l'association : la P'tite Boutik (son propre site) et les actions solidaires.
+  portes: (b) => section(b, `${b.title ? secHead(b, b.intro ? `\n        <p>${txt(b.intro)}</p>` : "") : ""}
+      <div class="portes">
+      ${list(b.items).filter(visible).map((i, n) => {
+        const href = safeUrl(i.link);
+        const ext = /^https?:/i.test(href);
+        return `<article class="porte porte-${["corail", "lagon"].includes(i.style) ? i.style : n % 2 ? "lagon" : "corail"}">
+        ${i.image ? `<img src="${esc(i.image)}" alt="" loading="lazy">` : ""}
+        ${i.kicker ? `<span class="lab">${esc(i.kicker)}</span>` : ""}
+        <h3>${emph(i.title)}</h3>
+        ${paras(i.text)}
+        ${list(i.points).length ? `<ul class="porte-points">${list(i.points).map((x) => `<li>${txt(x)}</li>`).join("")}</ul>` : ""}
+        ${href ? `<a class="btn" href="${esc(href)}"${ext ? ' rel="noopener"' : ""}>${esc(i.linkLabel || "Découvrir")}${ext ? ' <span aria-hidden="true">↗</span>' : ""}</a>` : ""}
+      </article>`;
+      }).join("\n      ")}
+      </div>`, "portes-sec"),
+
+  // Agenda rempli dans le navigateur par src/agenda.js (événements gérés depuis l'admin Cieux Ouverts).
+  agenda: (b) => section(b, `${secHead(b, b.intro ? `\n        <p>${txt(b.intro)}</p>` : "")}
+      <div class="agenda" data-api="${esc(safeUrl(b.api) || AGENDA_API)}" data-max="${Number(b.max) || 12}" data-vide="${esc(b.empty || "Pas de rendez-vous prévu pour le moment. Revenez bientôt !")}">
+        <div class="ag-liste" aria-live="polite"><p class="ag-vide">Chargement de l’agenda…</p></div>
+        <noscript><p class="ag-vide">L’agenda a besoin de JavaScript. Écrivez-nous pour connaître les prochaines dates.</p></noscript>
+      </div>`, "agenda-sec"),
 
   actions: (b) => section(b, `${secHead(b, b.intro ? `\n        <p>${txt(b.intro)}</p>` : "")}
       <div class="actions">
@@ -122,24 +148,38 @@ const renderers = {
   text: (b) => section(b, `${secHead(b)}
       <div class="prose">${paras(b.text)}</div>`),
 
-  contact: (b) => section(b, `${secHead(b, b.intro ? `\n        <p>${txt(b.intro)}</p>` : "")}
-      <form class="js-form contact-form" method="post" action="/api/contact" data-success="${esc(b.success || "Merci, votre message est bien parti.")}">
+  contact: (b) => {
+    const form = `<form class="js-form contact-form" method="post" action="/api/contact" novalidate data-success="${esc(b.success || "Merci, votre message est bien parti.")}">
+        <p class="note">Les champs marqués <b class="req">*</b> sont obligatoires.</p>
         <div class="row">
-          ${field("Nom", `<input name="name" autocomplete="name" required maxlength="120">`, true)}
+          ${field("Prénom", `<input name="firstName" autocomplete="given-name" required maxlength="80">`, true)}
+          ${field("Nom", `<input name="lastName" autocomplete="family-name" required maxlength="80">`, true)}
+        </div>
+        <div class="row">
           ${field("E-mail", `<input name="email" type="email" autocomplete="email" required maxlength="200">`, true)}
-        </div>
-        <div class="row">
           ${field("Téléphone", `<input name="phone" type="tel" autocomplete="tel" maxlength="40">`)}
-          ${list(b.subjects).length ? field("Sujet", `<select name="subject"><option value="">Choisir…</option>${list(b.subjects).map((s) => `<option>${esc(s)}</option>`).join("")}</select>`) : ""}
         </div>
-        ${field("Votre message", `<textarea name="message" rows="6" required maxlength="5000"></textarea>`, true)}
+        ${list(b.subjects).length ? field("Sujet", `<select name="subject"><option value="">Choisir…</option>${list(b.subjects).map((x) => `<option>${esc(x)}</option>`).join("")}</select>`) : ""}
+        ${field("Votre message", `<textarea name="message" rows="6" required minlength="10" maxlength="5000"></textarea>`, true)}
         ${antiSpam}
-        <p class="note">Vos coordonnées servent uniquement à vous répondre. Les champs marqués * sont obligatoires.</p>
-        <button class="btn" type="submit">Envoyer</button>
+        <p class="note">Vos coordonnées servent uniquement à vous répondre : rien n’est conservé sur le site.</p>
+        <button class="btn" type="submit">Envoyer le message</button>
         ${status}
-      </form>
-      ${b.email ? `<p class="mail-alt">${esc(b.emailText || "Vous préférez l’e-mail ? Écrivez-nous :")} ${mailLink(b.email, "écrire à l’association")}</p>` : ""}
-      ${list(b.social).length ? `<ul class="social">${list(b.social).filter((s) => safeUrl(s.url)).map((s) => `<li><a href="${esc(safeUrl(s.url))}" rel="noopener">${esc(s.label)}</a></li>`).join("")}</ul>` : ""}`),
+      </form>`;
+    const aside = `<aside class="contact-aside">
+        ${list(b.details).length ? `<dl class="find-list">${list(b.details).filter(visible).map((i) => {
+          const href = safeUrl(i.href);
+          return `<div><dt><span class="ico" aria-hidden="true">${esc(i.icon || "")}</span>${esc(i.label)}</dt><dd>${href ? `<a href="${esc(href)}">${txt(i.value)}</a>` : txt(i.value)}</dd></div>`;
+        }).join("")}</dl>` : ""}
+        ${b.email ? `<p class="mail-alt">${esc(b.emailText || "Vous préférez l’e-mail ? Écrivez-nous :")} ${mailLink(b.email, "écrire à l’association")}</p>` : ""}
+        ${list(b.social).length ? `<ul class="social">${list(b.social).filter((x) => safeUrl(x.url)).map((x) => `<li><a href="${esc(safeUrl(x.url))}" rel="noopener">${esc(x.label)}</a></li>`).join("")}</ul>` : ""}
+      </aside>`;
+    return section(b, `${secHead(b, b.intro ? `\n        <p>${txt(b.intro)}</p>` : "")}
+      <div class="contact-grid">
+        ${form}
+        ${aside}
+      </div>`, "contact-sec");
+  },
 };
 
 const blocks = list(data.blocks).filter(visible);
@@ -164,6 +204,7 @@ const html = `<!doctype html>
 <link rel="stylesheet" href="/style.css">
 <script>${readFileSync("src/theme.js", "utf8").trim()}</script>
 <script src="/forms.js" defer></script>
+${blocks.some((b) => b.type === "agenda") ? `<script type="module" src="/agenda.js"></script>` : ""}
 </head>
 <body>
 <header class="top">

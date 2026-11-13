@@ -1,6 +1,6 @@
 /* Identité Bras Ouverts, reprise du logo : bleu marine et turquoise, sur fond crème. */
 :root {
-  --bg: #f7f4ef;
+  --bg: #f6efe3;          /* sable doux */
   --surface: #ffffff;
   --ink: #1f2a3a;
   --muted: #546071;
@@ -9,6 +9,9 @@
   --accent-ink: #ffffff;
   --green: #1f2a3a;       /* bleu marine du logo */
   --soft: #e6efec;        /* fond des encadrés */
+  --corail: #c2553f;      /* la P'tite Boutik (texte sur clair : contraste AA) */
+  --corail-doux: #fbe3d9;
+  --lagon-doux: #d9efec;
   --ok: #137c74;
   --ph: #8a929d;          /* contenus à compléter */
   --display: "Fraunces", Georgia, serif;
@@ -18,12 +21,12 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #131a22; --surface: #1c2631; --ink: #eef2f5; --muted: #a9b5c2; --line: #2b3745;
-    --accent: #3cc5b8; --accent-ink: #131a22; --green: #8fd9d0; --soft: #1a2a30; --ok: #3cc5b8; --ph: #7d8896; color-scheme: dark;
+    --accent: #3cc5b8; --accent-ink: #131a22; --green: #8fd9d0; --soft: #1a2a30; --ok: #3cc5b8; --ph: #7d8896; --corail: #f08a72; --corail-doux: #3a2523; --lagon-doux: #17312f; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #131a22; --surface: #1c2631; --ink: #eef2f5; --muted: #a9b5c2; --line: #2b3745;
-  --accent: #3cc5b8; --accent-ink: #131a22; --green: #8fd9d0; --soft: #1a2a30; --ok: #3cc5b8; --ph: #7d8896; color-scheme: dark;
+  --accent: #3cc5b8; --accent-ink: #131a22; --green: #8fd9d0; --soft: #1a2a30; --ok: #3cc5b8; --ph: #7d8896; --corail: #f08a72; --corail-doux: #3a2523; --lagon-doux: #17312f; color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
@@ -67,7 +70,8 @@ p { margin: 0; max-width: 65ch; }
 }
 
 /* Accueil */
-.hero { padding-block: clamp(56px, 10vw, 120px) clamp(48px, 8vw, 96px); background: radial-gradient(120% 90% at 100% 0%, var(--soft), transparent 60%); }
+.hero { padding-block: clamp(56px, 10vw, 120px) clamp(48px, 8vw, 96px);
+  background: radial-gradient(90% 80% at 100% 0%, var(--lagon-doux), transparent 62%), radial-gradient(70% 70% at 0% 100%, var(--corail-doux), transparent 60%); }
 .hero .kicker { font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; color: var(--green); margin-bottom: 18px; }
 .hero h1 { font-size: clamp(2.4rem, 7.5vw, 4.8rem); letter-spacing: -0.02em; max-width: 15ch; }
 .hero h1 em, h2 em { font-style: italic; color: var(--accent); }
@@ -205,3 +209,55 @@ body.equipe section { border-top: 0; }
 .eq-ajout { max-width: 460px; }
 .eq-ajout h3 { font-size: 1.15rem; }
 .eq-table .btn { padding: 6px 14px; font-size: 0.9rem; }
+
+/* Les deux côtés de l'association */
+.portes { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.porte { position: relative; display: grid; gap: 14px; align-content: start; padding: clamp(24px, 4vw, 40px); border-radius: calc(var(--r) + 8px); border: 1px solid var(--line); min-width: 0; overflow: hidden; }
+.porte > * { position: relative; }
+.porte-corail { background: linear-gradient(150deg, var(--corail-doux), var(--surface) 70%); }
+.porte-lagon { background: linear-gradient(150deg, var(--lagon-doux), var(--surface) 70%); }
+.porte .lab { font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; }
+.porte-corail .lab, .porte-corail h3 em { color: var(--corail); }
+.porte-lagon .lab { color: var(--accent); }
+.porte h3 { font-size: clamp(1.6rem, 3.2vw, 2.2rem); }
+.porte h3 em { font-style: italic; color: var(--accent); }
+.porte img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 12px; }
+.porte-points { display: grid; gap: 6px; margin: 4px 0 0; padding: 0; list-style: none; font-weight: 700; }
+.porte-points li { padding-left: 26px; position: relative; }
+.porte-points li::before { content: ""; position: absolute; left: 4px; top: 0.55em; width: 10px; height: 10px; border-radius: 999px; background: var(--accent); }
+.porte-corail .porte-points li::before { background: var(--corail); }
+.porte .btn { margin-top: 8px; }
+.porte-corail .btn { background: var(--corail); color: var(--accent-ink); }
+
+/* Agenda */
+.agenda-sec { background: linear-gradient(180deg, transparent, var(--soft)); }
+.ag-liste { display: grid; gap: 12px; max-width: 860px; }
+.ag-mois-titre { font-size: 1.15rem; margin-top: 18px; color: var(--muted); }
+.ag-mois-titre:first-child { margin-top: 0; }
+.ag-items { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+.ag-item { display: grid; grid-template-columns: 72px 1fr; gap: 18px; padding: 16px 20px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); }
+.ag-date { display: grid; place-content: center; text-align: center; border-radius: 12px; background: var(--accent); color: var(--accent-ink); padding: 8px 0; align-self: start; }
+.ag-jour { font-family: var(--display); font-size: 1.7rem; line-height: 1; font-weight: 700; }
+.ag-mois { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+.ag-corps { display: grid; gap: 6px; min-width: 0; }
+.ag-corps h3 { font-size: 1.2rem; }
+.ag-meta { display: flex; flex-wrap: wrap; gap: 4px 16px; color: var(--muted); font-size: 0.95rem; }
+.ag-regulier { font-weight: 700; color: var(--accent); }
+.ag-desc { white-space: pre-line; }
+.ag-lien { font-weight: 700; justify-self: start; }
+.ag-vide { padding: 22px; background: var(--surface); border-radius: var(--r); border: 1px dashed var(--line); font-weight: 700; }
+.ag-erreur { border-style: solid; border-color: var(--corail); }
+
+/* Contact : formulaire et coordonnées côte à côte */
+.contact-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 32px; align-items: start; }
+.contact-grid > * { min-width: 0; }
+.contact-aside { display: grid; gap: 16px; }
+.contact-aside .mail-alt { margin: 0; }
+.js-form [aria-invalid="true"] { border-color: var(--corail); outline: 2px solid var(--corail); outline-offset: 0; }
+
+@media (max-width: 900px) {
+  .portes, .contact-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .ag-item { grid-template-columns: 58px 1fr; gap: 12px; padding: 14px; }
+}
