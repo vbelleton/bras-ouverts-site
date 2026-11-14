@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "description": "Fonctions seulement là où elles sont indispensables (quota Cloudflare). Voir README, section Quota.",
+  "include": [
+    "/api/*",
+    "/boutik",
+    "/boutik/",
+    "/boutik/index.html",
+    "/boutik/admin",
+    "/boutik/admin/*",
+    "/boutik/galerie",
+    "/boutik/galerie/*",
+    "/boutik/mentions",
+    "/boutik/mentions/*",
+    "/boutik/sw.js",
+    "/boutik/assets/ort*"
+  ],
+  "exclude": []
+}

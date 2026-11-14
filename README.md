@@ -46,6 +46,10 @@ Comme pour Kap’Itou : https://app.pagescms.org, connexion avec le compte GitHu
 
 Pour ouvrir un nouveau Parcours Alpha : bloc « Parcours Alpha et inscription » → « Parcours proposés à l’inscription » → ajouter un parcours avec un identifiant neuf (ex. `alpha-2027-printemps`), son nom et son nombre de places. Décocher « Inscriptions ouvertes » sur l’ancien. Ne pas changer l’identifiant d’un parcours dont les inscriptions ont commencé.
 
+## Quota Cloudflare
+
+Le compte gratuit a droit à 100 000 appels de fonction par jour, **pour tous ses sites** (église comprise). `public/_routes.json` limite les fonctions à `/api/*` et aux pages de la boutique ; ses autres fichiers (images, scripts) sont redirigés vers `petite-boutik-solidaire.pages.dev` par `_redirects`, sans fonction. Le 14/11/2026, une image en boucle relayée par `/boutik/*` a consommé 186 000 appels et coupé tous les sites du compte jusqu'à minuit UTC. Toute nouvelle fonction doit être ajoutée à `_routes.json` (test : `tests/routes.test.js`).
+
 ## Hébergement (Cloudflare Pages)
 
 Workers & Pages → Create → Pages → Connect to Git → ce dépôt, puis :
