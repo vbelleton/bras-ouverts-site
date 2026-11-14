@@ -14,9 +14,10 @@ test("seuls les événements « bras-ouverts » sont gardés", () => {
   assert.deepEqual(titres, ["Maraude"]);
 });
 
-test("la page demande au Worker l'agenda Bras Ouverts seulement", () => {
+test("la page demande au Worker l'agenda Bras Ouverts et les événements publiés sur les deux sites", () => {
   const js = readFileSync("src/agenda.js", "utf8");
-  assert.match(js, /source=\$\{AGENDA_BRAS_OUVERTS\}/);
+  assert.match(js, /source=\$\{source\}/);
+  assert.match(js, /lire\(api, AGENDA_BRAS_OUVERTS\), lire\(api, SOURCE_LES_DEUX\)/);
   assert.match(js, /AbortSignal\.timeout/);
   const html = readFileSync("dist/index.html", "utf8");
   assert.match(html, /class="agenda" data-api="https:\/\/eglise-app\.belletonv\.workers\.dev"/);
