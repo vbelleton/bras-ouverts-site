@@ -4,7 +4,7 @@
 // et le moteur partagé les filtre une seconde fois.
 // Le même chargement remplit aussi le bandeau « Prochains événements » en haut de page et les
 // listes « Prochaines dates » des maraudes. Les dates de la boutique viennent de sa propre base.
-import { buildEventList, AGENDA_BRAS_OUVERTS, SOURCE_LES_DEUX } from "./agenda-moteur.js";
+import { buildEventList, isoDay, AGENDA_BRAS_OUVERTS, SOURCE_LES_DEUX } from "./agenda-moteur.js";
 import { chargerOuvertures as lireOuvertures } from "./boutik-dates.js";
 import { choisirProchains, maraudesParRegle } from "./prochains.js";
 // Une seule lecture de la base de la boutique pour toute la page.
@@ -18,6 +18,7 @@ const moisCourt = (d) => d.toLocaleDateString("fr-FR", { month: "short" }).repla
 const moisLong = (d) => d.toLocaleDateString("fr-FR", { month: "long", year: "numeric" });
 const dateLongue = (d) => d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
 const heure = (h) => (h ? h.slice(0, 5).replace(":", " h ").replace(/ h 00$/, " h") : "");
+const majuscule = (t) => t.charAt(0).toUpperCase() + t.slice(1);
 const lienSur = (u) => (/^https?:\/\//i.test(String(u || "").trim()) ? String(u).trim() : "");
 
 const JOURS = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
@@ -82,7 +83,8 @@ function carte(ev) {
 }
 
 // Un seul appel au Worker pour toute la page.
-let evenements = null;
+let brut = null;
+let avenir = null;
 // Deux lectures : les événements propres à Bras Ouverts, et ceux publiés sur les deux sites (église + association).
 // La seconde est facultative : si elle échoue, l'agenda s'affiche avec la première.
 function lire(api, source) {
@@ -92,62 +94,166 @@ function lire(api, source) {
     return res.json();
   });
 }
-function chargerEvenements(api) {
-  if (!evenements) {
-    evenements = Promise.allSettled([lire(api, AGENDA_BRAS_OUVERTS), lire(api, SOURCE_LES_DEUX)]).then(([propres, deux]) => {
+function chargerBrut(api) {
+  if (!brut) {
+    brut = Promise.allSettled([lire(api, AGENDA_BRAS_OUVERTS), lire(api, SOURCE_LES_DEUX)]).then(([propres, deux]) => {
       if (propres.status === "rejected") throw propres.reason;
       const liste = [...propres.value];
       if (deux.status === "fulfilled") {
         const ids = new Set(liste.map((e) => e.id));
         for (const e of deux.value) if (!ids.has(e.id)) liste.push(e);
       }
-      return buildEventList(liste, { agenda: AGENDA_BRAS_OUVERTS });
+      return liste;
     });
   }
-  return evenements;
+  return brut;
+}
+// Rendez-vous à venir (diaporama du haut, « Prochaines dates » des encarts).
+function chargerEvenements(api) {
+  return (avenir ||= chargerBrut(api).then((l) => buildEventList(l, { agenda: AGENDA_BRAS_OUVERTS })));
+}
+// Avec l'historique (12 derniers mois) : le calendrier montre aussi les rendez-vous passés.
+const chargerHistorique = (api) => chargerBrut(api).then((l) => buildEventList(l, { futureOnly: false, agenda: AGENDA_BRAS_OUVERTS }));
+
+// Calendrier de l'agenda : grille du mois (lundi → dimanche) comme sur le site de l'église, passé compris,
+// et sous la grille la liste détaillée des rendez-vous du mois affiché. Les maraudes n'y figurent pas.
+const JOURS_COURTS = ["lun.", "mar.", "mer.", "jeu.", "ven.", "sam.", "dim."];
+const debutMois = (d) => new Date(d.getFullYear(), d.getMonth(), 1);
+const aujourdhui = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; };
+
+function carteBoutik(o) {
+  return el("li", { class: "ag-item ag-boutik" },
+    el("div", { class: "ag-date", "aria-hidden": "true" },
+      el("span", { class: "ag-jour" }, jour(o.date)),
+      el("span", { class: "ag-mois" }, moisCourt(o.date))),
+    el("div", { class: "ag-corps" },
+      el("h3", {}, "La P’tite Boutik est ouverte"),
+      el("p", { class: "ag-meta" }, el("span", {}, majuscule(dateLongue(o.date))), o.horaires ? el("span", {}, o.horaires) : null),
+      el("a", { href: "/boutik/", class: "ag-lien" }, "Découvrir la boutique")));
 }
 
 async function remplir(bloc) {
   const zone = bloc.querySelector(".ag-liste");
-  const max = Math.max(1, Number(bloc.dataset.max) || 12);
-  try {
-    // Un rendez-vous régulier n'occupe qu'une carte : sa prochaine date.
-    const vus = new Set();
-    // Les maraudes ne sont pas dans l'agenda public : seule leur prochaine date figure en haut de page.
-    const liste = (await chargerEvenements(bloc.dataset.api))
-      .filter((ev) => genre(ev) !== "maraude")
-      .filter((ev) => !ev.repeat_period || (!vus.has(ev.id) && vus.add(ev.id)))
-      .slice(0, max);
-    zone.replaceChildren();
-    if (!liste.length) {
-      // « Vide » n'est pas « pas pu charger » : ici l'agenda est réellement vide.
-      zone.append(el("p", { class: "ag-vide" }, bloc.dataset.vide));
+  const [evs, bk] = await Promise.allSettled([chargerHistorique(bloc.dataset.api), chargerOuvertures()]);
+  if (evs.status === "rejected") console.error("agenda:", evs.reason?.name || "erreur");
+  const items = [];
+  if (evs.status === "fulfilled") {
+    for (const ev of evs.value) {
+      if (genre(ev) === "maraude") continue;
+      items.push({ date: ev.date, fin: ev.dateFin || ev.date, sorte: genre(ev) === "boutik" ? "boutik" : "evenement",
+        titre: `${ev.emoji ? `${ev.emoji} ` : ""}${ev.titre || "Événement"}`, carte: () => carte(ev) });
+    }
+  }
+  if (bk.status === "fulfilled") {
+    for (const o of bk.value.dates) {
+      const horaires = o.horaires || bk.value.plage;
+      items.push({ date: o.date, fin: o.date, sorte: "boutik", titre: "P’tite Boutik", carte: () => carteBoutik({ ...o, horaires }) });
+    }
+  }
+  items.sort((a, b) => a.date - b.date);
+  // Chaque jour couvert (un événement sur plusieurs jours apparaît sur chacun).
+  const parJour = new Map();
+  for (const it of items) {
+    const d = new Date(it.date); d.setHours(0, 0, 0, 0);
+    const f = new Date(it.fin); f.setHours(0, 0, 0, 0);
+    for (let n = 0; d <= f && n < 62; n++, d.setDate(d.getDate() + 1)) {
+      const k = isoDay(d);
+      if (!parJour.has(k)) parJour.set(k, []);
+      parJour.get(k).push(it);
+    }
+  }
+
+  const auj = aujourdhui();
+  const min = new Date(auj.getFullYear() - 1, auj.getMonth(), 1);
+  const dernier = items.length ? items[items.length - 1].date : auj;
+  const max = debutMois(new Date(Math.max(dernier, new Date(auj.getFullYear(), auj.getMonth() + 3, 1))));
+  let mois = debutMois(auj);
+
+  const titre = el("h3", { class: "cal-titre", "aria-live": "polite" });
+  const prec = el("button", { type: "button", class: "cal-fleche", "aria-label": "Mois précédent" }, "‹");
+  const suiv = el("button", { type: "button", class: "cal-fleche", "aria-label": "Mois suivant" }, "›");
+  const ajd = el("button", { type: "button", class: "cal-auj" }, "Aujourd’hui");
+  const grille = el("div", { class: "cal-grille" });
+  const liste = el("div", { class: "cal-liste" });
+  const erreur = evs.status === "rejected"
+    ? el("p", { class: "ag-vide ag-erreur" }, "Les événements n’ont pas pu être chargés pour le moment. Réessayez plus tard, ou écrivez-nous pour connaître les prochaines dates.")
+    : null;
+
+  const aller = (m) => { mois = m < min ? min : m > max ? max : m; dessiner(); };
+  prec.addEventListener("click", () => aller(new Date(mois.getFullYear(), mois.getMonth() - 1, 1)));
+  suiv.addEventListener("click", () => aller(new Date(mois.getFullYear(), mois.getMonth() + 1, 1)));
+  ajd.addEventListener("click", () => aller(debutMois(auj)));
+
+  function montrerJour(k) {
+    const cible = liste.querySelector(`[data-jour="${k}"]`);
+    if (!cible) return;
+    cible.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center" });
+    cible.classList.remove("ag-vu"); void cible.offsetWidth; cible.classList.add("ag-vu");
+    cible.querySelector("a, h3")?.setAttribute("tabindex", "-1");
+  }
+
+  function dessiner() {
+    titre.textContent = majuscule(moisLong(mois));
+    prec.disabled = mois <= min;
+    suiv.disabled = mois >= max;
+    ajd.hidden = +mois === +debutMois(auj);
+    const cellules = JOURS_COURTS.map((j) => el("div", { class: "cal-entete", "aria-hidden": "true" }, j));
+    const decalage = (mois.getDay() + 6) % 7;
+    for (let n = 0; n < decalage; n++) cellules.push(el("div", { class: "cal-case cal-hors" }));
+    const nbJours = new Date(mois.getFullYear(), mois.getMonth() + 1, 0).getDate();
+    const duMois = [];
+    for (let j = 1; j <= nbJours; j++) {
+      const d = new Date(mois.getFullYear(), mois.getMonth(), j);
+      const k = isoDay(d);
+      const rdv = parJour.get(k) || [];
+      const passe = d < auj;
+      const classes = ["cal-case", passe && "cal-passe", +d === +auj && "cal-auj-case", rdv.length && "cal-plein"].filter(Boolean).join(" ");
+      const num = el("span", { class: "cal-num" }, String(j));
+      const pastilles = rdv.map((it) => el("span", { class: `cal-pastille cal-${it.sorte}` }, it.titre));
+      const etiquette = `${majuscule(dateLongue(d))}${rdv.length ? ` : ${rdv.map((it) => it.titre).join(", ")}` : ""}`;
+      if (rdv.length) {
+        const b = el("button", { type: "button", class: classes, "aria-label": etiquette }, num, el("span", { class: "cal-pastilles", "aria-hidden": "true" }, ...pastilles));
+        b.addEventListener("click", () => montrerJour(k));
+        cellules.push(b);
+        for (const it of rdv) if (!duMois.some((x) => x.it === it)) duMois.push({ it, k });
+      } else {
+        cellules.push(el("div", { class: classes }, num));
+      }
+    }
+    while ((cellules.length - 7) % 7) cellules.push(el("div", { class: "cal-case cal-hors" }));
+    grille.replaceChildren(...cellules);
+
+    liste.replaceChildren();
+    if (!duMois.length) {
+      const prochain = items.find((it) => it.date >= auj && debutMois(it.date) > mois);
+      liste.append(el("p", { class: "ag-vide" },
+        +mois === +debutMois(auj) || mois > auj ? "Pas de rendez-vous annoncé ce mois-ci." : "Pas de rendez-vous ce mois-là.",
+        prochain ? " " : "",
+        prochain ? (() => { const b = el("button", { type: "button", class: "cal-lien" }, `Prochain : ${prochain.titre}, ${dateLongue(prochain.date)}`); b.addEventListener("click", () => aller(debutMois(prochain.date))); return b; })() : null));
       return;
     }
-    let mois = "";
-    let ul = null;
-    for (const ev of liste) {
-      const m = moisLong(ev.date);
-      if (m !== mois) {
-        mois = m;
-        zone.append(el("h3", { class: "ag-mois-titre" }, m.charAt(0).toUpperCase() + m.slice(1)));
-        ul = el("ul", { class: "ag-items" });
-        zone.append(ul);
-      }
-      ul.append(carte(ev));
+    const ul = el("ul", { class: "ag-items" });
+    for (const { it, k } of duMois) {
+      const li = it.carte();
+      li.dataset.jour = k;
+      if (it.fin < auj) { li.classList.add("ag-passe"); li.querySelector(".ag-meta")?.prepend(el("span", { class: "ag-etiquette" }, "Passé")); }
+      ul.append(li);
     }
-  } catch (e) {
-    console.error("agenda:", e?.name || "erreur");
-    zone.replaceChildren(el("p", { class: "ag-vide ag-erreur" },
-      "L’agenda n’a pas pu être chargé pour le moment. Réessayez plus tard, ou écrivez-nous pour connaître les prochaines dates."));
+    liste.append(ul);
   }
+
+  zone.replaceChildren(...[erreur,
+    el("div", { class: "cal-tete" }, prec, titre, suiv, ajd),
+    grille,
+    liste].filter(Boolean));
+  zone.classList.add("cal");
+  dessiner();
 }
 
 // Bloc du haut de l'accueil, en diaporama (un rendez-vous à la fois). Choix des 3 rendez-vous :
 // les événements d'abord (ciné goûter, fête…) ; s'il en manque, la prochaine ouverture de la boutique,
 // puis la prochaine maraude (date seulement, jamais le lieu), puis d'autres ouvertures de la boutique.
 // 3 événements → 3 événements ; 2 → 2 + boutique ; 1 → 1 + boutique + maraude ; 0 → boutique, maraude, boutique.
-const majuscule = (t) => t.charAt(0).toUpperCase() + t.slice(1);
 function cartePr({ date, titre, detail, lien, sorte, lienTxt }) {
   return el("li", { class: `pr-item pr-${sorte}` },
     el("span", { class: "pr-date", "aria-hidden": "true" },

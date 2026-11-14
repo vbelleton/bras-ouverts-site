@@ -44,7 +44,8 @@ h2 { font-size: clamp(1.7rem, 4vw, 2.5rem); }
 h3 { font-size: 1.3rem; }
 p { margin: 0; max-width: 65ch; }
 
-.wrap { max-width: 1120px; margin: 0 auto; padding-inline: 20px; }
+/* Toute la largeur possible sur grand écran (même largeur que la boutique) */
+.wrap { max-width: 1520px; margin: 0 auto; padding-inline: clamp(20px, 3vw, 48px); }
 
 /* En-tête */
 .top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
@@ -241,7 +242,9 @@ body.equipe section { border-top: 0; }
 .eq-table .btn { padding: 6px 14px; font-size: 0.9rem; }
 
 /* Les deux côtés de l'association */
-.portes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 24px; }
+.portes { display: flex; flex-wrap: wrap; gap: 24px; }
+/* Pavés : toujours toute la largeur, même seul sur sa ligne (le dernier s'étire) */
+.portes > .porte { flex: 1 1 300px; }
 .porte { position: relative; display: grid; gap: 14px; align-content: start; padding: clamp(24px, 4vw, 40px); border-radius: calc(var(--r) + 8px); border: 1px solid var(--line); min-width: 0; overflow: hidden; }
 .porte > * { position: relative; }
 .porte-corail { background: linear-gradient(150deg, var(--corail-doux), var(--surface) 70%); }
@@ -265,7 +268,7 @@ body.equipe section { border-top: 0; }
 
 /* Agenda */
 .agenda-sec { background: linear-gradient(180deg, transparent, var(--soft)); }
-.ag-liste { display: grid; gap: 12px; max-width: 860px; }
+.ag-liste { display: grid; gap: 12px; }
 .ag-mois-titre { font-size: 1.15rem; margin-top: 18px; color: var(--muted); }
 .ag-mois-titre:first-child { margin-top: 0; }
 .ag-items { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
@@ -290,7 +293,8 @@ body.equipe section { border-top: 0; }
 .js-form [aria-invalid="true"] { border-color: var(--corail); outline: 2px solid var(--corail); outline-offset: 0; }
 
 @media (max-width: 900px) {
-  .portes, .contact-grid { grid-template-columns: 1fr; }
+  .contact-grid { grid-template-columns: 1fr; }
+  .portes > .porte { flex-basis: 100%; }
 }
 @media (max-width: 480px) {
   .ag-item { grid-template-columns: 58px 1fr; gap: 12px; padding: 14px; }
@@ -406,3 +410,43 @@ body.equipe section { border-top: 0; }
 .dt-squelette:nth-child(2) { width: 85%; } .dt-squelette:nth-child(3) { width: 70%; }
 .ag-squelette { height: 96px; border-radius: var(--r); }
 @media (prefers-reduced-motion: reduce) { .pr-squelette .pr-date, .pr-squelette .pr-corps span, .dt-squelette, .ag-squelette { animation: none; } }
+
+/* Calendrier de l'agenda : grille du mois, passé compris, puis la liste des rendez-vous du mois */
+.cal { gap: 18px; }
+.cal-tete { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.cal-titre { font-size: clamp(1.3rem, 3vw, 1.7rem); min-width: 9ch; text-align: center; }
+.cal-fleche { display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); font-size: 1.5rem; line-height: 1; cursor: pointer; }
+.cal-fleche:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.cal-fleche:disabled { opacity: .35; cursor: default; }
+.cal-auj { margin-left: auto; padding: 8px 16px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); font: inherit; font-weight: 700; font-size: 0.9rem; cursor: pointer; }
+.cal-auj[hidden] { display: none; }
+.cal-grille { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.cal-entete { padding: 8px 4px; background: var(--soft); text-align: center; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.cal-case { display: flex; flex-direction: column; align-items: stretch; gap: 4px; min-height: 96px; min-width: 0; padding: 6px; margin: 0; border: 0; border-radius: 0; background: var(--surface); color: var(--ink); font: inherit; text-align: left; }
+.cal-hors { background: var(--bg); }
+.cal-passe { background: color-mix(in srgb, var(--surface) 55%, var(--bg)); }
+.cal-passe .cal-num { color: var(--muted); }
+button.cal-case { cursor: pointer; }
+button.cal-case:hover { background: var(--soft); }
+.cal-num { font-weight: 700; font-size: 0.9rem; }
+.cal-auj-case .cal-num { display: inline-grid; place-items: center; align-self: flex-start; min-width: 26px; height: 26px; border-radius: 999px; background: var(--accent); color: var(--accent-ink); }
+.cal-pastilles { display: grid; gap: 3px; min-width: 0; }
+.cal-pastille { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; padding: 2px 6px; border-radius: 6px; font-size: 0.76rem; font-weight: 700; background: var(--bleu-doux); color: var(--bleu); border-left: 3px solid var(--bleu); }
+.cal-boutik { background: var(--corail-doux); color: var(--corail); border-left-color: var(--corail); }
+.cal-passe .cal-pastille { opacity: .6; }
+.cal-liste { display: grid; gap: 12px; }
+.cal-lien { padding: 0; border: 0; background: none; color: var(--accent); font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; text-align: left; }
+.ag-passe { opacity: .72; }
+.ag-etiquette { font-weight: 700; color: var(--muted); text-transform: uppercase; font-size: 0.78rem; letter-spacing: 0.08em; }
+.ag-item[data-jour] { scroll-margin: 120px; }
+.ag-vu { animation: agVu 1.6s ease; }
+@keyframes agVu { 0%, 40% { box-shadow: 0 0 0 3px var(--accent); } 100% { box-shadow: 0 0 0 0 transparent; } }
+@media (max-width: 700px) {
+  .cal-case { min-height: 52px; padding: 4px; align-items: center; }
+  .cal-entete { font-size: 0.68rem; padding: 6px 0; letter-spacing: 0; }
+  .cal-pastilles { display: flex; flex-wrap: wrap; justify-content: center; gap: 3px; }
+  .cal-pastille { width: 8px; height: 8px; padding: 0; border: 0; border-radius: 999px; font-size: 0; background: var(--bleu); }
+  .cal-boutik { background: var(--corail); }
+  .cal-auj { margin-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .ag-vu { animation: none; outline: 3px solid var(--accent); } }

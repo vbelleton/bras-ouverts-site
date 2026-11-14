@@ -161,9 +161,8 @@ content:
               - { name: menu, component: menu }
               - { name: label, component: label }
               - { name: title, component: title }
-              - { name: intro, label: Introduction, type: text, description: "Couleurs : bleu pour les événements, corail pour la boutique (titre contenant « boutik » ou « boutique »). Les rendez-vous dont le titre contient « maraude » ne sont pas listés dans l'agenda : seule leur prochaine date apparaît dans le diaporama du haut. Les dates elles-mêmes se saisissent dans l'écran des événements de l'admin du site de l'église, avec « Publier sur : site Bras Ouverts »." }
+              - { name: intro, label: Introduction, type: text, description: "Couleurs : bleu pour les événements, corail pour la boutique (titre contenant « boutik » ou « boutique »). L'agenda est un calendrier mois par mois (rendez-vous passés compris). Les rendez-vous dont le titre contient « maraude » n'y figurent pas : seule leur prochaine date apparaît dans le diaporama du haut. Les dates elles-mêmes se saisissent dans l'écran des événements de l'admin du site de l'église, avec « Publier sur : site Bras Ouverts »." }
               - { name: empty, label: Message quand aucune date n'est prévue, type: string }
-              - { name: max, label: Nombre maximum de dates affichées, type: number }
 
           - name: actions
             label: Nos actions (maraudes, bénévolat…)
