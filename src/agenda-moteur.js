@@ -22,11 +22,21 @@
 // le même écran d'admin (EventManager.vue, choix « Publier sur »). Tout le
 // reste (source vide, ou une source d'import) appartient à Cieux Ouverts.
 // Ne jamais afficher un événement Bras Ouverts sur le site de l'église, ni
-// l'inverse : le filtre est dans buildEventList, utilisé par les deux sites.
+// l'inverse (sauf s'il est publié sur les deux) : le filtre est dans buildEventList, utilisé par les deux sites.
 export const AGENDA_CIEUX_OUVERTS = 'cieux-ouverts'
 export const AGENDA_BRAS_OUVERTS = 'bras-ouverts'
+// Un événement peut aussi être publié sur les deux sites à la fois (ex. une fête ouverte à tous) :
+// il porte alors `source = 'cieux-et-bras-ouverts'` et s'affiche dans les deux agendas.
+export const AGENDA_LES_DEUX = 'les-deux'
+export const SOURCE_LES_DEUX = 'cieux-et-bras-ouverts'
 export function agendaDe(ev) {
-  return ev && ev.source === AGENDA_BRAS_OUVERTS ? AGENDA_BRAS_OUVERTS : AGENDA_CIEUX_OUVERTS
+  if (ev && ev.source === AGENDA_BRAS_OUVERTS) return AGENDA_BRAS_OUVERTS
+  if (ev && ev.source === SOURCE_LES_DEUX) return AGENDA_LES_DEUX
+  return AGENDA_CIEUX_OUVERTS
+}
+// L'événement (déjà passé par agendaDe) doit-il apparaître sur ce site ?
+export function visibleSur(agendaEvenement, site) {
+  return agendaEvenement === site || agendaEvenement === AGENDA_LES_DEUX
 }
 
 export function isoDay(date) {
@@ -306,7 +316,7 @@ export function buildEventList(allEvents, { futureOnly = true, now: nowArg, agen
 
   for (const ev of allEvents || []) {
     if (ev.status === 'cancelled') continue
-    if (agendaDe(ev) !== agenda) continue
+    if (!visibleSur(agendaDe(ev), agenda)) continue
 
     if (ev.repeat_period) {
       const occurrences = expandRecurring(ev, now, 12)

@@ -61,3 +61,11 @@ test("encart bleu Événements avec ses prochaines dates", () => {
   assert.match(html, /data-dates="evenements"/);
   assert.match(html, /data-maraude-debut="2026-11-14" data-maraude-jours="14"/);
 });
+
+import { buildEventList, agendaDe } from "../src/agenda-moteur.js";
+test("un événement publié sur les deux sites apparaît dans l'agenda de Bras Ouverts", () => {
+  const ev = (o) => ({ id: 1, title: "x", start_date: "2099-01-01", end_date: null, repeat_period: null, status: "active", exceptions: [], ...o });
+  const liste = [ev({ id: 1, title: "Culte" }), ev({ id: 2, title: "Fête", source: "cieux-et-bras-ouverts" }), ev({ id: 3, title: "Ciné", source: "bras-ouverts" })];
+  assert.equal(agendaDe(liste[1]), "les-deux");
+  assert.deepEqual(buildEventList(liste, { agenda: "bras-ouverts" }).map((e) => e.titre).sort(), ["Ciné", "Fête"]);
+});

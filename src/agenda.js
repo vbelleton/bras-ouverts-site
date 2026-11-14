@@ -4,7 +4,7 @@
 // et le moteur partagé les filtre une seconde fois.
 // Le même chargement remplit aussi le bandeau « Prochains événements » en haut de page et les
 // listes « Prochaines dates » des maraudes. Les dates de la boutique viennent de sa propre base.
-import { buildEventList, AGENDA_BRAS_OUVERTS } from "./agenda-moteur.js";
+import { buildEventList, AGENDA_BRAS_OUVERTS, SOURCE_LES_DEUX } from "./agenda-moteur.js";
 import { chargerOuvertures as lireOuvertures } from "./boutik-dates.js";
 import { choisirProchains, maraudesParRegle } from "./prochains.js";
 // Une seule lecture de la base de la boutique pour toute la page.
@@ -83,13 +83,26 @@ function carte(ev) {
 
 // Un seul appel au Worker pour toute la page.
 let evenements = null;
+// Deux lectures : les événements propres à Bras Ouverts, et ceux publiés sur les deux sites (église + association).
+// La seconde est facultative : si elle échoue, l'agenda s'affiche avec la première.
+function lire(api, source) {
+  const url = `${api.replace(/\/$/, "")}/api/church-events?source=${source}&include_exceptions=1&size=100`;
+  return fetch(url, { signal: AbortSignal.timeout(DELAI_MS) }).then((res) => {
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+  });
+}
 function chargerEvenements(api) {
   if (!evenements) {
-    const url = `${api.replace(/\/$/, "")}/api/church-events?source=${AGENDA_BRAS_OUVERTS}&include_exceptions=1&size=100`;
-    evenements = fetch(url, { signal: AbortSignal.timeout(DELAI_MS) }).then((res) => {
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return res.json();
-    }).then((json) => buildEventList(json, { agenda: AGENDA_BRAS_OUVERTS }));
+    evenements = Promise.allSettled([lire(api, AGENDA_BRAS_OUVERTS), lire(api, SOURCE_LES_DEUX)]).then(([propres, deux]) => {
+      if (propres.status === "rejected") throw propres.reason;
+      const liste = [...propres.value];
+      if (deux.status === "fulfilled") {
+        const ids = new Set(liste.map((e) => e.id));
+        for (const e of deux.value) if (!ids.has(e.id)) liste.push(e);
+      }
+      return buildEventList(liste, { agenda: AGENDA_BRAS_OUVERTS });
+    });
   }
   return evenements;
 }
