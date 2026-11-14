@@ -9,3 +9,7 @@
 /petite-boutik /boutik/ 301
 /ptite-boutik /boutik/ 301
 /equipe /inscriptions 302
+# Fichiers de la boutique (images, icônes…) : simple redirection vers son propre site, sans fonction.
+# Seules les pages, son service worker et l'outil de détourage de l'admin passent par le relais
+# (functions/boutik/[[path]].js), voir public/_routes.json. Garder cette règle EN DERNIER.
+/boutik/* https://petite-boutik-solidaire.pages.dev/boutik/:splat 302
