@@ -21,10 +21,19 @@ test("les valeurs Firestore (format REST) sont décodées", () => {
   assert.deepEqual(h, { plage: "10h – 17h", regles: [{ jour: 3, semaines: [2] }] });
 });
 
-test("la page a le bandeau des prochains événements et les listes de dates", () => {
+test("la page a le bloc des prochains événements, les dates de la boutique, aucune date de maraude", () => {
   const html = readFileSync("dist/index.html", "utf8");
-  assert.match(html, /class="prochains" data-api="https:\/\/eglise-app\.belletonv\.workers\.dev" data-max="3" hidden/);
+  assert.match(html, /<section class="prochains" data-api="https:\/\/eglise-app\.belletonv\.workers\.dev" data-max="3"/);
+  assert.ok(html.indexOf('class="prochains"') < html.indexOf('class="hero"'), "le bloc est tout en haut");
   assert.match(html, /data-dates="boutik"/);
-  assert.match(html, /data-dates="maraude"/);
+  assert.doesNotMatch(html, /data-dates="maraude"/, "les maraudes ne sont pas annoncées");
+  assert.doesNotMatch(html, /lg-maraude/);
   assert.doesNotMatch(html, /js-mail/, "plus d'adresse e-mail affichée");
+});
+
+test("le menu commun est publié pour la boutique (menu.json)", () => {
+  const { liens } = JSON.parse(readFileSync("dist/menu.json", "utf8"));
+  assert.ok(liens.length >= 3);
+  for (const l of liens) assert.match(l.url, /^(\/|https?:)/, "liens absolus, utilisables depuis /boutik/");
+  assert.ok(liens.some((l) => l.url === "/boutik/"));
 });

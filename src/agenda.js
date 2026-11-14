@@ -5,7 +5,10 @@
 // Le même chargement remplit aussi le bandeau « Prochains événements » en haut de page et les
 // listes « Prochaines dates » des maraudes. Les dates de la boutique viennent de sa propre base.
 import { buildEventList, AGENDA_BRAS_OUVERTS } from "./agenda-moteur.js";
-import { chargerOuvertures } from "./boutik-dates.js";
+import { chargerOuvertures as lireOuvertures } from "./boutik-dates.js";
+// Une seule lecture de la base de la boutique pour toute la page.
+let ouvertures = null;
+const chargerOuvertures = () => (ouvertures ||= lireOuvertures());
 
 const DELAI_MS = 8000; // un Worker muet ne doit pas laisser « Chargement » à l'infini
 
@@ -85,7 +88,9 @@ function chargerEvenements(api) {
     evenements = fetch(url, { signal: AbortSignal.timeout(DELAI_MS) }).then((res) => {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return res.json();
-    }).then((json) => buildEventList(json, { agenda: AGENDA_BRAS_OUVERTS }));
+    }).then((json) => buildEventList(json, { agenda: AGENDA_BRAS_OUVERTS })
+      // Les maraudes ne sont pas annoncées publiquement : jamais affichées, même saisies dans l'agenda.
+      .filter((ev) => genre(ev) !== "maraude"));
   }
   return evenements;
 }
@@ -94,7 +99,7 @@ async function remplir(bloc) {
   const zone = bloc.querySelector(".ag-liste");
   const max = Math.max(1, Number(bloc.dataset.max) || 12);
   try {
-    // Un rendez-vous régulier (maraude du jeudi…) n'occupe qu'une carte : sa prochaine date.
+    // Un rendez-vous régulier n'occupe qu'une carte : sa prochaine date.
     const vus = new Set();
     const liste = (await chargerEvenements(bloc.dataset.api))
       .filter((ev) => !ev.repeat_period || (!vus.has(ev.id) && vus.add(ev.id)))
@@ -124,27 +129,52 @@ async function remplir(bloc) {
   }
 }
 
-// Bandeau du haut : les prochains événements (ciné goûter, fête…), pas les dates habituelles.
-// S'il n'y en a aucun, ou si l'agenda ne répond pas, le bandeau reste caché.
-const dateCourte = (d) => d.toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" }).replace(/\./g, "");
-async function remplirProchains(bandeau) {
-  try {
-    const vus = new Set();
-    const liste = (await chargerEvenements(bandeau.dataset.api))
-      .filter((ev) => genre(ev) === "evenement" && !vus.has(ev.id) && vus.add(ev.id))
-      .slice(0, Math.max(1, Number(bandeau.dataset.max) || 3));
-    if (!liste.length) return;
-    bandeau.querySelector("ul").replaceChildren(...liste.map((ev) => el("li", {},
-      el("a", { href: "#agenda" },
-        el("span", { class: "pr-date" }, ((t) => t.charAt(0).toUpperCase() + t.slice(1))(dateCourte(ev.date))),
-        el("span", { class: "pr-titre" }, ev.emoji ? `${ev.emoji} ` : "", ev.titre || "Événement")))));
-    bandeau.hidden = false;
-  } catch (e) {
-    console.error("prochains:", e?.name || "erreur");
+// Bloc du haut de l'accueil : les 3 prochains rendez-vous. D'abord les événements (ciné goûter,
+// fête…, en bleu), complétés au besoin par les prochaines ouvertures de la P'tite Boutik (en corail).
+// Jamais les maraudes. Si rien ne répond, un message renvoie vers l'agenda.
+const majuscule = (t) => t.charAt(0).toUpperCase() + t.slice(1);
+function cartePr({ date, titre, detail, lien, sorte }) {
+  return el("li", { class: `pr-item pr-${sorte}` },
+    el("a", { href: lien },
+      el("span", { class: "pr-date", "aria-hidden": "true" },
+        el("span", { class: "pr-jour" }, jour(date)),
+        el("span", { class: "pr-mois" }, moisCourt(date))),
+      el("span", { class: "pr-corps" },
+        el("span", { class: "pr-quand" }, majuscule(dateLongue(date))),
+        el("strong", { class: "pr-titre" }, titre),
+        detail ? el("span", { class: "pr-detail" }, detail) : null)));
+}
+async function remplirProchains(bloc) {
+  const ul = bloc.querySelector("ul");
+  const max = Math.max(1, Number(bloc.dataset.max) || 3);
+  const [evs, bk] = await Promise.allSettled([chargerEvenements(bloc.dataset.api), chargerOuvertures()]);
+  const vus = new Set();
+  const cartes = (evs.status === "fulfilled" ? evs.value : [])
+    .filter((ev) => genre(ev) === "evenement" && !vus.has(ev.id) && vus.add(ev.id))
+    .map((ev) => ({ date: ev.date, sorte: "evenement", lien: "#agenda",
+      titre: `${ev.emoji ? `${ev.emoji} ` : ""}${ev.titre || "Événement"}`,
+      detail: [[heure(ev.heure), ev.fin ? heure(ev.fin) : ""].filter(Boolean).join(" – "), ev.lieu].filter(Boolean).join(" · ") }));
+  if (bk.status === "fulfilled") {
+    for (const d of bk.value.dates) cartes.push({ date: d.date, sorte: "boutik", lien: "/boutik/",
+      titre: "La P’tite Boutik est ouverte", detail: d.horaires || bk.value.plage });
   }
+  // Les événements passent devant ; la boutique ne fait que compléter les places libres.
+  const choix = [...cartes.filter((c) => c.sorte === "evenement").slice(0, max)];
+  choix.push(...cartes.filter((c) => c.sorte === "boutik").slice(0, max - choix.length));
+  choix.sort((a, b) => a.date - b.date);
+  if (evs.status === "rejected") console.error("prochains:", evs.reason?.name || "erreur");
+  if (!choix.length) {
+    ul.replaceChildren(el("li", { class: "pr-vide" },
+      evs.status === "rejected" && bk.status === "rejected"
+        ? "Les prochains rendez-vous n’ont pas pu être chargés. Réessayez plus tard."
+        : "Pas de rendez-vous annoncé pour le moment.",
+      " ", el("a", { href: "#agenda" }, "Voir l’agenda")));
+    return;
+  }
+  ul.replaceChildren(...choix.map(cartePr));
 }
 
-// « Prochaines dates » d'une maraude ou de la boutique (cartes de l'accueil, rubrique Maraude).
+// « Prochaines dates » de la boutique (carte de l'accueil).
 const dateJour = (d) => { const t = dateLongue(d); return t.charAt(0).toUpperCase() + t.slice(1); };
 async function remplirDates(zone) {
   const ul = zone.querySelector("ul");

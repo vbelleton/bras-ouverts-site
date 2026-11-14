@@ -15,3 +15,7 @@
 /manifest.webmanifest
   Content-Type: application/manifest+json
   Cache-Control: no-cache
+# Menu commun, lu par la P'tite Boutik (aussi depuis petite-boutik-solidaire.pages.dev).
+/menu.json
+  Access-Control-Allow-Origin: *
+  Cache-Control: no-cache

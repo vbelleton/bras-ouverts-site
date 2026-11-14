@@ -320,15 +320,6 @@ body.equipe section { border-top: 0; }
 .eq-message .btn { padding: 6px 14px; font-size: 0.9rem; }
 
 /* Bandeau « Prochains événements » sous l'en-tête */
-.prochains { background: var(--bleu-doux); border-bottom: 1px solid var(--line); }
-.prochains .wrap { display: flex; align-items: center; gap: 6px 16px; padding-block: 8px; overflow-x: auto; scrollbar-width: none; }
-.prochains .wrap::-webkit-scrollbar { display: none; }
-.pr-lab { flex: none; font-size: 0.74rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; color: var(--bleu); }
-.prochains ul { display: flex; gap: 8px; margin: 0; padding: 0; list-style: none; }
-.prochains li { flex: none; }
-.prochains a { display: inline-flex; align-items: baseline; gap: 8px; padding: 4px 12px; border-radius: 999px; background: var(--surface); border: 1px solid color-mix(in srgb, var(--bleu) 30%, transparent); color: var(--ink); text-decoration: none; font-size: 0.92rem; white-space: nowrap; }
-.prochains a:hover { border-color: var(--bleu); }
-.pr-date { font-weight: 700; color: var(--bleu); }
 
 /* Couleurs de l'agenda : événements en bleu, maraudes en turquoise, boutique en corail */
 .ag-legende { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: -18px 0 24px; padding: 0; list-style: none; font-size: 0.9rem; font-weight: 700; color: var(--muted); }
@@ -359,14 +350,28 @@ body.equipe section { border-top: 0; }
 
 /* Contact : rappel « nous répondons à tous les messages » */
 .contact-note { padding: 18px 20px; border-radius: var(--r); background: var(--soft); font-family: var(--display); font-size: 1.25rem; line-height: 1.35; color: var(--green); }
-@media (max-width: 700px) {
-  .prochains .wrap { display: grid; gap: 6px; overflow: visible; padding-block: 8px 10px; }
-  .prochains ul { overflow-x: auto; scrollbar-width: none; margin-inline: -20px; padding-inline: 20px; }
-  .prochains ul::-webkit-scrollbar { display: none; }
-}
 
 /* Espace équipe : où partent les e-mails du formulaire */
 .eq-mail { margin: 0; padding: 10px 14px; border-radius: 10px; font-size: 0.92rem; font-weight: 700; }
 .eq-mail.ok { background: var(--soft); color: var(--ok); }
 .eq-mail.err { background: var(--corail-doux); color: var(--corail); }
 .eq-login .btn { justify-self: start; }
+
+/* Bloc « Prochains événements » en haut de l'accueil : 3 cartes, bleu pour les événements, corail pour la boutique. */
+.prochains { padding-block: clamp(24px, 4vw, 40px); border-top: 0; border-bottom: 1px solid var(--line); background: linear-gradient(180deg, var(--bleu-doux), var(--bg)); }
+.pr-lab { font-family: var(--body); font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; color: var(--bleu); margin-bottom: 14px; }
+.pr-liste { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 0; padding: 0; list-style: none; }
+.pr-item a { display: flex; gap: 14px; align-items: flex-start; height: 100%; padding: 16px; border-radius: var(--r); background: var(--surface); border: 1px solid var(--line); border-left: 5px solid var(--bleu); color: var(--ink); text-decoration: none; }
+.pr-item a:hover { border-color: var(--bleu); }
+.pr-boutik a { border-left-color: var(--corail); }
+.pr-boutik a:hover { border-color: var(--corail); }
+.pr-date { flex: none; display: grid; place-items: center; width: 56px; padding: 6px 0; border-radius: 12px; background: var(--bleu-doux); color: var(--bleu); line-height: 1.1; }
+.pr-boutik .pr-date { background: var(--corail-doux); color: var(--corail); }
+.pr-jour { font-family: var(--display); font-size: 1.5rem; font-weight: 700; }
+.pr-mois { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+.pr-corps { display: grid; gap: 2px; min-width: 0; }
+.pr-quand { font-size: 0.85rem; color: var(--muted); }
+.pr-titre { font-family: var(--display); font-size: 1.1rem; line-height: 1.25; }
+.pr-detail { font-size: 0.9rem; color: var(--muted); }
+.pr-vide { grid-column: 1 / -1; color: var(--muted); }
+@media (max-width: 800px) { .pr-liste { grid-template-columns: 1fr; gap: 10px; } .pr-item a { padding: 12px 14px; } }
