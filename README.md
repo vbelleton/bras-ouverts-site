@@ -10,7 +10,9 @@ Site de l’association Bras Ouverts, en deux côtés : la P’tite Boutik Solid
 | `build.mjs` | Génère `dist/index.html` à partir du contenu (Node, sans dépendance) |
 | `src/style.css`, `src/forms.js`, `src/theme.js` | Styles, envoi des formulaires, thème clair/sombre |
 | `public/` | Logo (`logo.png`, `favicon.png`), photos ajoutées depuis l’administration (`uploads/`) |
-| `src/agenda.js`, `src/agenda-moteur.js` | Agenda : événements Bras Ouverts lus dans le navigateur depuis le Worker `eglise-app` (le moteur est une copie de celui du site de l’église) |
+| `src/agenda.js`, `src/agenda-moteur.js` | Agenda : événements Bras Ouverts lus dans le navigateur depuis le Worker `eglise-app` (le moteur est une copie de celui du site de l’église). Remplit aussi le bandeau « Prochains événements » du haut de page (événements seulement) et les listes « Prochaines maraudes ». Couleurs : titre contenant « maraude » = turquoise, « boutik »/« boutique » = corail, le reste = événement en bleu |
+| `functions/api/demande-acces.js` | « Demander l’accès » depuis l’admin de la boutique ou l’espace équipe : la demande (identité vérifiée par Google) est enregistrée dans l’onglet Messages et envoyée à `CONTACT_TO`, avec un lien qui préremplit l’ajout. Personne n’est ajouté automatiquement |
+| `src/boutik-dates.js` | Prochaines ouvertures de la P’tite Boutik, lues dans sa base Firestore (lecture publique) ; calcul repris de `openingDates.js` du dépôt de la boutique |
 | `functions/api/contact.js`, `functions/api/messages.js` | Formulaire de contact : le message est enregistré dans D1 (comme sur le site de l’église) et lu dans l’onglet « Messages » de `/inscriptions` ; une notification part par e-mail si l’envoi est configuré |
 | `src/sw.js`, `public/icons/` | Appli installable (PWA) : manifeste généré par `build.mjs`, copie de la page pour l’usage hors connexion |
 | `functions/api/inscription.js` | Inscription Alpha : enregistrée dans D1 (aucun e-mail par défaut) |
@@ -116,6 +118,6 @@ Pour tester l’envoi réel en local, créer un fichier `.dev.vars` (ignoré par
 ## Menu du bas, appli installable, formulaire de contact
 
 - **Barre du bas (téléphone)** : `site.barre` dans Pages CMS (5 boutons au plus, icône au choix). Le bouton de la rubrique affichée est mis en avant ; la barre s'efface pendant la saisie.
-- **Place de la P’tite Boutik dans le menu** : `site.navLinks`, champ « Placer après le bloc » (ancre, ex. `actions`).
+- **Place de la P’tite Boutik dans le menu** : `site.navLinks`, champ « Placer après le bloc » (ancre, ex. `deux-cotes`).
 - **Appli installable** : « Ajouter à l’écran d’accueil ». Le manifeste couvre tout le domaine, `/boutik/` compris.
 - **Contact** : la base D1 `DB` doit être liée (voir « Base des inscriptions ») pour que les messages soient conservés ; la table `messages` se crée toute seule. Les messages se lisent, se marquent lus et se suppriment dans l’onglet « Messages » de `/inscriptions`. Penser à supprimer ceux qui sont traités (mentions légales).

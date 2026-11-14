@@ -41,6 +41,7 @@ async function connexion(message) {
         montrer("Connexion en cours…", true);
         try {
           const r = await api("/api/auth/google", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ credential }) });
+          if (r.res.status === 403) return proposerDemande(credential, r.data.error);
           if (!r.res.ok || !r.data.ok) return montrer(r.data.error || FAIL, false);
           demarrer();
         } catch {
@@ -48,6 +49,24 @@ async function connexion(message) {
         }
       },
     });
+    // Compte Google valide mais pas dans l'équipe : il peut demander l'accès (e-mail à l'association).
+    const proposerDemande = (credential, message) => {
+      montrer(message || "Ce compte n’a pas accès à cette page.", false);
+      const demander = el("button", { className: "btn", type: "button" }, "Demander l’accès");
+      demander.addEventListener("click", async () => {
+        demander.disabled = true;
+        try {
+          const r = await api("/api/demande-acces", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ espace: "equipe", jeton: credential }) });
+          if (!r.res.ok || !r.data.ok) { demander.disabled = false; return montrer(r.data.error || FAIL, false); }
+          demander.remove();
+          montrer("Votre demande est envoyée à l’association. Vous aurez accès dès qu’un membre de l’équipe vous aura ajouté.", true);
+        } catch {
+          demander.disabled = false;
+          montrer(FAIL, false);
+        }
+      });
+      statut.after(demander);
+    };
     google.accounts.id.renderButton(bouton, { theme: "outline", size: "large", text: "signin_with", locale: "fr", shape: "pill" });
   } catch {
     montrer("Impossible de charger la connexion Google. Vérifiez votre connexion et réessayez.", false);
@@ -138,6 +157,10 @@ function vueMessages() {
         el("p", { className: "eq-intro" }, messages.length
           ? `${messages.length} message${messages.length > 1 ? "s" : ""}${nouveaux ? `, dont ${nouveaux} nouveau${nouveaux > 1 ? "x" : ""}` : ""}. Pensez à supprimer ceux qui sont traités.`
           : "Aucun message pour le moment."),
+        // Où partent les e-mails du formulaire (variable CONTACT_TO dans Cloudflare)
+        data.mail && data.mail.actif
+          ? el("p", { className: "eq-mail ok" }, `Chaque message est aussi envoyé par e-mail à : ${data.mail.destinataires.join(", ")}.`)
+          : el("p", { className: "eq-mail err" }, "Les messages ne sont pas envoyés par e-mail : l’envoi n’est pas configuré (variables APPS_SCRIPT_URL, APPS_SCRIPT_SECRET et CONTACT_TO dans Cloudflare). Ils restent consultables ici."),
         statut,
         ...messages.map((m) => carte(m, messages, dessiner)));
     };

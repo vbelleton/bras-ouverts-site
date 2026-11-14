@@ -2,7 +2,10 @@
 // (écran des événements, « Publier sur : site Bras Ouverts »), servis par le Worker
 // eglise-app. Seuls les événements Bras Ouverts sont demandés (source=bras-ouverts),
 // et le moteur partagé les filtre une seconde fois.
+// Le même chargement remplit aussi le bandeau « Prochains événements » en haut de page et les
+// listes « Prochaines dates » des maraudes. Les dates de la boutique viennent de sa propre base.
 import { buildEventList, AGENDA_BRAS_OUVERTS } from "./agenda-moteur.js";
+import { chargerOuvertures } from "./boutik-dates.js";
 
 const DELAI_MS = 8000; // un Worker muet ne doit pas laisser « Chargement » à l'infini
 
@@ -32,6 +35,16 @@ function regularite(rp) {
   return t.charAt(0).toUpperCase() + t.slice(1);
 }
 
+// Genre d'un rendez-vous, pour sa couleur : les maraudes et les ouvertures de la boutique sont les
+// dates habituelles ; tout le reste (ciné goûter, fête de l'été, projection…) est un événement, en bleu.
+export function genre(ev) {
+  const t = String(ev.titre || "");
+  if (/maraude/i.test(t)) return "maraude";
+  if (/boutik|boutique/i.test(t)) return "boutik";
+  if (ev.repeat_period) return "regulier";
+  return "evenement";
+}
+
 function el(tag, attrs = {}, ...enfants) {
   const n = document.createElement(tag);
   for (const [k, v] of Object.entries(attrs)) {
@@ -49,7 +62,7 @@ function carte(ev) {
     ? `Du ${dateLongue(ev.date)} au ${dateLongue(ev.dateFin)}`
     : dateLongue(ev.date);
   const lien = lienSur(ev.lien);
-  return el("li", { class: "ag-item" },
+  return el("li", { class: `ag-item ag-${genre(ev)}` },
     el("div", { class: "ag-date", "aria-hidden": "true" },
       el("span", { class: "ag-jour" }, jour(ev.date)),
       el("span", { class: "ag-mois" }, moisCourt(ev.date))),
@@ -64,16 +77,26 @@ function carte(ev) {
       lien ? el("a", { href: lien, rel: "noopener", class: "ag-lien" }, "En savoir plus") : null));
 }
 
+// Un seul appel au Worker pour toute la page.
+let evenements = null;
+function chargerEvenements(api) {
+  if (!evenements) {
+    const url = `${api.replace(/\/$/, "")}/api/church-events?source=${AGENDA_BRAS_OUVERTS}&include_exceptions=1&size=100`;
+    evenements = fetch(url, { signal: AbortSignal.timeout(DELAI_MS) }).then((res) => {
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    }).then((json) => buildEventList(json, { agenda: AGENDA_BRAS_OUVERTS }));
+  }
+  return evenements;
+}
+
 async function remplir(bloc) {
   const zone = bloc.querySelector(".ag-liste");
   const max = Math.max(1, Number(bloc.dataset.max) || 12);
-  const url = `${bloc.dataset.api.replace(/\/$/, "")}/api/church-events?source=${AGENDA_BRAS_OUVERTS}&include_exceptions=1&size=100`;
   try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(DELAI_MS) });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     // Un rendez-vous régulier (maraude du jeudi…) n'occupe qu'une carte : sa prochaine date.
     const vus = new Set();
-    const liste = buildEventList(await res.json(), { agenda: AGENDA_BRAS_OUVERTS })
+    const liste = (await chargerEvenements(bloc.dataset.api))
       .filter((ev) => !ev.repeat_period || (!vus.has(ev.id) && vus.add(ev.id)))
       .slice(0, max);
     zone.replaceChildren();
@@ -101,4 +124,53 @@ async function remplir(bloc) {
   }
 }
 
+// Bandeau du haut : les prochains événements (ciné goûter, fête…), pas les dates habituelles.
+// S'il n'y en a aucun, ou si l'agenda ne répond pas, le bandeau reste caché.
+const dateCourte = (d) => d.toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" }).replace(/\./g, "");
+async function remplirProchains(bandeau) {
+  try {
+    const vus = new Set();
+    const liste = (await chargerEvenements(bandeau.dataset.api))
+      .filter((ev) => genre(ev) === "evenement" && !vus.has(ev.id) && vus.add(ev.id))
+      .slice(0, Math.max(1, Number(bandeau.dataset.max) || 3));
+    if (!liste.length) return;
+    bandeau.querySelector("ul").replaceChildren(...liste.map((ev) => el("li", {},
+      el("a", { href: "#agenda" },
+        el("span", { class: "pr-date" }, ((t) => t.charAt(0).toUpperCase() + t.slice(1))(dateCourte(ev.date))),
+        el("span", { class: "pr-titre" }, ev.emoji ? `${ev.emoji} ` : "", ev.titre || "Événement")))));
+    bandeau.hidden = false;
+  } catch (e) {
+    console.error("prochains:", e?.name || "erreur");
+  }
+}
+
+// « Prochaines dates » d'une maraude ou de la boutique (cartes de l'accueil, rubrique Maraude).
+const dateJour = (d) => { const t = dateLongue(d); return t.charAt(0).toUpperCase() + t.slice(1); };
+async function remplirDates(zone) {
+  const ul = zone.querySelector("ul");
+  const max = Math.max(1, Number(zone.dataset.max) || 3);
+  try {
+    let lignes;
+    if (zone.dataset.dates === "boutik") {
+      const { dates, plage } = await chargerOuvertures();
+      lignes = dates.slice(0, max).map((d) => [dateJour(d.date), d.horaires || plage]);
+    } else {
+      lignes = (await chargerEvenements(zone.dataset.api))
+        .filter((ev) => genre(ev) === zone.dataset.dates)
+        .slice(0, max)
+        .map((ev) => [dateJour(ev.date), [heure(ev.heure), ev.fin ? heure(ev.fin) : ""].filter(Boolean).join(" – ")]);
+    }
+    if (!lignes.length) {
+      ul.replaceChildren(el("li", { class: "dt-vide" }, zone.dataset.vide || "Prochaines dates bientôt annoncées."));
+    } else {
+      ul.replaceChildren(...lignes.map(([jourTxt, h]) => el("li", {}, el("strong", {}, jourTxt), h ? el("span", {}, h) : null)));
+    }
+  } catch (e) {
+    console.error("dates:", e?.name || "erreur");
+    ul.replaceChildren(el("li", { class: "dt-vide" }, "Les dates n’ont pas pu être chargées. Réessayez plus tard."));
+  }
+}
+
 for (const bloc of document.querySelectorAll(".agenda[data-api]")) remplir(bloc);
+for (const bandeau of document.querySelectorAll(".prochains[data-api]")) remplirProchains(bandeau);
+for (const zone of document.querySelectorAll("[data-dates]")) remplirDates(zone);

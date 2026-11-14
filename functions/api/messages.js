@@ -3,6 +3,7 @@
 // Réservé aux membres connectés ; les écritures n'acceptent que du JSON.
 import { base } from "../../lib/alpha.js";
 import { membreConnecte } from "../../lib/auth.js";
+import { destinataires, mailPret } from "../../lib/mail.js";
 
 const headers = { "cache-control": "no-store" };
 const rep = (corps, status = 200) => Response.json(corps, { status, headers });
@@ -28,7 +29,9 @@ export async function onRequestGet({ request, env }) {
   if (refus) return refus;
   const db = await base(env.DB);
   const { results } = await db.prepare("SELECT id, first_name, last_name, email, phone, subject, message, lu, created_at FROM messages ORDER BY created_at DESC, id DESC").all();
-  return rep({ ok: true, messages: results });
+  // Pour vérifier d'un coup d'œil où partent les e-mails du formulaire (variable CONTACT_TO).
+  const to = destinataires(env.CONTACT_TO);
+  return rep({ ok: true, messages: results, mail: { actif: mailPret(env) && to.length > 0, destinataires: to } });
 }
 
 export async function onRequestPatch({ request, env }) {
