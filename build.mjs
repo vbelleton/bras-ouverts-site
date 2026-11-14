@@ -44,8 +44,9 @@ const field = (label, input, req = false) =>
 const status = `<p class="status" role="status" aria-live="polite"></p>`;
 // Worker des événements (le même que l'agenda de l'église, événements distincts).
 const AGENDA_API = "https://eglise-app.belletonv.workers.dev";
-// Liste « Prochaines dates » remplie par src/agenda.js : maraudes (agenda) ou P'tite Boutik (sa propre base).
-const DATES = { maraude: "Prochaines maraudes", boutik: "Prochaines ouvertures" };
+// Liste « Prochaines dates » de la P’tite Boutik (lue dans sa propre base par src/agenda.js).
+// Pas de dates pour les maraudes : l’association ne les annonce pas publiquement.
+const DATES = { boutik: "Prochaines ouvertures" };
 const prochainesDates = (quoi) => DATES[quoi] ? `<div class="dates" data-dates="${quoi}" data-api="${AGENDA_API}" data-max="3">
         <span class="lab">${DATES[quoi]}</span>
         <ul aria-live="polite"><li class="dt-vide">Chargement des dates…</li></ul>
@@ -83,7 +84,7 @@ const renderers = {
   // Agenda rempli dans le navigateur par src/agenda.js (événements gérés depuis l'admin Cieux Ouverts).
   agenda: (b) => section(b, `${secHead(b, b.intro ? `\n        <p>${txt(b.intro)}</p>` : "")}
       <ul class="ag-legende" aria-label="Couleurs de l’agenda">
-        <li class="lg-evenement">Événements</li><li class="lg-maraude">Maraudes</li><li class="lg-boutik">P’tite Boutik</li>
+        <li class="lg-evenement">Événements</li><li class="lg-boutik">P’tite Boutik</li>
       </ul>
       <div class="agenda" data-api="${esc(safeUrl(b.api) || AGENDA_API)}" data-max="${Number(b.max) || 12}" data-vide="${esc(b.empty || "Pas de rendez-vous prévu pour le moment. Revenez bientôt !")}">
         <div class="ag-liste" aria-live="polite"><p class="ag-vide">Chargement de l’agenda…</p></div>
@@ -199,14 +200,16 @@ const ancre = (b) => b.anchor || slug(b.title);
 // Menu : les blocs qui ont un libellé, et les liens vers d'autres pages du domaine (ex. la P'tite Boutik
 // sous /boutik/) glissés après le bloc choisi (« apres » = ancre du bloc ; vide = en fin de menu).
 const navLinks = list((data.site || {}).navLinks).filter((l) => l.label && safeUrl(l.url));
-const lienNav = (l) => `<a href="${esc(safeUrl(l.url))}">${esc(l.label)}</a>`;
-const nav = [
+// Liste des liens du menu ; la même liste est publiée dans /menu.json pour que la P'tite Boutik
+// (sous /boutik/) affiche exactement le même menu.
+const menuLiens = [
   ...blocks.filter((b) => b.menu && b.type !== "hero").flatMap((b) => [
-    `<a href="#${esc(ancre(b))}">${esc(b.menu)}</a>`,
-    ...navLinks.filter((l) => l.apres && l.apres === ancre(b)).map(lienNav),
+    { label: b.menu, url: `#${ancre(b)}` },
+    ...navLinks.filter((l) => l.apres && l.apres === ancre(b)).map((l) => ({ label: l.label, url: safeUrl(l.url) })),
   ]),
-  ...navLinks.filter((l) => !l.apres || !blocks.some((b) => b.menu && b.type !== "hero" && ancre(b) === l.apres)).map(lienNav),
-].join("\n      ");
+  ...navLinks.filter((l) => !l.apres || !blocks.some((b) => b.menu && b.type !== "hero" && ancre(b) === l.apres)).map((l) => ({ label: l.label, url: safeUrl(l.url) })),
+];
+const nav = menuLiens.map((l) => `<a href="${esc(l.url)}">${esc(l.label)}</a>`).join("\n      ");
 
 // Barre de boutons en bas de l'écran sur téléphone (site.barre dans Pages CMS) : 5 boutons au plus.
 const ICONES = {
@@ -226,12 +229,12 @@ const barreHtml = barre.length ? `
 // Bandeau « Prochains événements » sous l'en-tête (rempli par src/agenda.js, caché s'il n'y a rien).
 const pr = (data.site || {}).prochains || {};
 const prochainsHtml = pr.visible === false ? "" : `
-<div class="prochains" data-api="${AGENDA_API}" data-max="${Number(pr.max) || 3}" hidden>
+<section class="prochains" data-api="${AGENDA_API}" data-max="${Number(pr.max) || 3}" aria-labelledby="pr-titre">
   <div class="wrap">
-    <span class="pr-lab">${esc(pr.label || "Prochains événements")}</span>
-    <ul></ul>
+    <h2 id="pr-titre" class="pr-lab">${esc(pr.label || "Prochains événements")}</h2>
+    <ul class="pr-liste" aria-live="polite"><li class="pr-vide">Chargement des prochains rendez-vous…</li></ul>
   </div>
-</div>`;
+</section>`;
 const body = blocks.map((b) => (renderers[b.type] ? renderers[b.type](b) : "")).join("\n");
 const s = data.site || {};
 const l = data.legal || {};
@@ -331,6 +334,8 @@ mkdirSync(OUT, { recursive: true });
 if (existsSync("public")) cpSync("public", OUT, { recursive: true });
 cpSync("src", OUT, { recursive: true });
 writeFileSync(`${OUT}/index.html`, html);
+// Menu commun lu par la P'tite Boutik : ancres rendues absolues (/#agenda), le logo mène à l'accueil.
+writeFileSync(`${OUT}/menu.json`, JSON.stringify({ liens: menuLiens.map((l) => ({ label: l.label, url: l.url.startsWith("#") ? `/${l.url}` : l.url })) }));
 // Le domaine sert aussi la boutique sous /boutik/ : robots et plan du site couvrent les deux.
 const SITE_URL = String(s.url || "").replace(/\/+$/, "");
 writeFileSync(`${OUT}/robots.txt`, `User-agent: *\nAllow: /\nDisallow: /inscriptions\nDisallow: /boutik/admin\n${SITE_URL ? `\nSitemap: ${SITE_URL}/sitemap.xml\n` : ""}`);

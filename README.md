@@ -10,7 +10,7 @@ Site de l’association Bras Ouverts, en deux côtés : la P’tite Boutik Solid
 | `build.mjs` | Génère `dist/index.html` à partir du contenu (Node, sans dépendance) |
 | `src/style.css`, `src/forms.js`, `src/theme.js` | Styles, envoi des formulaires, thème clair/sombre |
 | `public/` | Logo (`logo.png`, `favicon.png`), photos ajoutées depuis l’administration (`uploads/`) |
-| `src/agenda.js`, `src/agenda-moteur.js` | Agenda : événements Bras Ouverts lus dans le navigateur depuis le Worker `eglise-app` (le moteur est une copie de celui du site de l’église). Remplit aussi le bandeau « Prochains événements » du haut de page (événements seulement) et les listes « Prochaines maraudes ». Couleurs : titre contenant « maraude » = turquoise, « boutik »/« boutique » = corail, le reste = événement en bleu |
+| `src/agenda.js`, `src/agenda-moteur.js` | Agenda : événements Bras Ouverts lus dans le navigateur depuis le Worker `eglise-app` (le moteur est une copie de celui du site de l’église). Remplit aussi le bloc « Prochains événements » tout en haut de l’accueil (3 cartes : les événements en bleu, complétés si besoin par les ouvertures de la boutique en corail). Les rendez-vous dont le titre contient « maraude » ne sont jamais affichés (l’association ne les annonce pas). Couleurs : « boutik »/« boutique » = corail, le reste = événement en bleu |
 | `functions/api/demande-acces.js` | « Demander l’accès » depuis l’admin de la boutique ou l’espace équipe : la demande (identité vérifiée par Google) est enregistrée dans l’onglet Messages et envoyée à `CONTACT_TO`, avec un lien qui préremplit l’ajout. Personne n’est ajouté automatiquement |
 | `src/boutik-dates.js` | Prochaines ouvertures de la P’tite Boutik, lues dans sa base Firestore (lecture publique) ; calcul repris de `openingDates.js` du dépôt de la boutique |
 | `functions/api/contact.js`, `functions/api/messages.js` | Formulaire de contact : le message est enregistré dans D1 (comme sur le site de l’église) et lu dans l’onglet « Messages » de `/inscriptions` ; une notification part par e-mail si l’envoi est configuré |
@@ -27,6 +27,8 @@ Site de l’association Bras Ouverts, en deux côtés : la P’tite Boutik Solid
 ## La P’tite Boutik sous /boutik/
 
 Sur le même domaine (prévu : `brasouverts.bzh`), `/boutik/…` affiche le site de la P’tite Boutik : `functions/boutik/[[path]].js` relaie chaque requête vers son propre projet Pages (`petite-boutik-solidaire.pages.dev/boutik/…`, dépôt `vbelleton/petite_boutik_solidaire`). La boutique garde donc tout : admin (`/boutik/admin`), agenda des ouvertures, photos, appli installable. Variable facultative `BOUTIK_ORIGIN` pour viser une préversion. Chaque fichier de la boutique compte comme un appel de fonction (100 000 gratuits par jour, très au-delà des besoins).
+
+**Menu commun** : le build publie `/menu.json` (les liens du menu, adresses absolues). La boutique le lit pour afficher exactement le même menu, avec le même bouton de thème clair/sombre (même mémoire `bras-ouverts-theme`, partagée puisque même domaine). Changer le menu dans Pages CMS le change donc aussi sur la boutique.
 
 Adresses courtes (`public/_redirects`) : `/maraudes`, `/agenda`, `/contact`, `/benevole`, `/petite-boutik`.
 

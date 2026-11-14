@@ -62,7 +62,7 @@ content:
               - { name: apres, label: "Placer après le bloc (son ancre, ex. actions). Vide : en fin de menu", type: string }
           - name: prochains
             label: Bandeau « Prochains événements » en haut de page
-            description: Montre les prochains événements de l'agenda (pas les maraudes ni les ouvertures de la boutique). Caché s'il n'y en a aucun.
+            description: "Bloc en haut de l'accueil : les prochains événements de l'agenda (en bleu), complétés si besoin par les prochaines ouvertures de la boutique. Les maraudes n'y figurent jamais."
             type: object
             fields:
               - { name: visible, label: Afficher le bandeau, type: boolean, default: true }
@@ -147,7 +147,6 @@ content:
                     options:
                       values:
                         - { value: "", label: Aucune }
-                        - { value: maraude, label: Maraudes (dates de l'agenda dont le titre contient « maraude ») }
                         - { value: boutik, label: "Ouvertures de la P'tite Boutik (calendrier de la boutique)" }
 
           - name: agenda
@@ -158,7 +157,7 @@ content:
               - { name: menu, component: menu }
               - { name: label, component: label }
               - { name: title, component: title }
-              - { name: intro, label: Introduction, type: text, description: "Couleurs : bleu pour les événements, turquoise pour les maraudes (titre contenant « maraude »), corail pour la boutique (titre contenant « boutik » ou « boutique »). Les dates elles-mêmes se saisissent dans l'écran des événements de l'admin du site de l'église, avec « Publier sur : site Bras Ouverts »." }
+              - { name: intro, label: Introduction, type: text, description: "Couleurs : bleu pour les événements, corail pour la boutique (titre contenant « boutik » ou « boutique »). Les rendez-vous dont le titre contient « maraude » ne sont jamais affichés. Les dates elles-mêmes se saisissent dans l'écran des événements de l'admin du site de l'église, avec « Publier sur : site Bras Ouverts »." }
               - { name: empty, label: Message quand aucune date n'est prévue, type: string }
               - { name: max, label: Nombre maximum de dates affichées, type: number }
 
@@ -191,7 +190,6 @@ content:
                     options:
                       values:
                         - { value: "", label: Aucune }
-                        - { value: maraude, label: Maraudes (dates de l'agenda dont le titre contient « maraude ») }
                         - { value: boutik, label: "Ouvertures de la P'tite Boutik (calendrier de la boutique)" }
                   - { name: help, label: Phrase d'appel (ex. comment aider), type: string }
 
