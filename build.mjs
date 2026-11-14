@@ -44,6 +44,12 @@ const field = (label, input, req = false) =>
 const status = `<p class="status" role="status" aria-live="polite"></p>`;
 // Worker des événements (le même que l'agenda de l'église, événements distincts).
 const AGENDA_API = "https://eglise-app.belletonv.workers.dev";
+// Liste « Prochaines dates » remplie par src/agenda.js : maraudes (agenda) ou P'tite Boutik (sa propre base).
+const DATES = { maraude: "Prochaines maraudes", boutik: "Prochaines ouvertures" };
+const prochainesDates = (quoi) => DATES[quoi] ? `<div class="dates" data-dates="${quoi}" data-api="${AGENDA_API}" data-max="3">
+        <span class="lab">${DATES[quoi]}</span>
+        <ul aria-live="polite"><li class="dt-vide">Chargement des dates…</li></ul>
+      </div>` : "";
 
 const renderers = {
   hero: (b) => `
@@ -68,6 +74,7 @@ const renderers = {
         <h3>${emph(i.title)}</h3>
         ${paras(i.text)}
         ${list(i.points).length ? `<ul class="porte-points">${list(i.points).map((x) => `<li>${txt(x)}</li>`).join("")}</ul>` : ""}
+        ${prochainesDates(i.dates)}
         ${href ? `<a class="btn" href="${esc(href)}"${ext ? ' rel="noopener"' : ""}>${esc(i.linkLabel || "Découvrir")}${ext ? ' <span aria-hidden="true">↗</span>' : ""}</a>` : ""}
       </article>`;
       }).join("\n      ")}
@@ -75,18 +82,22 @@ const renderers = {
 
   // Agenda rempli dans le navigateur par src/agenda.js (événements gérés depuis l'admin Cieux Ouverts).
   agenda: (b) => section(b, `${secHead(b, b.intro ? `\n        <p>${txt(b.intro)}</p>` : "")}
+      <ul class="ag-legende" aria-label="Couleurs de l’agenda">
+        <li class="lg-evenement">Événements</li><li class="lg-maraude">Maraudes</li><li class="lg-boutik">P’tite Boutik</li>
+      </ul>
       <div class="agenda" data-api="${esc(safeUrl(b.api) || AGENDA_API)}" data-max="${Number(b.max) || 12}" data-vide="${esc(b.empty || "Pas de rendez-vous prévu pour le moment. Revenez bientôt !")}">
         <div class="ag-liste" aria-live="polite"><p class="ag-vide">Chargement de l’agenda…</p></div>
         <noscript><p class="ag-vide">L’agenda a besoin de JavaScript. Écrivez-nous pour connaître les prochaines dates.</p></noscript>
       </div>`, "agenda-sec"),
 
   actions: (b) => section(b, `${secHead(b, b.intro ? `\n        <p>${txt(b.intro)}</p>` : "")}
-      <div class="actions">
+      <div class="actions${list(b.items).filter(visible).length === 1 ? " actions-une" : ""}">
       ${list(b.items).filter(visible).map((i) => `<article class="action" id="${esc(i.anchor || slug(i.title))}">
         ${i.image ? `<img src="${esc(i.image)}" alt="" loading="lazy">` : ""}
         <h3>${emph(i.title)}</h3>
         ${paras(i.text)}
         ${facts(i.infos)}
+        ${prochainesDates(i.dates)}
         ${i.help ? `<p class="help">${txt(i.help)}</p>` : ""}
       </article>`).join("\n      ")}
       </div>`),
@@ -167,6 +178,7 @@ const renderers = {
         ${status}
       </form>`;
     const aside = `<aside class="contact-aside">
+        ${b.note ? `<p class="contact-note">${txt(b.note)}</p>` : ""}
         ${list(b.details).length ? `<dl class="find-list">${list(b.details).filter(visible).map((i) => {
           const href = safeUrl(i.href);
           return `<div><dt><span class="ico" aria-hidden="true">${esc(i.icon || "")}</span>${esc(i.label)}</dt><dd>${href ? `<a href="${esc(href)}">${txt(i.value)}</a>` : txt(i.value)}</dd></div>`;
@@ -211,6 +223,15 @@ const barreHtml = barre.length ? `
 <nav class="barre" aria-label="Accès rapide">
   ${barre.map((x) => `<a href="${esc(safeUrl(x.url))}"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONES[x.icon] || ICONES.coeur}</svg><span>${esc(x.label)}</span></a>`).join("\n  ")}
 </nav>` : "";
+// Bandeau « Prochains événements » sous l'en-tête (rempli par src/agenda.js, caché s'il n'y a rien).
+const pr = (data.site || {}).prochains || {};
+const prochainsHtml = pr.visible === false ? "" : `
+<div class="prochains" data-api="${AGENDA_API}" data-max="${Number(pr.max) || 3}" hidden>
+  <div class="wrap">
+    <span class="pr-lab">${esc(pr.label || "Prochains événements")}</span>
+    <ul></ul>
+  </div>
+</div>`;
 const body = blocks.map((b) => (renderers[b.type] ? renderers[b.type](b) : "")).join("\n");
 const s = data.site || {};
 const l = data.legal || {};
@@ -237,7 +258,7 @@ ${s.url ? `<link rel="canonical" href="${esc(String(s.url).replace(/\/+$/, ""))}
 <link rel="stylesheet" href="/style.css">
 <script>${readFileSync("src/theme.js", "utf8").trim()}</script>
 <script src="/forms.js" defer></script>
-${blocks.some((b) => b.type === "agenda") ? `<script type="module" src="/agenda.js"></script>` : ""}
+${prochainsHtml || /data-dates=|class="agenda"/.test(body) ? `<script type="module" src="/agenda.js"></script>` : ""}
 </head>
 <body${barre.length ? ' class="avec-barre"' : ""}>
 <header class="top">
@@ -254,7 +275,7 @@ ${blocks.some((b) => b.type === "agenda") ? `<script type="module" src="/agenda.
       <svg class="i-sun" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 1.5v2.5M12 20v2.5M1.5 12H4M20 12h2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8"/></g></svg>
     </button>
   </div>
-</header>
+</header>${prochainsHtml}
 
 <main>
 ${body}

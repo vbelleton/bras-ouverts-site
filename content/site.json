@@ -6,9 +6,9 @@
     "tagline": "Association solidaire · Morlaix",
     "navLinks": [
       {
-        "label": "La P’tite Boutik",
+        "label": "Petite boutik",
         "url": "/boutik/",
-        "apres": "actions"
+        "apres": "deux-cotes"
       }
     ],
     "url": "https://bras-ouverts.pages.dev",
@@ -19,14 +19,14 @@
         "icon": "accueil"
       },
       {
-        "label": "Actions",
-        "url": "#actions",
-        "icon": "coeur"
-      },
-      {
         "label": "Boutik",
         "url": "/boutik/",
         "icon": "boutique"
+      },
+      {
+        "label": "Maraude",
+        "url": "#maraudes",
+        "icon": "mains"
       },
       {
         "label": "Agenda",
@@ -38,7 +38,12 @@
         "url": "#contact",
         "icon": "contact"
       }
-    ]
+    ],
+    "prochains": {
+      "visible": true,
+      "label": "Prochains événements",
+      "max": 3
+    }
   },
   "blocks": [
     {
@@ -55,10 +60,10 @@
       "type": "portes",
       "visible": true,
       "anchor": "deux-cotes",
-      "menu": "",
+      "menu": "Découvrir l’association",
       "label": "L’association",
-      "title": "Deux façons de *tendre la main*",
-      "intro": "D’un côté, une boutique solidaire pour les familles. De l’autre, des actions de terrain auprès des plus fragiles. Les deux portent le même esprit : accueillir chacun tel qu’il est.",
+      "title": "Deux façons d’*agir*",
+      "intro": "D’un côté, une boutique solidaire pour les familles. De l’autre, des actions de terrain auprès des plus fragiles. Les deux portent le même esprit : tendre la main à ceux qui en ont besoin.",
       "items": [
         {
           "visible": true,
@@ -68,11 +73,11 @@
           "text": "Au 2, rue Jean-Monnet à Morlaix, la P’tite Boutik propose des vêtements d’enfants de seconde main à prix mini. Elle encourage le recyclage, aide les familles et fait de chaque passage un moment convivial.",
           "points": [
             "Vêtements enfants de 0 à 10 ans",
-            "Chaussures, puériculture, vêtements de maternité",
-            "Dons de vêtements en bon état bienvenus"
+            "Chaussures, puériculture, vêtements de maternité"
           ],
           "link": "/boutik/",
-          "linkLabel": "Horaires, dons et photos de la boutique"
+          "linkLabel": "Découvrir la petite boutik",
+          "dates": "boutik"
         },
         {
           "visible": true,
@@ -82,26 +87,26 @@
           "text": "Des bénévoles vont à la rencontre des personnes qui vivent à la rue : un café, un repas chaud, du temps pour discuter, et une orientation vers les structures d’aide quand c’est utile.",
           "points": [
             "Maraudes dans Morlaix",
-            "Écoute et orientation",
-            "Toujours besoin de bénévoles"
+            "Écoute et orientation"
           ],
-          "link": "#actions",
-          "linkLabel": "Voir nos actions"
+          "link": "#maraudes",
+          "linkLabel": "Découvrir les maraudes",
+          "dates": "maraude"
         }
       ]
     },
     {
       "type": "actions",
       "visible": true,
-      "anchor": "actions",
-      "menu": "Nos actions",
-      "label": "Nos actions",
-      "title": "Sur le *terrain*",
+      "anchor": "maraudes",
+      "menu": "Maraude",
+      "label": "Maraude",
+      "title": "Les *maraudes*",
       "items": [
         {
           "visible": true,
-          "anchor": "maraudes",
-          "title": "Les maraudes",
+          "anchor": "maraude",
+          "title": "Aller à la *rencontre*",
           "text": "Des équipes de bénévoles vont à la rencontre des personnes qui vivent à la rue : un café, un repas chaud, du temps pour discuter, et une orientation vers les structures d’aide quand c’est utile.",
           "infos": [
             {
@@ -113,10 +118,11 @@
               "value": "[à compléter : lieu de départ]"
             }
           ],
-          "help": "Vous voulez participer ? Écrivez-nous via le formulaire de contact."
+          "help": "",
+          "dates": "maraude"
         },
         {
-          "visible": true,
+          "visible": false,
           "anchor": "benevoles",
           "title": "Devenir *bénévole*",
           "text": "Maraudes, tri des dons, accueil à la boutique, coups de main ponctuels : il y a une place pour chacun, même pour une heure de temps en temps.\n\nOn commence toujours accompagné d’un bénévole qui connaît déjà l’association.",
@@ -133,7 +139,7 @@
           "help": "Envie de nous rejoindre ? Choisissez « Devenir bénévole » dans le formulaire de contact."
         },
         {
-          "visible": true,
+          "visible": false,
           "anchor": "soutenir",
           "title": "Soutenir *l’association*",
           "text": "Les dons de vêtements font vivre la boutique ; les dons en nature (café, gâteaux, couvertures, produits d’hygiène neufs) font vivre les maraudes.",
@@ -163,24 +169,24 @@
           "help": "Vous avez des vêtements d’enfants ou de la puériculture à donner ? Contactez-nous avant de passer."
         }
       ],
-      "intro": "Tout ce que fait l’association en dehors de la boutique. Chacun peut donner un peu de temps, selon ses disponibilités."
+      "intro": ""
     },
     {
       "type": "agenda",
       "visible": true,
       "anchor": "agenda",
       "menu": "Agenda",
-      "label": "Agenda",
-      "title": "Nos prochains *rendez-vous*",
-      "intro": "Maraudes, collectes, ouvertures exceptionnelles de la boutique : toutes les dates de l’association.",
+      "label": "",
+      "title": "*Agenda*",
+      "intro": "Les événements de l’association (ciné goûter, fête de l’été, projections…) en bleu, et les dates des maraudes et de la P’tite Boutik.",
       "empty": "Pas de rendez-vous annoncé pour le moment. Revenez bientôt, ou écrivez-nous pour être prévenu.",
       "max": 8
     },
     {
       "type": "find",
-      "visible": true,
+      "visible": false,
       "anchor": "trouver",
-      "menu": "Nous trouver",
+      "menu": "",
       "label": "Nous trouver",
       "title": "Où nous trouver ?",
       "items": [
@@ -211,17 +217,17 @@
       "menu": "Contact",
       "label": "Contact",
       "title": "Nous *écrire*",
-      "intro": "Une question sur la boutique, envie de participer aux maraudes ou de faire un don ? Écrivez-nous, un bénévole vous répond.",
+      "intro": "Une question sur la boutique, les maraudes ou un don ? Écrivez-nous : nous répondons à tous les messages.",
       "subjects": [
         "La P’tite Boutik (dons, horaires)",
         "Les maraudes",
-        "Devenir bénévole",
         "Faire un don",
         "Autre"
       ],
-      "success": "Merci, votre message est bien parti. Nous vous répondons rapidement.",
-      "email": "brasouverts.morlaix@gmail.com",
-      "emailText": "Vous préférez l’e-mail ? Écrivez-nous :"
+      "success": "Merci, votre message est bien parti. Nous répondons à tous les messages.",
+      "email": "",
+      "emailText": "Vous préférez l’e-mail ? Écrivez-nous :",
+      "note": "Nous répondons à tous les messages, sans exception."
     },
     {
       "type": "alpha",
