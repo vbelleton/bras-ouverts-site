@@ -62,12 +62,14 @@ content:
               - { name: apres, label: "Placer après le bloc (son ancre, ex. actions). Vide : en fin de menu", type: string }
           - name: prochains
             label: Bandeau « Prochains événements » en haut de page
-            description: "Bloc en haut de l'accueil : les prochains événements de l'agenda (en bleu), complétés si besoin par les prochaines ouvertures de la boutique. Les maraudes n'y figurent jamais."
+            description: "Diaporama en haut de l'accueil, un rendez-vous à la fois. Priorité aux événements de l'agenda (3 événements = 3 cartes) ; s'il en manque : la prochaine ouverture de la boutique, puis la prochaine maraude (date seulement), puis d'autres ouvertures."
             type: object
             fields:
               - { name: visible, label: Afficher le bandeau, type: boolean, default: true }
               - { name: label, label: Intitulé, type: string }
-              - { name: max, label: Nombre d'événements (3 conseillé), type: number }
+              - { name: max, label: Nombre de rendez-vous (3 conseillé), type: number }
+              - { name: maraudeDebut, label: "Maraudes : une date de maraude connue (AAAA-MM-JJ)", type: string, description: "Sert seulement si aucune maraude n'est saisie dans l'agenda." }
+              - { name: maraudeJours, label: "Maraudes : tous les combien de jours (ex. 14)", type: number }
           - name: barre
             label: Boutons du bas de l'écran sur téléphone (5 au plus)
             type: object
@@ -134,6 +136,7 @@ content:
                       values:
                         - { value: corail, label: Corail (boutique) }
                         - { value: lagon, label: Turquoise (actions) }
+                        - { value: bleu, label: Bleu (événements) }
                   - { name: kicker, label: Surtitre, type: string }
                   - { name: title, label: Titre, type: string, description: "Entourez un mot d'astérisques (*mot*) pour le mettre en couleur." }
                   - { name: image, label: Photo (facultatif), type: image }
@@ -148,6 +151,7 @@ content:
                       values:
                         - { value: "", label: Aucune }
                         - { value: boutik, label: "Ouvertures de la P'tite Boutik (calendrier de la boutique)" }
+                        - { value: evenements, label: "Événements de l'agenda (ciné goûter, fête…)" }
 
           - name: agenda
             label: Agenda (dates gérées dans l'admin des événements)
@@ -157,7 +161,7 @@ content:
               - { name: menu, component: menu }
               - { name: label, component: label }
               - { name: title, component: title }
-              - { name: intro, label: Introduction, type: text, description: "Couleurs : bleu pour les événements, corail pour la boutique (titre contenant « boutik » ou « boutique »). Les rendez-vous dont le titre contient « maraude » ne sont jamais affichés. Les dates elles-mêmes se saisissent dans l'écran des événements de l'admin du site de l'église, avec « Publier sur : site Bras Ouverts »." }
+              - { name: intro, label: Introduction, type: text, description: "Couleurs : bleu pour les événements, corail pour la boutique (titre contenant « boutik » ou « boutique »). Les rendez-vous dont le titre contient « maraude » ne sont pas listés dans l'agenda : seule leur prochaine date apparaît dans le diaporama du haut. Les dates elles-mêmes se saisissent dans l'écran des événements de l'admin du site de l'église, avec « Publier sur : site Bras Ouverts »." }
               - { name: empty, label: Message quand aucune date n'est prévue, type: string }
               - { name: max, label: Nombre maximum de dates affichées, type: number }
 
@@ -191,6 +195,7 @@ content:
                       values:
                         - { value: "", label: Aucune }
                         - { value: boutik, label: "Ouvertures de la P'tite Boutik (calendrier de la boutique)" }
+                        - { value: evenements, label: "Événements de l'agenda (ciné goûter, fête…)" }
                   - { name: help, label: Phrase d'appel (ex. comment aider), type: string }
 
           - name: alpha

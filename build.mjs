@@ -46,10 +46,10 @@ const status = `<p class="status" role="status" aria-live="polite"></p>`;
 const AGENDA_API = "https://eglise-app.belletonv.workers.dev";
 // Liste « Prochaines dates » de la P’tite Boutik (lue dans sa propre base par src/agenda.js).
 // Pas de dates pour les maraudes : l’association ne les annonce pas publiquement.
-const DATES = { boutik: "Prochaines ouvertures" };
+const DATES = { boutik: "Prochaines ouvertures", evenements: "Prochains événements" };
 const prochainesDates = (quoi) => DATES[quoi] ? `<div class="dates" data-dates="${quoi}" data-api="${AGENDA_API}" data-max="3">
         <span class="lab">${DATES[quoi]}</span>
-        <ul aria-live="polite"><li class="dt-vide">Chargement des dates…</li></ul>
+        <ul aria-live="polite"><li class="dt-squelette" aria-label="Chargement des dates"></li><li class="dt-squelette"></li><li class="dt-squelette"></li></ul>
       </div>` : "";
 
 const renderers = {
@@ -69,7 +69,7 @@ const renderers = {
       ${list(b.items).filter(visible).map((i, n) => {
         const href = safeUrl(i.link);
         const ext = /^https?:/i.test(href);
-        return `<article class="porte porte-${["corail", "lagon"].includes(i.style) ? i.style : n % 2 ? "lagon" : "corail"}">
+        return `<article class="porte porte-${["corail", "lagon", "bleu"].includes(i.style) ? i.style : ["corail", "lagon", "bleu"][n % 3]}">
         ${i.image ? `<img src="${esc(i.image)}" alt="" loading="lazy">` : ""}
         ${i.kicker ? `<span class="lab">${esc(i.kicker)}</span>` : ""}
         <h3>${emph(i.title)}</h3>
@@ -87,7 +87,7 @@ const renderers = {
         <li class="lg-evenement">Événements</li><li class="lg-boutik">P’tite Boutik</li>
       </ul>
       <div class="agenda" data-api="${esc(safeUrl(b.api) || AGENDA_API)}" data-max="${Number(b.max) || 12}" data-vide="${esc(b.empty || "Pas de rendez-vous prévu pour le moment. Revenez bientôt !")}">
-        <div class="ag-liste" aria-live="polite"><p class="ag-vide">Chargement de l’agenda…</p></div>
+        <div class="ag-liste" aria-live="polite"><div class="ag-squelette" aria-label="Chargement de l’agenda"></div><div class="ag-squelette"></div></div>
         <noscript><p class="ag-vide">L’agenda a besoin de JavaScript. Écrivez-nous pour connaître les prochaines dates.</p></noscript>
       </div>`, "agenda-sec"),
 
@@ -228,11 +228,16 @@ const barreHtml = barre.length ? `
 </nav>` : "";
 // Bandeau « Prochains événements » sous l'en-tête (rempli par src/agenda.js, caché s'il n'y a rien).
 const pr = (data.site || {}).prochains || {};
+const maraudeRegle = /^\d{4}-\d{2}-\d{2}$/.test(String(pr.maraudeDebut || "")) && Number(pr.maraudeJours) > 0
+  ? ` data-maraude-debut="${esc(pr.maraudeDebut)}" data-maraude-jours="${Number(pr.maraudeJours)}"` : "";
 const prochainsHtml = pr.visible === false ? "" : `
-<section class="prochains" data-api="${AGENDA_API}" data-max="${Number(pr.max) || 3}" aria-labelledby="pr-titre">
+<section class="prochains" data-api="${AGENDA_API}" data-max="${Number(pr.max) || 3}"${maraudeRegle} aria-labelledby="pr-titre" aria-roledescription="diaporama">
   <div class="wrap">
-    <h2 id="pr-titre" class="pr-lab">${esc(pr.label || "Prochains événements")}</h2>
-    <ul class="pr-liste" aria-live="polite"><li class="pr-vide">Chargement des prochains rendez-vous…</li></ul>
+    <div class="pr-tete">
+      <h2 id="pr-titre" class="pr-lab">${esc(pr.label || "Prochains rendez-vous")}</h2>
+      <div class="pr-nav" hidden></div>
+    </div>
+    <ul class="pr-liste" aria-live="polite"><li class="pr-item pr-squelette actif" aria-label="Chargement des prochains rendez-vous"><span class="pr-date"></span><span class="pr-corps"><span></span><span></span></span></li></ul>
   </div>
 </section>`;
 const body = blocks.map((b) => (renderers[b.type] ? renderers[b.type](b) : "")).join("\n");
