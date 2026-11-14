@@ -41,8 +41,10 @@
     ],
     "prochains": {
       "visible": true,
-      "label": "Prochains événements",
-      "max": 3
+      "label": "Prochains rendez-vous",
+      "max": 3,
+      "maraudeDebut": "2026-11-14",
+      "maraudeJours": 14
     }
   },
   "blocks": [
@@ -92,6 +94,17 @@
           "link": "#maraudes",
           "linkLabel": "Découvrir les maraudes",
           "dates": ""
+        },
+        {
+          "visible": true,
+          "style": "bleu",
+          "kicker": "Événements",
+          "title": "Des moments *à partager*",
+          "text": "Ciné goûter, fête de l’été, projections de films… L’association organise aussi des rendez-vous conviviaux, ouverts à tous, petits et grands.",
+          "points": [],
+          "link": "#agenda",
+          "linkLabel": "Voir l’agenda",
+          "dates": "evenements"
         }
       ]
     },

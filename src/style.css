@@ -241,11 +241,15 @@ body.equipe section { border-top: 0; }
 .eq-table .btn { padding: 6px 14px; font-size: 0.9rem; }
 
 /* Les deux côtés de l'association */
-.portes { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.portes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 24px; }
 .porte { position: relative; display: grid; gap: 14px; align-content: start; padding: clamp(24px, 4vw, 40px); border-radius: calc(var(--r) + 8px); border: 1px solid var(--line); min-width: 0; overflow: hidden; }
 .porte > * { position: relative; }
 .porte-corail { background: linear-gradient(150deg, var(--corail-doux), var(--surface) 70%); }
 .porte-lagon { background: linear-gradient(150deg, var(--lagon-doux), var(--surface) 70%); }
+.porte-bleu { background: linear-gradient(150deg, var(--bleu-doux), var(--surface) 70%); }
+.porte-bleu .lab, .porte.porte-bleu h3 em, .porte-bleu .dates .lab { color: var(--bleu); }
+.porte-bleu .porte-points li::before { background: var(--bleu); }
+.porte-bleu .btn { background: var(--bleu); color: var(--accent-ink); }
 .porte .lab { font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; }
 .porte-corail .lab, .porte-corail h3 em { color: var(--corail); }
 .porte-lagon .lab { color: var(--accent); }
@@ -357,21 +361,48 @@ body.equipe section { border-top: 0; }
 .eq-mail.err { background: var(--corail-doux); color: var(--corail); }
 .eq-login .btn { justify-self: start; }
 
-/* Bloc « Prochains événements » en haut de l'accueil : 3 cartes, bleu pour les événements, corail pour la boutique. */
-.prochains { padding-block: clamp(24px, 4vw, 40px); border-top: 0; border-bottom: 1px solid var(--line); background: linear-gradient(180deg, var(--bleu-doux), var(--bg)); }
-.pr-lab { font-family: var(--body); font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; color: var(--bleu); margin-bottom: 14px; }
-.pr-liste { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 0; padding: 0; list-style: none; }
-.pr-item a { display: flex; gap: 14px; align-items: flex-start; height: 100%; padding: 16px; border-radius: var(--r); background: var(--surface); border: 1px solid var(--line); border-left: 5px solid var(--bleu); color: var(--ink); text-decoration: none; }
-.pr-item a:hover { border-color: var(--bleu); }
-.pr-boutik a { border-left-color: var(--corail); }
-.pr-boutik a:hover { border-color: var(--corail); }
-.pr-date { flex: none; display: grid; place-items: center; width: 56px; padding: 6px 0; border-radius: 12px; background: var(--bleu-doux); color: var(--bleu); line-height: 1.1; }
+/* Diaporama « Prochains rendez-vous » en haut de l'accueil : un rendez-vous à la fois.
+   Les cartes sont empilées dans la même case de grille : la hauteur ne bouge pas d'une carte à l'autre. */
+.prochains { padding-block: clamp(20px, 3.5vw, 32px); border-top: 0; border-bottom: 1px solid var(--line); background: var(--bg); }
+.pr-tete { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.pr-lab { font-family: var(--body); font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; color: var(--green); }
+.pr-nav { display: flex; align-items: center; gap: 6px; }
+.pr-nav[hidden] { display: none; }
+.pr-fleche { display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); font-size: 1.3rem; line-height: 1; cursor: pointer; }
+.pr-fleche:hover { border-color: var(--accent); color: var(--accent); }
+.pr-point { width: 10px; height: 10px; padding: 0; border: 0; border-radius: 999px; background: var(--line); cursor: pointer; transition: width .25s, background .25s; }
+.pr-point[aria-current="true"] { width: 24px; background: var(--accent); }
+.pr-liste { display: grid; margin: 0; padding: 0; list-style: none; }
+.pr-item { grid-area: 1 / 1; display: flex; gap: 18px; align-items: center; min-height: 112px; padding: 18px 22px; border-radius: var(--r); background: var(--surface); border: 1px solid var(--line); border-left: 6px solid var(--bleu);
+  opacity: 0; visibility: hidden; transform: translateX(12px); transition: opacity .45s ease, transform .45s ease, visibility 0s .45s; }
+.pr-item.actif { opacity: 1; visibility: visible; transform: none; transition: opacity .45s ease, transform .45s ease, visibility 0s; }
+.pr-boutik { border-left-color: var(--corail); }
+.pr-maraude { border-left-color: var(--accent); }
+.pr-date { flex: none; display: grid; place-items: center; width: 68px; padding: 8px 0; border-radius: 12px; background: var(--bleu-doux); color: var(--bleu); line-height: 1.1; }
 .pr-boutik .pr-date { background: var(--corail-doux); color: var(--corail); }
-.pr-jour { font-family: var(--display); font-size: 1.5rem; font-weight: 700; }
-.pr-mois { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
-.pr-corps { display: grid; gap: 2px; min-width: 0; }
-.pr-quand { font-size: 0.85rem; color: var(--muted); }
-.pr-titre { font-family: var(--display); font-size: 1.1rem; line-height: 1.25; }
-.pr-detail { font-size: 0.9rem; color: var(--muted); }
-.pr-vide { grid-column: 1 / -1; color: var(--muted); }
-@media (max-width: 800px) { .pr-liste { grid-template-columns: 1fr; gap: 10px; } .pr-item a { padding: 12px 14px; } }
+.pr-maraude .pr-date { background: var(--lagon-doux); color: var(--accent); }
+.pr-jour { font-family: var(--display); font-size: 1.8rem; font-weight: 700; }
+.pr-mois { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+.pr-corps { display: grid; gap: 2px; min-width: 0; flex: 1; }
+.pr-sorte { font-size: 0.74rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; color: var(--bleu); }
+.pr-boutik .pr-sorte { color: var(--corail); }
+.pr-maraude .pr-sorte { color: var(--accent); }
+.pr-titre { font-family: var(--display); font-size: clamp(1.15rem, 2.4vw, 1.45rem); line-height: 1.2; }
+.pr-quand { font-size: 0.95rem; color: var(--muted); }
+.pr-lien { justify-self: start; margin-top: 4px; font-weight: 700; font-size: 0.92rem; }
+.pr-vide { color: var(--muted); border-left-color: var(--line); }
+@media (prefers-reduced-motion: reduce) { .pr-item, .pr-item.actif { transition: none; transform: none; } }
+@media (max-width: 700px) { .pr-item { gap: 14px; padding: 14px 16px; min-height: 124px; } .pr-date { width: 58px; } .pr-jour { font-size: 1.5rem; } .pr-fleche { display: none; } }
+
+/* Squelettes de chargement : la place est réservée, rien ne saute quand les données arrivent. */
+@keyframes lueur { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+.pr-squelette .pr-date, .pr-squelette .pr-corps span, .dt-squelette, .ag-squelette {
+  background: linear-gradient(90deg, var(--line) 0%, color-mix(in srgb, var(--line) 40%, var(--surface)) 50%, var(--line) 100%); background-size: 200% 100%; animation: lueur 1.4s ease-in-out infinite; border-radius: 8px; }
+.pr-squelette { border-left-color: var(--line); }
+.pr-squelette .pr-date { height: 64px; }
+.pr-squelette .pr-corps span { display: block; height: 14px; width: 40%; }
+.pr-squelette .pr-corps span + span { height: 22px; width: 70%; margin-top: 8px; }
+.dt-squelette { list-style: none; height: 1.4em; }
+.dt-squelette:nth-child(2) { width: 85%; } .dt-squelette:nth-child(3) { width: 70%; }
+.ag-squelette { height: 96px; border-radius: var(--r); }
+@media (prefers-reduced-motion: reduce) { .pr-squelette .pr-date, .pr-squelette .pr-corps span, .dt-squelette, .ag-squelette { animation: none; } }
