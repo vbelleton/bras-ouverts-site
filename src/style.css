@@ -364,3 +364,9 @@ body.equipe section { border-top: 0; }
   .prochains ul { overflow-x: auto; scrollbar-width: none; margin-inline: -20px; padding-inline: 20px; }
   .prochains ul::-webkit-scrollbar { display: none; }
 }
+
+/* Espace équipe : où partent les e-mails du formulaire */
+.eq-mail { margin: 0; padding: 10px 14px; border-radius: 10px; font-size: 0.92rem; font-weight: 700; }
+.eq-mail.ok { background: var(--soft); color: var(--ok); }
+.eq-mail.err { background: var(--corail-doux); color: var(--corail); }
+.eq-login .btn { justify-self: start; }
