@@ -77,8 +77,7 @@
             "Chaussures, puériculture, vêtements de maternité"
           ],
           "link": "/boutik/",
-          "linkLabel": "Découvrir la petite boutik",
-          "dates": "boutik"
+          "linkLabel": "Découvrir la petite boutik"
         },
         {
           "visible": true,
@@ -91,8 +90,7 @@
             "Écoute et orientation"
           ],
           "link": "#maraudes",
-          "linkLabel": "Découvrir les maraudes",
-          "dates": "maraude"
+          "linkLabel": "Découvrir les maraudes"
         },
         {
           "visible": true,
@@ -101,8 +99,7 @@
           "title": "Des moments *à partager*",
           "text": "Ciné goûter, fête de l’été, projections de films… L’association organise aussi des rendez-vous conviviaux, ouverts à tous, petits et grands.",
           "link": "#agenda",
-          "linkLabel": "Voir l’agenda",
-          "dates": "evenements"
+          "linkLabel": "Voir l’agenda"
         }
       ]
     },
