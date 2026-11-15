@@ -5,6 +5,7 @@
     "description": "Bras Ouverts est une Association de bénévoles à Morlaix qui va à la rencontre de celles et ceux qui en ont besoin : une boutique solidaire pour les familles, des maraudes auprès des personnes qui vivent à la rue, et des évènements ponctuels pour créer du lien.",
     "tagline": "Association solidaire · Morlaix",
     "url": "https://bras-ouverts.pages.dev",
+    "favicon": "/uploads/favicon-couleur.png",
     "navLinks": [
       {
         "label": "La P’tite Boutik",
@@ -17,7 +18,9 @@
       "label": "Prochains rendez-vous",
       "max": 3,
       "maraudeDebut": "2026-11-14",
-      "maraudeJours": 14
+      "maraudeJours": 14,
+      "imagesFond": false,
+      "texteSurImage": true
     },
     "barre": [
       {
@@ -76,6 +79,7 @@
             "Vêtements enfants de 0 à 10 ans",
             "Chaussures, puériculture, vêtements de maternité"
           ],
+          "bouton": true,
           "link": "/boutik/",
           "linkLabel": "Découvrir la P’tite Boutik",
           "dates": "boutik"
@@ -90,6 +94,7 @@
             "Maraudes dans Morlaix",
             "Écoute et orientation"
           ],
+          "bouton": true,
           "link": "#maraudes",
           "linkLabel": "Prochaines maraudes",
           "dates": "maraude"
@@ -100,6 +105,7 @@
           "kicker": "Événements",
           "title": "Des moments *à partager*",
           "text": "Ciné goûter, fête de l’été, projections de films… L’Association organise aussi des rendez-vous conviviaux, ouverts à tous, petits et grands.",
+          "bouton": true,
           "link": "#agenda",
           "linkLabel": "Voir l’agenda"
         }
