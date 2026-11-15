@@ -52,7 +52,7 @@ content:
           - { name: description, label: Description pour les moteurs de recherche, type: text }
           - { name: tagline, label: Phrase du pied de page, type: string }
           - { name: url, label: "Adresse du site (ex. https://brasouverts.bzh), pour Google et les partages", type: string }
-          - { name: favicon, label: "Favicon (petite icône de l'onglet du navigateur)", type: image, description: "Image carrée, en couleur, au moins 128 px. Vide : l'étoile du logo. La P'tite Boutik a son propre favicon, réglé dans son admin." }
+          - { name: favicon, label: "Favicon (petite icône de l'onglet du navigateur)", type: image, description: "Image carrée, en couleur, au moins 128 px. Vide : l'étoile du logo. Pour le recadrer en carré avant de l'envoyer : /outils/recadrer-favicon.html. La P'tite Boutik a son propre favicon, réglé dans son admin." }
           - name: navLinks
             label: Liens du menu vers d'autres pages (ex. la P'tite Boutik)
             type: object
