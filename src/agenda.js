@@ -6,7 +6,7 @@
 // listes « Prochaines dates » des maraudes. Les dates de la boutique viennent de sa propre base.
 import { buildEventList, isoDay, AGENDA_BRAS_OUVERTS, SOURCE_LES_DEUX } from "./agenda-moteur.js";
 import { chargerOuvertures as lireOuvertures } from "./boutik-dates.js";
-import { choisirProchains, maraudesParRegle } from "./prochains.js";
+import { choisirProchains, maraudesParRegle, maraudesEntre } from "./prochains.js";
 // Une seule lecture de la base de la boutique pour toute la page.
 let ouvertures = null;
 const chargerOuvertures = () => (ouvertures ||= lireOuvertures());
@@ -82,6 +82,27 @@ function carte(ev) {
       lien ? el("a", { href: lien, rel: "noopener", class: "ag-lien" }, "En savoir plus") : null));
 }
 
+// Maraude : la date seulement, jamais le lieu ni l'heure (l'association ne dit pas où passe l'équipe).
+function carteMaraude(date) {
+  return el("li", { class: "ag-item ag-maraude" },
+    el("div", { class: "ag-date", "aria-hidden": "true" },
+      el("span", { class: "ag-jour" }, jour(date)),
+      el("span", { class: "ag-mois" }, moisCourt(date))),
+    el("div", { class: "ag-corps" },
+      el("h3", {}, "Maraude de l’association"),
+      el("p", { class: "ag-meta" }, el("span", {}, majuscule(dateLongue(date)))),
+      el("a", { href: "#maraudes", class: "ag-lien" }, "Découvrir les maraudes")));
+}
+// Dates de maraude : celles saisies dans l'agenda (titre contenant « maraude »), sinon la règle du site
+// (Pages CMS : première maraude + tous les N jours), portée par data-maraude-debut / data-maraude-jours.
+function datesMaraude(evs, bloc, de, a) {
+  const saisies = evs.filter((ev) => genre(ev) === "maraude").map((ev) => ev.date);
+  const vues = new Set();
+  const uniques = saisies.filter((d) => { const k = isoDay(d); return !vues.has(k) && vues.add(k); });
+  if (uniques.length) return uniques.filter((d) => d >= de && d <= a).sort((x, y) => x - y);
+  return maraudesEntre(bloc.dataset.maraudeDebut, bloc.dataset.maraudeJours, de, a);
+}
+
 // Un seul appel au Worker pour toute la page.
 let brut = null;
 let avenir = null;
@@ -116,7 +137,7 @@ function chargerEvenements(api) {
 const chargerHistorique = (api) => chargerBrut(api).then((l) => buildEventList(l, { futureOnly: false, agenda: AGENDA_BRAS_OUVERTS }));
 
 // Calendrier de l'agenda : grille du mois (lundi → dimanche) comme sur le site de l'église, passé compris,
-// et sous la grille la liste détaillée des rendez-vous du mois affiché. Les maraudes n'y figurent pas.
+// et sous la grille la liste détaillée des rendez-vous du mois affiché. Les maraudes y figurent, date seule.
 const JOURS_COURTS = ["lun.", "mar.", "mer.", "jeu.", "ven.", "sam.", "dim."];
 const debutMois = (d) => new Date(d.getFullYear(), d.getMonth(), 1);
 const aujourdhui = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; };
@@ -137,6 +158,12 @@ async function remplir(bloc) {
   const [evs, bk] = await Promise.allSettled([chargerHistorique(bloc.dataset.api), chargerOuvertures()]);
   if (evs.status === "rejected") console.error("agenda:", evs.reason?.name || "erreur");
   const items = [];
+  const auj0 = aujourdhui();
+  const evsListe = evs.status === "fulfilled" ? evs.value : [];
+  // Maraudes : 12 mois en arrière, 3 mois en avant (même si l'agenda n'a pas pu être chargé, la règle suffit).
+  for (const d of datesMaraude(evsListe, bloc, new Date(auj0.getFullYear() - 1, auj0.getMonth(), 1), new Date(auj0.getFullYear(), auj0.getMonth() + 3, 0))) {
+    items.push({ date: d, fin: d, sorte: "maraude", titre: "Maraude", carte: () => carteMaraude(d) });
+  }
   if (evs.status === "fulfilled") {
     for (const ev of evs.value) {
       if (genre(ev) === "maraude") continue;
@@ -351,6 +378,12 @@ async function remplirDates(zone) {
     if (zone.dataset.dates === "boutik") {
       const { dates, plage } = await chargerOuvertures();
       lignes = dates.slice(0, max).map((d) => [dateJour(d.date), d.horaires || plage]);
+    } else if (zone.dataset.dates === "maraude") {
+      // Date seule. Si l'agenda ne répond pas, la règle du site suffit.
+      const evs = await chargerEvenements(zone.dataset.api).catch(() => []);
+      const de = aujourdhui();
+      const loin = new Date(de.getFullYear() + 1, de.getMonth(), de.getDate());
+      lignes = datesMaraude(evs, zone, de, loin).slice(0, max).map((d) => [dateJour(d), ""]);
     } else {
       const vus = new Set();
       lignes = (await chargerEvenements(zone.dataset.api))

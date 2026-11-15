@@ -18,3 +18,16 @@ export function maraudesParRegle(debutIso, jours, today = new Date(), n = 3) {
   while (d < j0) d.setDate(d.getDate() + pas);
   return Array.from({ length: n }, (_, i) => { const x = new Date(d); x.setDate(x.getDate() + i * pas); return x; });
 }
+// Dates de maraude de la règle comprises entre `de` et `a` (inclus), pour le calendrier : aucune avant la première.
+export function maraudesEntre(debutIso, jours, de, a) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(debutIso || ""));
+  const pas = Number(jours);
+  if (!m || !(pas > 0)) return [];
+  const debut = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+  const d = new Date(debut);
+  const borne = new Date(de); borne.setHours(0, 0, 0, 0);
+  while (d < borne) d.setDate(d.getDate() + pas);
+  const dates = [];
+  for (; d <= a && dates.length < 400; d.setDate(d.getDate() + pas)) dates.push(new Date(d));
+  return dates;
+}

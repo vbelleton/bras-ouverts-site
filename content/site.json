@@ -93,7 +93,7 @@
           ],
           "link": "#maraudes",
           "linkLabel": "Découvrir les maraudes",
-          "dates": ""
+          "dates": "maraude"
         },
         {
           "visible": true,
@@ -123,7 +123,7 @@
           "text": "Des équipes de bénévoles vont à la rencontre des personnes qui vivent à la rue : un café, un repas chaud, du temps pour discuter, et une orientation vers les structures d’aide quand c’est utile.",
           "infos": [],
           "help": "",
-          "dates": ""
+          "dates": "maraude"
         },
         {
           "visible": false,
@@ -182,7 +182,7 @@
       "menu": "Agenda",
       "label": "",
       "title": "*Agenda*",
-      "intro": "Les événements de l’association (ciné goûter, fête de l’été, projections…) en bleu, et les ouvertures de la P’tite Boutik.",
+      "intro": "Les événements de l’association (ciné goûter, fête de l’été, projections…) en bleu, les maraudes en turquoise et les ouvertures de la P’tite Boutik.",
       "empty": "Pas de rendez-vous annoncé pour le moment. Revenez bientôt, ou écrivez-nous pour être prévenu.",
       "max": 8
     },
