@@ -147,7 +147,7 @@ function carteBoutik(o) {
       el("span", { class: "ag-jour" }, jour(o.date)),
       el("span", { class: "ag-mois" }, moisCourt(o.date))),
     el("div", { class: "ag-corps" },
-      el("h3", {}, "La P’tite Boutik est ouverte"),
+      el("h3", {}, "Ouverture de la P’tite Boutik"),
       el("p", { class: "ag-meta" }, el("span", {}, majuscule(dateLongue(o.date))), o.horaires ? el("span", {}, o.horaires) : null),
       el("a", { href: "/boutik/", class: "ag-lien" }, "Découvrir la boutique")));
 }
@@ -367,7 +367,7 @@ async function remplirProchains(bloc) {
       detail: [[heure(ev.heure), ev.fin ? heure(ev.fin) : ""].filter(Boolean).join(" – "), ev.lieu].filter(Boolean).join(" · ") }));
   const boutik = bk.status === "fulfilled"
     ? bk.value.dates.map((d) => ({ date: d.date, sorte: "boutik", lien: "/boutik/", lienTxt: "Découvrir la boutique",
-      titre: "La P’tite Boutik est ouverte", detail: d.horaires || bk.value.plage }))
+      titre: "Ouverture de la P’tite Boutik", detail: d.horaires || bk.value.plage }))
     : [];
   // Maraude : la date seulement (ni lieu ni heure). Celles de l'agenda, sinon la règle du site (tous les 15 jours…).
   let datesMaraude = tous.filter((ev) => genre(ev) === "maraude").map((ev) => ev.date);
