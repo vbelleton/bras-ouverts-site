@@ -10,6 +10,11 @@
         "label": "Petite boutik",
         "url": "/boutik/",
         "apres": "deux-cotes"
+      },
+      {
+        "label": "Dons",
+        "url": "/boutik/#dons",
+        "apres": "deux-cotes"
       }
     ],
     "prochains": {
