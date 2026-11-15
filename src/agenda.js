@@ -370,7 +370,7 @@ async function remplirProchains(bloc) {
   // Maraude : la date seulement (ni lieu ni heure). Celles de l'agenda, sinon la règle du site (tous les 15 jours…).
   let datesMaraude = tous.filter((ev) => genre(ev) === "maraude").map((ev) => ev.date);
   if (!datesMaraude.length) datesMaraude = maraudesParRegle(bloc.dataset.maraudeDebut, bloc.dataset.maraudeJours);
-  const maraudes = datesMaraude.map((date) => ({ date, sorte: "maraude", lien: "", lienTxt: "", titre: "Maraude de l’Association", detail: "" }));
+  const maraudes = datesMaraude.map((date) => ({ date, sorte: "maraude", lien: "#agenda", lienTxt: "Voir l’agenda", titre: "Maraude de l’Association", detail: "" }));
   if (evs.status === "rejected") console.error("prochains:", evs.reason?.name || "erreur");
   const choix = choisirProchains({ evenements, boutik, maraudes, max });
   if (!choix.length) {
