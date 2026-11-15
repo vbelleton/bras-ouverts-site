@@ -90,8 +90,7 @@ function carteMaraude(date) {
       el("span", { class: "ag-mois" }, moisCourt(date))),
     el("div", { class: "ag-corps" },
       el("h3", {}, "Maraude de l’association"),
-      el("p", { class: "ag-meta" }, el("span", {}, majuscule(dateLongue(date)))),
-      el("a", { href: "#maraudes", class: "ag-lien" }, "Découvrir les maraudes")));
+      el("p", { class: "ag-meta" }, el("span", {}, majuscule(dateLongue(date))))));
 }
 // Dates de maraude : celles saisies dans l'agenda (titre contenant « maraude »), sinon la règle du site
 // (Pages CMS : première maraude + tous les N jours), portée par data-maraude-debut / data-maraude-jours.
@@ -353,7 +352,7 @@ async function remplirProchains(bloc) {
   // Maraude : la date seulement (ni lieu ni heure). Celles de l'agenda, sinon la règle du site (tous les 15 jours…).
   let datesMaraude = tous.filter((ev) => genre(ev) === "maraude").map((ev) => ev.date);
   if (!datesMaraude.length) datesMaraude = maraudesParRegle(bloc.dataset.maraudeDebut, bloc.dataset.maraudeJours);
-  const maraudes = datesMaraude.map((date) => ({ date, sorte: "maraude", lien: "#maraudes", lienTxt: "Découvrir les maraudes", titre: "Maraude de l’association", detail: "" }));
+  const maraudes = datesMaraude.map((date) => ({ date, sorte: "maraude", lien: "", lienTxt: "", titre: "Maraude de l’association", detail: "" }));
   if (evs.status === "rejected") console.error("prochains:", evs.reason?.name || "erreur");
   const choix = choisirProchains({ evenements, boutik, maraudes, max });
   if (!choix.length) {

@@ -21,11 +21,14 @@ test("les valeurs Firestore (format REST) sont décodées", () => {
   assert.deepEqual(h, { plage: "10h – 17h", regles: [{ jour: 3, semaines: [2] }] });
 });
 
+const datesDemandees = (sorte) => JSON.parse(readFileSync("content/site.json", "utf8")).blocks
+  .some((b) => (b.items || []).some((i) => i.visible !== false && i.dates === sorte));
 test("la page a le bloc des prochains événements, les dates de la boutique et des maraudes (date seule)", () => {
   const html = readFileSync("dist/index.html", "utf8");
   assert.match(html, /<section class="prochains" data-api="https:\/\/eglise-app\.belletonv\.workers\.dev" data-max="3"/);
   assert.ok(html.indexOf('class="prochains"') < html.indexOf('class="hero"'), "le bloc est tout en haut");
-  assert.match(html, /data-dates="boutik"/);
+  // Les dates sous chaque carte sont un choix de contenu (Pages CMS) : on vérifie seulement celles demandées.
+  if (datesDemandees("boutik")) assert.match(html, /data-dates="boutik"/);
   assert.match(html, /data-dates="maraude" data-api="[^"]+" data-max="3" data-maraude-debut="2026-11-14" data-maraude-jours="14"/, "prochaines maraudes sous les cartes, avec la règle");
   assert.match(html, /class="agenda" [^>]*data-maraude-debut="2026-11-14" data-maraude-jours="14"/, "le calendrier connaît la règle");
   assert.match(html, /lg-maraude/);
@@ -65,7 +68,7 @@ test("maraudes du calendrier : de la première date jusqu'à la borne, aucune av
 test("encart bleu Événements avec ses prochaines dates", () => {
   const html = readFileSync("dist/index.html", "utf8");
   assert.match(html, /porte porte-bleu/);
-  assert.match(html, /data-dates="evenements"/);
+  if (datesDemandees("evenements")) assert.match(html, /data-dates="evenements"/);
   assert.match(html, /data-maraude-debut="2026-11-14" data-maraude-jours="14"/);
 });
 
