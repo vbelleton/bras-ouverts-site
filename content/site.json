@@ -82,7 +82,8 @@
             "Chaussures, puériculture, vêtements de maternité"
           ],
           "link": "/boutik/",
-          "linkLabel": "Découvrir la petite boutik"
+          "linkLabel": "Découvrir la petite boutik",
+          "dates": "boutik"
         },
         {
           "visible": true,
