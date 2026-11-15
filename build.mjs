@@ -45,9 +45,13 @@ const status = `<p class="status" role="status" aria-live="polite"></p>`;
 // Worker des événements (le même que l'agenda de l'église, événements distincts).
 const AGENDA_API = "https://eglise-app.belletonv.workers.dev";
 // Liste « Prochaines dates » de la P’tite Boutik (lue dans sa propre base par src/agenda.js).
-// Pas de dates pour les maraudes : l’association ne les annonce pas publiquement.
-const DATES = { boutik: "Prochaines ouvertures", evenements: "Prochains événements" };
-const prochainesDates = (quoi) => DATES[quoi] ? `<div class="dates" data-dates="${quoi}" data-api="${AGENDA_API}" data-max="3">
+// Maraudes : la date seulement (ni lieu ni heure), saisie dans l'agenda ou calculée par la règle du site.
+const DATES = { boutik: "Prochaines ouvertures", evenements: "Prochains événements", maraude: "Prochaines maraudes" };
+// Règle des maraudes (Pages CMS → Prochains rendez-vous) : première date + tous les N jours.
+const prRegle = (data.site || {}).prochains || {};
+const maraudeRegle = /^\d{4}-\d{2}-\d{2}$/.test(String(prRegle.maraudeDebut || "")) && Number(prRegle.maraudeJours) > 0
+  ? ` data-maraude-debut="${esc(prRegle.maraudeDebut)}" data-maraude-jours="${Number(prRegle.maraudeJours)}"` : "";
+const prochainesDates = (quoi) => DATES[quoi] ? `<div class="dates" data-dates="${quoi}" data-api="${AGENDA_API}" data-max="3"${quoi === "maraude" ? maraudeRegle : ""}>
         <span class="lab">${DATES[quoi]}</span>
         <ul aria-live="polite"><li class="dt-squelette" aria-label="Chargement des dates"></li><li class="dt-squelette"></li><li class="dt-squelette"></li></ul>
       </div>` : "";
@@ -84,9 +88,9 @@ const renderers = {
   // Agenda rempli dans le navigateur par src/agenda.js (événements gérés depuis l'admin Cieux Ouverts).
   agenda: (b) => section(b, `${secHead(b, b.intro ? `\n        <p>${txt(b.intro)}</p>` : "")}
       <ul class="ag-legende" aria-label="Couleurs de l’agenda">
-        <li class="lg-evenement">Événements</li><li class="lg-boutik">P’tite Boutik</li>
+        <li class="lg-evenement">Événements</li><li class="lg-maraude">Maraudes</li><li class="lg-boutik">P’tite Boutik</li>
       </ul>
-      <div class="agenda" data-api="${esc(safeUrl(b.api) || AGENDA_API)}" data-max="${Number(b.max) || 12}" data-vide="${esc(b.empty || "Pas de rendez-vous prévu pour le moment. Revenez bientôt !")}">
+      <div class="agenda" data-api="${esc(safeUrl(b.api) || AGENDA_API)}" data-max="${Number(b.max) || 12}"${maraudeRegle} data-vide="${esc(b.empty || "Pas de rendez-vous prévu pour le moment. Revenez bientôt !")}">
         <div class="ag-liste" aria-live="polite"><div class="ag-squelette" aria-label="Chargement de l’agenda"></div><div class="ag-squelette"></div></div>
         <noscript><p class="ag-vide">L’agenda a besoin de JavaScript. Écrivez-nous pour connaître les prochaines dates.</p></noscript>
       </div>`, "agenda-sec"),
@@ -227,9 +231,7 @@ const barreHtml = barre.length ? `
   ${barre.map((x) => `<a href="${esc(safeUrl(x.url))}"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONES[x.icon] || ICONES.coeur}</svg><span>${esc(x.label)}</span></a>`).join("\n  ")}
 </nav>` : "";
 // Bandeau « Prochains événements » sous l'en-tête (rempli par src/agenda.js, caché s'il n'y a rien).
-const pr = (data.site || {}).prochains || {};
-const maraudeRegle = /^\d{4}-\d{2}-\d{2}$/.test(String(pr.maraudeDebut || "")) && Number(pr.maraudeJours) > 0
-  ? ` data-maraude-debut="${esc(pr.maraudeDebut)}" data-maraude-jours="${Number(pr.maraudeJours)}"` : "";
+const pr = prRegle;
 const prochainsHtml = pr.visible === false ? "" : `
 <section class="prochains" data-api="${AGENDA_API}" data-max="${Number(pr.max) || 3}"${maraudeRegle} aria-labelledby="pr-titre" aria-roledescription="diaporama">
   <div class="wrap">

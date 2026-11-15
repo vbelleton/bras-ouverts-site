@@ -335,6 +335,7 @@ body.equipe section { border-top: 0; }
 .ag-legende li::before { content: ""; width: 12px; height: 12px; border-radius: 4px; background: var(--accent); }
 .ag-legende .lg-evenement::before { background: var(--bleu); }
 .ag-legende .lg-boutik::before { background: var(--corail); }
+.ag-legende .lg-maraude::before { background: var(--accent); }
 .ag-item { border-left: 5px solid var(--accent); }
 .ag-evenement { border-left-color: var(--bleu); background: linear-gradient(90deg, var(--bleu-doux), var(--surface) 60%); }
 .ag-evenement .ag-date { background: var(--bleu); }
@@ -342,6 +343,7 @@ body.equipe section { border-top: 0; }
 .ag-boutik { border-left-color: var(--corail); }
 .ag-boutik .ag-date { background: var(--corail); }
 .ag-evenement .ag-regulier { color: var(--bleu); }
+.ag-maraude .ag-date { background: var(--accent); }
 
 /* Prochaines dates (maraudes, boutique) */
 .dates { display: grid; gap: 8px; padding: 14px 18px; border-radius: 12px; background: color-mix(in srgb, var(--surface) 80%, transparent); border: 1px solid var(--line); }
@@ -433,6 +435,7 @@ button.cal-case:hover { background: var(--soft); }
 .cal-pastilles { display: grid; gap: 3px; min-width: 0; }
 .cal-pastille { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; padding: 2px 6px; border-radius: 6px; font-size: 0.76rem; font-weight: 700; background: var(--bleu-doux); color: var(--bleu); border-left: 3px solid var(--bleu); }
 .cal-boutik { background: var(--corail-doux); color: var(--corail); border-left-color: var(--corail); }
+.cal-maraude { background: var(--lagon-doux); color: var(--accent); border-left-color: var(--accent); }
 .cal-passe .cal-pastille { opacity: .6; }
 .cal-liste { display: grid; gap: 12px; }
 .cal-lien { padding: 0; border: 0; background: none; color: var(--accent); font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; text-align: left; }
@@ -447,6 +450,7 @@ button.cal-case:hover { background: var(--soft); }
   .cal-pastilles { display: flex; flex-wrap: wrap; justify-content: center; gap: 3px; }
   .cal-pastille { width: 8px; height: 8px; padding: 0; border: 0; border-radius: 999px; font-size: 0; background: var(--bleu); }
   .cal-boutik { background: var(--corail); }
+  .cal-maraude { background: var(--accent); }
   .cal-auj { margin-left: 0; }
 }
 @media (prefers-reduced-motion: reduce) { .ag-vu { animation: none; outline: 3px solid var(--accent); } }

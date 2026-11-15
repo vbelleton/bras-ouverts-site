@@ -21,13 +21,14 @@ test("les valeurs Firestore (format REST) sont décodées", () => {
   assert.deepEqual(h, { plage: "10h – 17h", regles: [{ jour: 3, semaines: [2] }] });
 });
 
-test("la page a le bloc des prochains événements, les dates de la boutique, aucune date de maraude", () => {
+test("la page a le bloc des prochains événements, les dates de la boutique et des maraudes (date seule)", () => {
   const html = readFileSync("dist/index.html", "utf8");
   assert.match(html, /<section class="prochains" data-api="https:\/\/eglise-app\.belletonv\.workers\.dev" data-max="3"/);
   assert.ok(html.indexOf('class="prochains"') < html.indexOf('class="hero"'), "le bloc est tout en haut");
   assert.match(html, /data-dates="boutik"/);
-  assert.doesNotMatch(html, /data-dates="maraude"/, "les maraudes ne sont pas annoncées");
-  assert.doesNotMatch(html, /lg-maraude/);
+  assert.match(html, /data-dates="maraude" data-api="[^"]+" data-max="3" data-maraude-debut="2026-11-14" data-maraude-jours="14"/, "prochaines maraudes sous les cartes, avec la règle");
+  assert.match(html, /class="agenda" [^>]*data-maraude-debut="2026-11-14" data-maraude-jours="14"/, "le calendrier connaît la règle");
+  assert.match(html, /lg-maraude/);
   assert.doesNotMatch(html, /js-mail/, "plus d'adresse e-mail affichée");
 });
 
@@ -38,7 +39,7 @@ test("le menu commun est publié pour la boutique (menu.json)", () => {
   assert.ok(liens.some((l) => l.url === "/boutik/"));
 });
 
-import { choisirProchains, maraudesParRegle } from "../src/prochains.js";
+import { choisirProchains, maraudesParRegle, maraudesEntre } from "../src/prochains.js";
 const E = (n) => Array.from({ length: n }, (_, i) => `evenement${i + 1}`);
 const B = ["boutik1", "boutik2", "boutik3"];
 const M = ["maraude1", "maraude2"];
@@ -54,6 +55,12 @@ test("maraudes par défaut : tous les 14 jours depuis le 14 novembre 2026", () =
   assert.deepEqual(d, ["2026-11-28", "2026-12-12", "2026-12-26"]);
   assert.equal(maraudesParRegle("2026-11-14", 14, new Date(2026, 10, 14)).map(iso)[0], "2026-11-14");
   assert.deepEqual(maraudesParRegle("", 14), []);
+});
+test("maraudes du calendrier : de la première date jusqu'à la borne, aucune avant", () => {
+  const d = maraudesEntre("2026-11-14", 14, new Date(2025, 10, 1), new Date(2027, 0, 31)).map(iso);
+  assert.deepEqual(d, ["2026-11-14", "2026-11-28", "2026-12-12", "2026-12-26", "2027-01-09", "2027-01-23"]);
+  assert.deepEqual(maraudesEntre("2026-11-14", 14, new Date(2026, 11, 1), new Date(2026, 11, 31)).map(iso), ["2026-12-12", "2026-12-26"]);
+  assert.deepEqual(maraudesEntre("", 14, new Date(), new Date()), []);
 });
 test("encart bleu Événements avec ses prochaines dates", () => {
   const html = readFileSync("dist/index.html", "utf8");
