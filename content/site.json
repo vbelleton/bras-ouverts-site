@@ -84,13 +84,14 @@
           "style": "lagon",
           "kicker": "Actions solidaires",
           "title": "Maraudes et *entraide*",
-          "text": "Des bénévoles vont à la rencontre des personnes qui vivent à la rue : un café, un repas chaud, du temps pour discuter, et une orientation vers les structures d’aide quand c’est utile.",
+          "text": "Des bénévoles vont à la rencontre des personnes qui vivent à la rue : un café, un repas chaud, du temps pour discuter, et une orientation vers les structures d’aide déjà présentes à Morlaix.",
           "points": [
             "Maraudes dans Morlaix",
             "Écoute et orientation"
           ],
           "link": "#maraudes",
-          "linkLabel": "Découvrir les maraudes"
+          "linkLabel": "Prochaines maraudes",
+          "dates": "maraude"
         },
         {
           "visible": true,
@@ -100,70 +101,6 @@
           "text": "Ciné goûter, fête de l’été, projections de films… L’association organise aussi des rendez-vous conviviaux, ouverts à tous, petits et grands.",
           "link": "#agenda",
           "linkLabel": "Voir l’agenda"
-        }
-      ]
-    },
-    {
-      "type": "actions",
-      "visible": true,
-      "anchor": "maraudes",
-      "menu": "Maraude",
-      "label": "Maraude",
-      "title": "Les *maraudes*",
-      "items": [
-        {
-          "visible": true,
-          "anchor": "maraude",
-          "title": "Aller à la *rencontre*",
-          "text": "Des équipes de bénévoles vont à la rencontre des personnes qui vivent à la rue : un café, un repas chaud, du temps pour discuter, et une orientation vers les structures d’aide quand c’est utile.",
-          "dates": "maraude"
-        },
-        {
-          "visible": false,
-          "anchor": "benevoles",
-          "title": "Devenir *bénévole*",
-          "text": "Maraudes, tri des dons, accueil à la boutique, coups de main ponctuels : il y a une place pour chacun, même pour une heure de temps en temps.\n\nOn commence toujours accompagné d’un bénévole qui connaît déjà l’association.",
-          "infos": [
-            {
-              "label": "Pour qui",
-              "value": "Toute personne qui a envie d’aider"
-            },
-            {
-              "label": "Engagement",
-              "value": "Selon vos disponibilités, sans obligation de régularité"
-            }
-          ],
-          "help": "Envie de nous rejoindre ? Choisissez « Devenir bénévole » dans le formulaire de contact."
-        },
-        {
-          "visible": false,
-          "anchor": "soutenir",
-          "title": "Soutenir *l’association*",
-          "text": "Les dons de vêtements font vivre la boutique ; les dons en nature (café, gâteaux, couvertures, produits d’hygiène neufs) font vivre les maraudes.",
-          "infos": [
-            {
-              "label": "Dons pour les maraudes",
-              "value": "[à compléter : ce dont l’équipe a besoin en ce moment]"
-            }
-          ],
-          "help": "Avant de déposer un don, contactez-nous pour savoir ce qui manque."
-        },
-        {
-          "visible": false,
-          "anchor": "petite-boutik",
-          "title": "La petite boutik",
-          "text": "Une boutique de seconde main à prix mini, avec des vêtements pour enfants de 0 à 10 ans, des chaussures et de la puériculture. C’est aussi un lieu où l’on prend le temps de se parler.",
-          "infos": [
-            {
-              "label": "Ouverture",
-              "value": "Mercredi et samedi [à compléter : heures]"
-            },
-            {
-              "label": "Adresse",
-              "value": "2 rue Jean-Monnet, 29600 Morlaix"
-            }
-          ],
-          "help": "Vous avez des vêtements d’enfants ou de la puériculture à donner ? Contactez-nous avant de passer."
         }
       ]
     },
