@@ -234,9 +234,10 @@ const barreHtml = barre.length ? `
 const pr = prRegle;
 // Diapos : image de fond par défaut pour chaque sorte de rendez-vous (Pages CMS, facultatives), et
 // « texte sur l'image » : non = une diapo qui a une image n'affiche que l'image (une affiche porte déjà son texte).
-const prImages = [["evenement", pr.imageEvenement], ["boutik", pr.imageBoutik], ["maraude", pr.imageMaraude]]
+// Les images de fond ne s'affichent que si la case « Afficher les images en fond » est cochée (décision de l'association).
+const prImages = pr.imagesFond !== true ? "" : [["evenement", pr.imageEvenement], ["boutik", pr.imageBoutik], ["maraude", pr.imageMaraude]]
   .filter(([, u]) => safeUrl(u)).map(([k, u]) => ` data-img-${k}="${esc(safeUrl(u))}"`).join("")
-  + (pr.texteSurImage === false ? ' data-texte-image="non"' : "");
+  + (pr.imagesFond === true ? ' data-images="oui"' : "") + (pr.texteSurImage === false ? ' data-texte-image="non"' : "");
 const prochainsHtml = pr.visible === false ? "" : `
 <section class="prochains" data-api="${AGENDA_API}" data-max="${Number(pr.max) || 3}"${maraudeRegle}${prImages} aria-labelledby="pr-titre" aria-roledescription="diaporama">
   <div class="wrap">
@@ -251,6 +252,7 @@ const body = blocks.map((b) => (renderers[b.type] ? renderers[b.type](b) : "")).
 const s = data.site || {};
 const l = data.legal || {};
 const home = (blocks[0] || {}).anchor || "accueil";
+const faviconUrl = safeUrl((data.site || {}).favicon) || "/favicon.png";
 
 const html = `<!doctype html>
 <html lang="fr">
@@ -263,7 +265,7 @@ const html = `<!doctype html>
 <meta property="og:description" content="${esc(s.description)}">
 <meta property="og:type" content="website">
 ${s.url ? `<link rel="canonical" href="${esc(String(s.url).replace(/\/+$/, ""))}/">\n<meta property="og:url" content="${esc(String(s.url).replace(/\/+$/, ""))}/">\n<meta property="og:image" content="${esc(String(s.url).replace(/\/+$/, ""))}/logo.png">` : ""}
-<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="icon" href="${esc(faviconUrl)}">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 <meta name="theme-color" content="#f6efe3" media="(prefers-color-scheme: light)">
@@ -325,7 +327,7 @@ const equipePage = `<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <title>Espace équipe · ${esc(s.name)}</title>
-<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="icon" href="${esc(faviconUrl)}">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,400;0,6..12,700;1,6..12,400&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap">
 <link rel="stylesheet" href="/style.css">
 <script>${readFileSync("src/theme.js", "utf8").trim()}</script>
@@ -347,7 +349,8 @@ if (existsSync("public")) cpSync("public", OUT, { recursive: true });
 cpSync("src", OUT, { recursive: true });
 writeFileSync(`${OUT}/index.html`, html);
 // Menu commun lu par la P'tite Boutik : ancres rendues absolues (/#agenda), le logo mène à l'accueil.
-writeFileSync(`${OUT}/menu.json`, JSON.stringify({ liens: menuLiens.map((l) => ({ label: l.label, url: l.url.startsWith("#") ? `/${l.url}` : l.url })) }));
+// « Accueil » en premier pour la boutique : revenir au haut de la page, pas sur la rubrique « Découvrir l'association ».
+writeFileSync(`${OUT}/menu.json`, JSON.stringify({ liens: [{ label: "Accueil", url: "/" }, ...menuLiens].map((l) => ({ label: l.label, url: l.url.startsWith("#") ? `/${l.url}` : l.url })) }));
 // Le domaine sert aussi la boutique sous /boutik/ : robots et plan du site couvrent les deux.
 const SITE_URL = String(s.url || "").replace(/\/+$/, "");
 writeFileSync(`${OUT}/robots.txt`, `User-agent: *\nAllow: /\nDisallow: /inscriptions\nDisallow: /boutik/admin\n${SITE_URL ? `\nSitemap: ${SITE_URL}/sitemap.xml\n` : ""}`);

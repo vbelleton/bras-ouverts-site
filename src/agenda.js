@@ -293,7 +293,9 @@ const DECOR = { evenement: "🎉", boutik: "👕", maraude: "☕" };
 // Diapo : grand texte ; image en fond si le rendez-vous en a une (ou image par défaut du site), sinon fond coloré.
 // Option « pas de texte sur l'image » : la diapo n'affiche que l'image, le texte reste pour les lecteurs d'écran.
 function cartePr({ date, titre, detail, lien, sorte, lienTxt, image }, bloc) {
-  const img = image || imageSure(bloc?.dataset[`img${sorte.charAt(0).toUpperCase()}${sorte.slice(1)}`]);
+  // Images de fond seulement si validées dans Pages CMS (data-images="oui") : sinon fond coloré.
+  const permis = bloc?.dataset.images === "oui";
+  const img = !permis ? "" : image || imageSure(bloc?.dataset[`img${sorte.charAt(0).toUpperCase()}${sorte.slice(1)}`]);
   const imageSeule = !!img && bloc?.dataset.texteImage === "non";
   const li = el("li", { class: `pr-item pr-${sorte}${img ? " pr-avec-image" : ""}${imageSeule ? " pr-image-seule" : ""}` },
     img ? null : el("span", { class: "pr-decor", "aria-hidden": "true" }, DECOR[sorte] || "✦"),
