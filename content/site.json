@@ -7,13 +7,8 @@
     "url": "https://bras-ouverts.pages.dev",
     "navLinks": [
       {
-        "label": "Petite boutik",
+        "label": "La P’tite Boutik",
         "url": "/boutik/",
-        "apres": "deux-cotes"
-      },
-      {
-        "label": "Dons",
-        "url": "/boutik/#dons",
         "apres": "deux-cotes"
       }
     ],

@@ -80,7 +80,7 @@ const renderers = {
         ${paras(i.text)}
         ${list(i.points).length ? `<ul class="porte-points">${list(i.points).map((x) => `<li>${txt(x)}</li>`).join("")}</ul>` : ""}
         ${prochainesDates(i.dates)}
-        ${href ? `<a class="btn" href="${esc(href)}"${ext ? ' rel="noopener"' : ""}>${esc(i.linkLabel || "Découvrir")}${ext ? ' <span aria-hidden="true">↗</span>' : ""}</a>` : ""}
+        ${href && i.bouton !== false ? `<a class="btn" href="${esc(href)}"${ext ? ' rel="noopener"' : ""}>${esc(i.linkLabel || "Découvrir")}${ext ? ' <span aria-hidden="true">↗</span>' : ""}</a>` : ""}
       </article>`;
       }).join("\n      ")}
       </div>`, "portes-sec"),
@@ -232,8 +232,13 @@ const barreHtml = barre.length ? `
 </nav>` : "";
 // Bandeau « Prochains événements » sous l'en-tête (rempli par src/agenda.js, caché s'il n'y a rien).
 const pr = prRegle;
+// Diapos : image de fond par défaut pour chaque sorte de rendez-vous (Pages CMS, facultatives), et
+// « texte sur l'image » : non = une diapo qui a une image n'affiche que l'image (une affiche porte déjà son texte).
+const prImages = [["evenement", pr.imageEvenement], ["boutik", pr.imageBoutik], ["maraude", pr.imageMaraude]]
+  .filter(([, u]) => safeUrl(u)).map(([k, u]) => ` data-img-${k}="${esc(safeUrl(u))}"`).join("")
+  + (pr.texteSurImage === false ? ' data-texte-image="non"' : "");
 const prochainsHtml = pr.visible === false ? "" : `
-<section class="prochains" data-api="${AGENDA_API}" data-max="${Number(pr.max) || 3}"${maraudeRegle} aria-labelledby="pr-titre" aria-roledescription="diaporama">
+<section class="prochains" data-api="${AGENDA_API}" data-max="${Number(pr.max) || 3}"${maraudeRegle}${prImages} aria-labelledby="pr-titre" aria-roledescription="diaporama">
   <div class="wrap">
     <div class="pr-tete">
       <h2 id="pr-titre" class="pr-lab">${esc(pr.label || "Prochains rendez-vous")}</h2>
@@ -273,7 +278,7 @@ ${prochainsHtml || /data-dates=|class="agenda"/.test(body) ? `<script type="modu
 <body${barre.length ? ' class="avec-barre"' : ""}>
 <header class="top">
   <div class="wrap">
-    <a class="logo" href="#${esc(home)}"><img src="/logo.png" alt="${esc(s.name || '')}" width="178" height="34"></a>
+    <a class="logo" href="#${esc(home)}"><img src="/logo.png" alt="${esc(s.name || '')}" width="545" height="160"></a>
     <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="menu-principal">
       <span class="menu-ico" aria-hidden="true"><span></span><span></span><span></span></span><span class="menu-txt">Menu</span>
     </button>
@@ -328,7 +333,7 @@ const equipePage = `<!doctype html>
 </head>
 <body class="equipe">
 <header class="top"><div class="wrap">
-  <a class="logo" href="/"><img src="/logo.png" alt="${esc(s.name || "")}" width="178" height="34"></a>
+  <a class="logo" href="/"><img src="/logo.png" alt="${esc(s.name || "")}" width="545" height="160"></a>
   <span class="equipe-titre">Espace équipe</span>
 </div></header>
 <main><section><div class="wrap" id="app"><p>Chargement…</p></div></section></main>

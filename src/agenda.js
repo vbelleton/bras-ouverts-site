@@ -280,21 +280,39 @@ async function remplir(bloc) {
 // les événements d'abord (ciné goûter, fête…) ; s'il en manque, la prochaine ouverture de la boutique,
 // puis la prochaine maraude (date seulement, jamais le lieu), puis d'autres ouvertures de la boutique.
 // 3 événements → 3 événements ; 2 → 2 + boutique ; 1 → 1 + boutique + maraude ; 0 → boutique, maraude, boutique.
-function cartePr({ date, titre, detail, lien, sorte, lienTxt }) {
-  return el("li", { class: `pr-item pr-${sorte}` },
-    el("span", { class: "pr-date", "aria-hidden": "true" },
-      el("span", { class: "pr-jour" }, jour(date)),
-      el("span", { class: "pr-mois" }, moisCourt(date))),
-    el("span", { class: "pr-corps" },
-      el("span", { class: "pr-sorte" }, { evenement: "Événement", boutik: "P’tite Boutik", maraude: "Maraude" }[sorte]),
-      el("strong", { class: "pr-titre" }, titre),
-      el("span", { class: "pr-quand" }, [majuscule(dateLongue(date)), detail].filter(Boolean).join(" · ")),
-      lien ? el("a", { class: "pr-lien", href: lien }, lienTxt) : null));
+// Images des événements : téléversées dans l'admin du site de l'église, servies par celui-ci (/api/media/…).
+const ORIGINE_IMAGES = "https://eglise-cieux-ouverts.pages.dev";
+const imageSure = (u, origine) => {
+  if (!u) return "";
+  try {
+    const url = new URL(String(u), origine || location.origin);
+    return /^https?:$/.test(url.protocol) ? url.href : "";
+  } catch { return ""; }
+};
+const DECOR = { evenement: "🎉", boutik: "👕", maraude: "☕" };
+// Diapo : grand texte ; image en fond si le rendez-vous en a une (ou image par défaut du site), sinon fond coloré.
+// Option « pas de texte sur l'image » : la diapo n'affiche que l'image, le texte reste pour les lecteurs d'écran.
+function cartePr({ date, titre, detail, lien, sorte, lienTxt, image }, bloc) {
+  const img = image || imageSure(bloc?.dataset[`img${sorte.charAt(0).toUpperCase()}${sorte.slice(1)}`]);
+  const imageSeule = !!img && bloc?.dataset.texteImage === "non";
+  const li = el("li", { class: `pr-item pr-${sorte}${img ? " pr-avec-image" : ""}${imageSeule ? " pr-image-seule" : ""}` },
+    img ? null : el("span", { class: "pr-decor", "aria-hidden": "true" }, DECOR[sorte] || "✦"),
+    el("span", { class: `pr-texte${imageSeule ? " sr" : ""}` },
+      el("span", { class: "pr-date", "aria-hidden": "true" },
+        el("span", { class: "pr-jour" }, jour(date)),
+        el("span", { class: "pr-mois" }, moisCourt(date))),
+      el("span", { class: "pr-corps" },
+        el("span", { class: "pr-sorte" }, { evenement: "Événement", boutik: "P’tite Boutik", maraude: "Maraude" }[sorte]),
+        el("strong", { class: "pr-titre" }, titre),
+        el("span", { class: "pr-quand" }, [majuscule(dateLongue(date)), detail].filter(Boolean).join(" · ")))),
+    lien ? el("a", { class: "pr-lien", href: lien }, lienTxt) : null);
+  if (img) li.style.setProperty("--pr-img", `url(${JSON.stringify(img)})`);
+  return li;
 }
 function diaporama(bloc, cartes) {
   const ul = bloc.querySelector("ul");
   const nav = bloc.querySelector(".pr-nav");
-  ul.replaceChildren(...cartes.map(cartePr));
+  ul.replaceChildren(...cartes.map((c) => cartePr(c, bloc)));
   const items = [...ul.children];
   let i = 0;
   let minuterie = null;
@@ -344,6 +362,7 @@ async function remplirProchains(bloc) {
   const evenements = tous.filter((ev) => genre(ev) === "evenement" && unique(ev))
     .map((ev) => ({ date: ev.date, sorte: "evenement", lien: "#agenda", lienTxt: "Voir l’agenda",
       titre: `${ev.emoji ? `${ev.emoji} ` : ""}${ev.titre || "Événement"}`,
+      image: imageSure(ev.image_url || (ev.images || [])[0], ORIGINE_IMAGES),
       detail: [[heure(ev.heure), ev.fin ? heure(ev.fin) : ""].filter(Boolean).join(" – "), ev.lieu].filter(Boolean).join(" · ") }));
   const boutik = bk.status === "fulfilled"
     ? bk.value.dates.map((d) => ({ date: d.date, sorte: "boutik", lien: "/boutik/", lienTxt: "Découvrir la boutique",

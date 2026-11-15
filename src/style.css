@@ -51,10 +51,10 @@ p { margin: 0; max-width: 65ch; }
 .top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
 .top .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px; padding-block: 10px; }
 .logo { display: flex; align-items: center; }
-.logo img { display: block; height: 34px; width: auto; }
-/* Le logo est bleu marine sur transparent : en thème sombre on le passe en clair. */
-:root[data-theme="dark"] .logo img { filter: brightness(0) invert(0.94); }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .logo img { filter: brightness(0) invert(0.94); } }
+.logo img { display: block; height: 46px; width: auto; }
+/* Logo en couleur sur transparent : en thème sombre, posé sur une pastille claire pour rester lisible. */
+:root[data-theme="dark"] .logo img { background: #f6f1e7; border-radius: 10px; padding: 3px 8px; box-sizing: content-box; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .logo img { background: #f6f1e7; border-radius: 10px; padding: 3px 8px; box-sizing: content-box; } }
 .top nav { display: flex; flex-wrap: wrap; gap: 4px 20px; margin-left: auto; }
 .top nav a { color: var(--muted); text-decoration: none; font-weight: 700; font-size: 0.95rem; }
 .top nav a:hover { color: var(--accent); }
@@ -81,7 +81,7 @@ p { margin: 0; max-width: 65ch; }
 
 @media (max-width: 700px) {
   .top .wrap { gap: 8px 10px; }
-  .logo img { height: 30px; }
+  .logo img { height: 38px; }
   .theme-toggle { width: 40px; height: 40px; }
   .top nav { order: 3; flex-basis: 100%; margin-left: 0; }
   /* Avec JavaScript : menu replié derrière le bouton */
@@ -399,6 +399,32 @@ body.equipe section { border-top: 0; }
 .pr-vide { color: var(--muted); border-left-color: var(--line); }
 @media (prefers-reduced-motion: reduce) { .pr-item, .pr-item.actif { transition: none; transform: none; } }
 @media (max-width: 700px) { .pr-item { gap: 14px; padding: 14px 16px; min-height: 124px; } .pr-date { width: 58px; } .pr-jour { font-size: 1.5rem; } .pr-fleche { display: none; } }
+
+/* Diapos en grand : texte dynamique sur fond coloré (avec un grand pictogramme), ou sur l'image du rendez-vous.
+   Couleurs fixes : le texte blanc reste lisible dans les deux thèmes. */
+.pr-evenement, .pr-boutik, .pr-maraude { position: relative; overflow: hidden; isolation: isolate; flex-direction: column; justify-content: flex-end; align-items: flex-start; gap: 16px;
+  min-height: clamp(210px, 26vw, 320px); padding: clamp(20px, 4vw, 44px); border: 0; border-radius: 22px; color: #fff; background: var(--pr-fond); }
+.pr-evenement { --pr-fond: linear-gradient(135deg, #2a5aa6, #17325f); }
+.pr-boutik { --pr-fond: linear-gradient(135deg, #b9533c, #7d2f20); }
+.pr-maraude { --pr-fond: linear-gradient(135deg, #0f6e67, #0a3f3b); }
+.pr-avec-image { background: linear-gradient(90deg, rgba(12, 18, 28, .84) 0%, rgba(12, 18, 28, .5) 55%, rgba(12, 18, 28, .18) 100%), var(--pr-img) center / cover no-repeat, #1f2a3a; }
+.pr-image-seule { min-height: clamp(240px, 32vw, 400px); background: #1f2a3a; }
+/* Image entière (une affiche n'est pas recadrée), posée sur un flou de la même image */
+.pr-image-seule::before, .pr-image-seule::after { content: ""; position: absolute; pointer-events: none; }
+.pr-image-seule::before { inset: -30px; z-index: -2; background: var(--pr-img) center / cover no-repeat; filter: blur(26px) brightness(.75); }
+.pr-image-seule::after { inset: 0; z-index: -1; background: var(--pr-img) center / contain no-repeat; }
+.pr-decor { position: absolute; z-index: -1; right: clamp(12px, 5vw, 64px); top: 50%; transform: translateY(-50%); font-size: clamp(5rem, 14vw, 10rem); line-height: 1; opacity: .22; pointer-events: none; }
+.pr-texte { display: flex; gap: clamp(14px, 2.4vw, 26px); align-items: center; max-width: 920px; }
+.pr-item .pr-texte .pr-date { width: clamp(64px, 8vw, 96px); background: rgba(255, 255, 255, .16); border: 1px solid rgba(255, 255, 255, .35); color: #fff; }
+.pr-texte .pr-jour { font-size: clamp(1.8rem, 4vw, 2.8rem); }
+.pr-item .pr-texte .pr-sorte { color: rgba(255, 255, 255, .88); }
+.pr-texte .pr-titre { color: #fff; font-size: clamp(1.6rem, 4.2vw, 3rem); line-height: 1.08; text-wrap: balance; }
+.pr-texte .pr-quand { color: rgba(255, 255, 255, .92); font-size: clamp(.95rem, 1.6vw, 1.15rem); }
+.pr-item > .pr-lien { margin: 0; padding: 8px 18px; border-radius: 999px; background: #fff; color: #1f2a3a; text-decoration: none; }
+.pr-item > .pr-lien:hover { text-decoration: underline; }
+.pr-image-seule > .pr-lien { position: absolute; right: 16px; bottom: 16px; }
+@media (max-width: 700px) { .pr-texte { align-items: flex-start; } }
+.sr { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
 
 /* Squelettes de chargement : la place est réservée, rien ne saute quand les données arrivent. */
 @keyframes lueur { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
