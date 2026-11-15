@@ -89,7 +89,7 @@ function carteMaraude(date) {
       el("span", { class: "ag-jour" }, jour(date)),
       el("span", { class: "ag-mois" }, moisCourt(date))),
     el("div", { class: "ag-corps" },
-      el("h3", {}, "Maraude de l’association"),
+      el("h3", {}, "Maraude de l’Association"),
       el("p", { class: "ag-meta" }, el("span", {}, majuscule(dateLongue(date))))));
 }
 // Dates de maraude : celles saisies dans l'agenda (titre contenant « maraude »), sinon la règle du site
@@ -133,7 +133,7 @@ function chargerEvenements(api) {
   return (avenir ||= chargerBrut(api).then((l) => buildEventList(l, { agenda: AGENDA_BRAS_OUVERTS })));
 }
 // Avec l'historique (12 derniers mois) : le calendrier montre aussi les rendez-vous passés.
-const chargerHistorique = (api) => chargerBrut(api).then((l) => buildEventList(l, { futureOnly: false, agenda: AGENDA_BRAS_OUVERTS }));
+const chargerHistorique = (api) => chargerBrut(api).then((l) => buildEventList(l, { agenda: AGENDA_BRAS_OUVERTS }));
 
 // Calendrier de l'agenda : grille du mois (lundi → dimanche) comme sur le site de l'église, passé compris,
 // et sous la grille la liste détaillée des rendez-vous du mois affiché. Les maraudes y figurent, date seule.
@@ -262,7 +262,6 @@ async function remplir(bloc) {
     for (const { it, k } of duMois) {
       const li = it.carte();
       li.dataset.jour = k;
-      if (it.fin < auj) { li.classList.add("ag-passe"); li.querySelector(".ag-meta")?.prepend(el("span", { class: "ag-etiquette" }, "Passé")); }
       ul.append(li);
     }
     liste.append(ul);
@@ -373,7 +372,7 @@ async function remplirProchains(bloc) {
   // Maraude : la date seulement (ni lieu ni heure). Celles de l'agenda, sinon la règle du site (tous les 15 jours…).
   let datesMaraude = tous.filter((ev) => genre(ev) === "maraude").map((ev) => ev.date);
   if (!datesMaraude.length) datesMaraude = maraudesParRegle(bloc.dataset.maraudeDebut, bloc.dataset.maraudeJours);
-  const maraudes = datesMaraude.map((date) => ({ date, sorte: "maraude", lien: "", lienTxt: "", titre: "Maraude de l’association", detail: "" }));
+  const maraudes = datesMaraude.map((date) => ({ date, sorte: "maraude", lien: "", lienTxt: "", titre: "Maraude de l’Association", detail: "" }));
   if (evs.status === "rejected") console.error("prochains:", evs.reason?.name || "erreur");
   const choix = choisirProchains({ evenements, boutik, maraudes, max });
   if (!choix.length) {

@@ -188,7 +188,7 @@ const renderers = {
           const href = safeUrl(i.href);
           return `<div><dt><span class="ico" aria-hidden="true">${esc(i.icon || "")}</span>${esc(i.label)}</dt><dd>${href ? `<a href="${esc(href)}">${txt(i.value)}</a>` : txt(i.value)}</dd></div>`;
         }).join("")}</dl>` : ""}
-        ${b.email ? `<p class="mail-alt">${esc(b.emailText || "Vous préférez l’e-mail ? Écrivez-nous :")} ${mailLink(b.email, "écrire à l’association")}</p>` : ""}
+        ${b.email ? `<p class="mail-alt">${esc(b.emailText || "Vous préférez l’e-mail ? Écrivez-nous :")} ${mailLink(b.email, "écrire à l’Association")}</p>` : ""}
         ${list(b.social).length ? `<ul class="social">${list(b.social).filter((x) => safeUrl(x.url)).map((x) => `<li><a href="${esc(safeUrl(x.url))}" rel="noopener">${esc(x.label)}</a></li>`).join("")}</ul>` : ""}
       </aside>`;
     return section(b, `${secHead(b, b.intro ? `\n        <p>${txt(b.intro)}</p>` : "")}
@@ -311,7 +311,7 @@ ${body}
         ${l.siret ? `<div><dt>SIRET</dt><dd>${esc(l.siret)}</dd></div>` : ""}
         ${l.publisher ? `<div><dt>Directeur de la publication</dt><dd>${txt(l.publisher)}</dd></div>` : ""}
         ${l.host ? `<div><dt>Hébergement</dt><dd>${esc(l.host)}</dd></div>` : ""}
-        <div><dt>Données personnelles</dt><dd>Les messages du formulaire de contact servent uniquement à vous répondre. Ils ne sont lus que par l’équipe de l’association et sont supprimés une fois traités.${blocks.some((b) => b.type === "alpha") ? ` ${txt(l.retention || "")}` : ""}</dd></div>
+        <div><dt>Données personnelles</dt><dd>Les messages du formulaire de contact servent uniquement à vous répondre. Ils ne sont lus que par l’équipe de l’Association et sont supprimés une fois traités.${blocks.some((b) => b.type === "alpha") ? ` ${txt(l.retention || "")}` : ""}</dd></div>
       </dl>
     </details>
   </div>

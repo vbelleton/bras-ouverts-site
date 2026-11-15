@@ -118,7 +118,7 @@ content:
               - { name: ctaTarget, label: Ancre visée par le bouton (ex. alpha), type: string }
 
           - name: portes
-            label: Les deux côtés de l'association (P'tite Boutik / actions)
+            label: Les deux côtés de l'Association (P'tite Boutik / actions)
             fields:
               - { name: visible, component: visible }
               - { name: anchor, component: anchor }
@@ -300,7 +300,7 @@ content:
               - { name: subjects, label: Choix du menu « Sujet », type: string, list: true }
               - { name: success, label: Message affiché après l'envoi, type: text }
               - { name: note, label: "Phrase à côté du formulaire (ex. Nous répondons à tous les messages)", type: string }
-              - { name: email, label: E-mail de l'association affiché sous le formulaire (laisser vide pour le masquer), type: string }
+              - { name: email, label: E-mail de l'Association affiché sous le formulaire (laisser vide pour le masquer), type: string }
               - { name: emailText, label: Phrase avant l'e-mail, type: string }
               - name: details
                 label: Coordonnées à côté du formulaire (facultatif)
@@ -323,7 +323,7 @@ content:
         label: Mentions légales
         type: object
         fields:
-          - { name: association, label: Nom de l'association, type: string }
+          - { name: association, label: Nom de l'Association, type: string }
           - { name: address, label: Adresse du siège, type: string }
           - { name: siret, label: SIRET, type: string }
           - { name: publisher, label: Directeur de la publication, type: string }
