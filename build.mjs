@@ -282,7 +282,7 @@ ${prochainsHtml || /data-dates=|class="agenda"/.test(body) ? `<script type="modu
 <body${barre.length ? ' class="avec-barre"' : ""}>
 <header class="top">
   <div class="wrap">
-    <a class="logo" href="#${esc(home)}"><img src="/logo.png" alt="${esc(s.name || '')}" width="545" height="160"></a>
+    <a class="logo" href="#${esc(home)}"><img class="logo-clair" src="/logo.png" alt="${esc(s.name || '')}" width="545" height="160"><img class="logo-sombre" src="/logo-blanc.png" alt="" aria-hidden="true" width="545" height="160"></a>
     <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="menu-principal">
       <span class="menu-ico" aria-hidden="true"><span></span><span></span><span></span></span><span class="menu-txt">Menu</span>
     </button>
@@ -337,7 +337,7 @@ const equipePage = `<!doctype html>
 </head>
 <body class="equipe">
 <header class="top"><div class="wrap">
-  <a class="logo" href="/"><img src="/logo.png" alt="${esc(s.name || "")}" width="545" height="160"></a>
+  <a class="logo" href="/"><img class="logo-clair" src="/logo.png" alt="${esc(s.name || "")}" width="545" height="160"><img class="logo-sombre" src="/logo-blanc.png" alt="" aria-hidden="true" width="545" height="160"></a>
   <span class="equipe-titre">Espace équipe</span>
 </div></header>
 <main><section><div class="wrap" id="app"><p>Chargement…</p></div></section></main>

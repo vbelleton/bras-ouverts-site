@@ -52,9 +52,11 @@ p { margin: 0; max-width: 65ch; }
 .top .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px; padding-block: 10px; }
 .logo { display: flex; align-items: center; }
 .logo img { display: block; height: 46px; width: auto; }
+.logo .logo-sombre { display: none; }
 /* Logo en couleur sur transparent : en thème sombre, posé sur une pastille claire pour rester lisible. */
-:root[data-theme="dark"] .logo img { background: #f6f1e7; border-radius: 10px; padding: 3px 8px; box-sizing: content-box; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .logo img { background: #f6f1e7; border-radius: 10px; padding: 3px 8px; box-sizing: content-box; } }
+:root[data-theme="dark"] .logo-clair { display: none; }
+:root[data-theme="dark"] .logo-sombre { display: block; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .logo-clair { display: none; } :root:not([data-theme="light"]) .logo-sombre { display: block; } }
 .top nav { display: flex; flex-wrap: wrap; gap: 4px 20px; margin-left: auto; }
 .top nav a { color: var(--muted); text-decoration: none; font-weight: 700; font-size: 0.95rem; }
 .top nav a:hover { color: var(--accent); }
