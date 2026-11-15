@@ -62,7 +62,7 @@ content:
               - { name: apres, label: "Placer après le bloc (son ancre, ex. actions). Vide : en fin de menu", type: string }
           - name: prochains
             label: Bandeau « Prochains événements » en haut de page
-            description: "Diaporama en haut de l'accueil, un rendez-vous à la fois. Priorité aux événements de l'agenda (3 événements = 3 cartes) ; s'il en manque : la prochaine ouverture de la boutique, puis la prochaine maraude (date seulement), puis d'autres ouvertures."
+            description: "Diaporama en haut de l'accueil, un rendez-vous à la fois, en grand (image de l'événement en fond s'il en a une, sinon fond coloré). Priorité aux événements de l'agenda (3 événements = 3 cartes) ; s'il en manque : la prochaine ouverture de la boutique, puis la prochaine maraude (date seulement), puis d'autres ouvertures."
             type: object
             fields:
               - { name: visible, label: Afficher le bandeau, type: boolean, default: true }
@@ -70,6 +70,10 @@ content:
               - { name: max, label: Nombre de rendez-vous (3 conseillé), type: number }
               - { name: maraudeDebut, label: "Maraudes : une date de maraude connue (AAAA-MM-JJ)", type: string, description: "Sert seulement si aucune maraude n'est saisie dans l'agenda." }
               - { name: maraudeJours, label: "Maraudes : tous les combien de jours (ex. 14)", type: number }
+              - { name: texteSurImage, label: "Écrire le texte sur l'image", type: boolean, default: true, description: "Quand un rendez-vous a une image (affiche de l'événement saisie dans l'admin des événements, ou image par défaut ci-dessous). Décochez si vos images portent déjà leur texte : seule l'image s'affiche, le texte reste lu par les lecteurs d'écran." }
+              - { name: imageEvenement, label: "Image de fond par défaut : événements (facultatif)", type: image, description: "Utilisée quand l'événement n'a pas sa propre image. Sans image : fond coloré." }
+              - { name: imageBoutik, label: "Image de fond : ouvertures de la P'tite Boutik (facultatif)", type: image }
+              - { name: imageMaraude, label: "Image de fond : maraudes (facultatif)", type: image }
           - name: barre
             label: Boutons du bas de l'écran sur téléphone (5 au plus)
             type: object
@@ -142,6 +146,7 @@ content:
                   - { name: image, label: Photo (facultatif), type: image }
                   - { name: text, label: Présentation, type: text }
                   - { name: points, label: Points clés, type: string, list: true }
+                  - { name: bouton, label: Afficher le bouton, type: boolean, default: true, description: "Décochez pour une carte sans bouton." }
                   - { name: link, label: "Lien du bouton (adresse d'un site ou #ancre de la page)", type: string }
                   - { name: linkLabel, label: Texte du bouton, type: string }
                   - name: dates
