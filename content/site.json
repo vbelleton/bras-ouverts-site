@@ -4,6 +4,7 @@
     "title": "Bras Ouverts · Association solidaire à Morlaix",
     "description": "Bras Ouverts, association solidaire de Morlaix : la P’tite Boutik Solidaire (vêtements enfants de seconde main à prix mini) et les maraudes auprès des personnes à la rue. Agenda, bénévolat, contact.",
     "tagline": "Association solidaire · Morlaix",
+    "url": "https://bras-ouverts.pages.dev",
     "navLinks": [
       {
         "label": "Petite boutik",
@@ -11,7 +12,13 @@
         "apres": "deux-cotes"
       }
     ],
-    "url": "https://bras-ouverts.pages.dev",
+    "prochains": {
+      "visible": true,
+      "label": "Prochains rendez-vous",
+      "max": 3,
+      "maraudeDebut": "2026-11-14",
+      "maraudeJours": 14
+    },
     "barre": [
       {
         "label": "Accueil",
@@ -38,14 +45,7 @@
         "url": "#contact",
         "icon": "contact"
       }
-    ],
-    "prochains": {
-      "visible": true,
-      "label": "Prochains rendez-vous",
-      "max": 3,
-      "maraudeDebut": "2026-11-14",
-      "maraudeJours": 14
-    }
+    ]
   },
   "blocks": [
     {
@@ -64,7 +64,7 @@
       "anchor": "deux-cotes",
       "menu": "Découvrir l’association",
       "label": "L’association",
-      "title": "Deux façons de *tendre la main*",
+      "title": "Plusieurs façons de *tendre la main*",
       "intro": "D’un côté, une boutique solidaire pour les familles. De l’autre, des actions de terrain auprès des plus fragiles. Les deux portent le même esprit : tendre la main à ceux qui en ont besoin.",
       "items": [
         {
@@ -101,7 +101,6 @@
           "kicker": "Événements",
           "title": "Des moments *à partager*",
           "text": "Ciné goûter, fête de l’été, projections de films… L’association organise aussi des rendez-vous conviviaux, ouverts à tous, petits et grands.",
-          "points": [],
           "link": "#agenda",
           "linkLabel": "Voir l’agenda",
           "dates": "evenements"
@@ -121,8 +120,6 @@
           "anchor": "maraude",
           "title": "Aller à la *rencontre*",
           "text": "Des équipes de bénévoles vont à la rencontre des personnes qui vivent à la rue : un café, un repas chaud, du temps pour discuter, et une orientation vers les structures d’aide quand c’est utile.",
-          "infos": [],
-          "help": "",
           "dates": "maraude"
         },
         {
@@ -172,25 +169,21 @@
           ],
           "help": "Vous avez des vêtements d’enfants ou de la puériculture à donner ? Contactez-nous avant de passer."
         }
-      ],
-      "intro": ""
+      ]
     },
     {
       "type": "agenda",
       "visible": true,
       "anchor": "agenda",
       "menu": "Agenda",
-      "label": "",
       "title": "*Agenda*",
       "intro": "Les événements de l’association (ciné goûter, fête de l’été, projections…) en bleu, les maraudes en turquoise et les ouvertures de la P’tite Boutik.",
-      "empty": "Pas de rendez-vous annoncé pour le moment. Revenez bientôt, ou écrivez-nous pour être prévenu.",
-      "max": 8
+      "empty": "Pas de rendez-vous annoncé pour le moment. Revenez bientôt, ou écrivez-nous pour être prévenu."
     },
     {
       "type": "find",
       "visible": false,
       "anchor": "trouver",
-      "menu": "",
       "label": "Nous trouver",
       "title": "Où nous trouver ?",
       "items": [
@@ -229,15 +222,13 @@
         "Autre"
       ],
       "success": "Merci, votre message est bien parti. Nous répondons à tous les messages.",
-      "email": "",
-      "emailText": "Vous préférez l’e-mail ? Écrivez-nous :",
-      "note": "Nous répondons à tous les messages, sans exception."
+      "note": "Nous répondons à tous les messages, sans exception.",
+      "emailText": "Vous préférez l’e-mail ? Écrivez-nous :"
     },
     {
       "type": "alpha",
       "visible": false,
       "anchor": "alpha",
-      "menu": "",
       "label": "Parcours Alpha",
       "title": "Le Parcours *Alpha*",
       "text": "Alpha est une série de rencontres qui permet d’explorer librement, en petits groupes, les bases de la foi chrétienne.\n\nQue vous soyez croyant, curieux ou sceptique, vous êtes bienvenu : chacun peut dire ce qu’il pense, ou ne rien dire du tout.",
