@@ -59,7 +59,7 @@ async function connexion(message) {
           const r = await api("/api/demande-acces", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ espace: "equipe", jeton: credential }) });
           if (!r.res.ok || !r.data.ok) { demander.disabled = false; return montrer(r.data.error || FAIL, false); }
           demander.remove();
-          montrer("Votre demande est envoyée à l’association. Vous aurez accès dès qu’un membre de l’équipe vous aura ajouté.", true);
+          montrer("Votre demande est envoyée à l’Association. Vous aurez accès dès qu’un membre de l’équipe vous aura ajouté.", true);
         } catch {
           demander.disabled = false;
           montrer(FAIL, false);

@@ -2,7 +2,7 @@
   "site": {
     "name": "Bras Ouverts",
     "title": "Bras Ouverts · Association solidaire à Morlaix",
-    "description": "Bras Ouverts est une association de bénévoles à Morlaix qui va à la rencontre de celles et ceux qui en ont besoin : une boutique solidaire pour les familles, des maraudes auprès des personnes qui vivent à la rue, et des évènements ponctuels pour créer du lien.",
+    "description": "Bras Ouverts est une Association de bénévoles à Morlaix qui va à la rencontre de celles et ceux qui en ont besoin : une boutique solidaire pour les familles, des maraudes auprès des personnes qui vivent à la rue, et des évènements ponctuels pour créer du lien.",
     "tagline": "Association solidaire · Morlaix",
     "url": "https://bras-ouverts.pages.dev",
     "navLinks": [
@@ -54,16 +54,16 @@
       "anchor": "accueil",
       "kicker": "Association solidaire · Morlaix",
       "title": "Ouvrir les bras, *créer du lien*",
-      "lead": "Bras Ouverts est une association de bénévoles à Morlaix qui va à la rencontre de celles et ceux qui en ont besoin : une boutique solidaire pour les familles, des maraudes auprès des personnes qui vivent à la rue, et des évènements ponctuels pour créer du lien.",
-      "cta": "Découvrir l’association",
+      "lead": "Bras Ouverts est une Association de bénévoles à Morlaix qui va à la rencontre de celles et ceux qui en ont besoin : une boutique solidaire pour les familles, des maraudes auprès des personnes qui vivent à la rue, et des évènements ponctuels pour créer du lien.",
+      "cta": "Découvrir l’Association",
       "ctaTarget": "deux-cotes"
     },
     {
       "type": "portes",
       "visible": true,
       "anchor": "tendre-la-main",
-      "menu": "Découvrir l’association",
-      "label": "L’association",
+      "menu": "Découvrir l’Association",
+      "label": "L’Association",
       "title": "Plusieurs façons de *tendre la main*",
       "items": [
         {
@@ -77,7 +77,7 @@
             "Chaussures, puériculture, vêtements de maternité"
           ],
           "link": "/boutik/",
-          "linkLabel": "Découvrir la petite boutik",
+          "linkLabel": "Découvrir la P’tite Boutik",
           "dates": "boutik"
         },
         {
@@ -99,7 +99,7 @@
           "style": "bleu",
           "kicker": "Événements",
           "title": "Des moments *à partager*",
-          "text": "Ciné goûter, fête de l’été, projections de films… L’association organise aussi des rendez-vous conviviaux, ouverts à tous, petits et grands.",
+          "text": "Ciné goûter, fête de l’été, projections de films… L’Association organise aussi des rendez-vous conviviaux, ouverts à tous, petits et grands.",
           "link": "#agenda",
           "linkLabel": "Voir l’agenda"
         }
@@ -111,7 +111,7 @@
       "anchor": "agenda",
       "menu": "Agenda",
       "title": "*Agenda*",
-      "intro": "Les événements de l’association (ciné goûter, fête de l’été, projections…) en bleu, les maraudes en turquoise et les ouvertures de la P’tite Boutik.",
+      "intro": "Les événements de l’Association (ciné goûter, fête de l’été, projections…) en bleu, les maraudes en turquoise et les ouvertures de la P’tite Boutik.",
       "empty": "Pas de rendez-vous annoncé pour le moment. Revenez bientôt, ou écrivez-nous pour être prévenu."
     },
     {
@@ -148,14 +148,14 @@
       "menu": "Contact",
       "label": "Contact",
       "title": "Nous *écrire*",
-      "intro": "Une question sur la boutique, les maraudes ou un don ? Écrivez-nous : nous répondons à tous les messages.",
+      "intro": "Une question sur la boutique, les maraudes ou un don ? Écrivez-nous.",
       "subjects": [
         "La P’tite Boutik (dons, horaires)",
         "Les maraudes",
         "Faire un don",
         "Autre"
       ],
-      "success": "Merci, votre message est bien parti. Nous répondons à tous les messages.",
+      "success": "Merci, votre message est bien parti.",
       "note": "Nous répondons à tous les messages, sans exception.",
       "emailText": "Vous préférez l’e-mail ? Écrivez-nous :"
     },
@@ -229,7 +229,7 @@
     }
   ],
   "legal": {
-    "association": "Bras Ouverts, association loi 1901",
+    "association": "Bras Ouverts, Association loi 1901",
     "address": "2 rue Jean-Monnet, 29600 Morlaix",
     "publisher": "Bras Ouverts",
     "host": "Cloudflare, Inc., 101 Townsend St, San Francisco, CA 94107, États-Unis",
