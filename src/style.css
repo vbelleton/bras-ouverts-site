@@ -307,7 +307,7 @@ body.equipe section { border-top: 0; }
   .barre { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; position: fixed; z-index: 9; left: 0; right: 0; bottom: 0;
     padding: 4px max(4px, env(safe-area-inset-left)) env(safe-area-inset-bottom, 0px); background: color-mix(in srgb, var(--surface) 94%, transparent);
     backdrop-filter: blur(10px); border-top: 1px solid var(--line); box-shadow: 0 -4px 18px rgb(0 0 0 / 0.06); }
-  .barre a { display: grid; justify-items: center; gap: 2px; min-height: 56px; padding: 7px 2px 6px; color: var(--muted); text-decoration: none; font-size: 0.72rem; font-weight: 700; line-height: 1.2; border-radius: 12px; }
+  .barre a { display: grid; justify-items: center; gap: 2px; min-height: 56px; padding: 7px 2px 6px; color: var(--muted); text-decoration: none; font-size: 0.72rem; font-weight: 700; line-height: 1.15; border-radius: 12px; text-align: center; text-wrap: balance; }
   .barre a[aria-current="true"] { color: var(--accent); }
   .barre a[aria-current="true"] svg { transform: translateY(-1px); stroke-width: 2.2; }
   .barre a:active { background: var(--soft); }

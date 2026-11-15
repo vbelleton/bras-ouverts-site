@@ -207,6 +207,8 @@ const navLinks = list((data.site || {}).navLinks).filter((l) => l.label && safeU
 // Liste des liens du menu ; la même liste est publiée dans /menu.json pour que la P'tite Boutik
 // (sous /boutik/) affiche exactement le même menu.
 const menuLiens = [
+  // « Accueil » en premier, comme sur la boutique : le menu est identique des deux côtés.
+  { label: "Accueil", url: `#${(blocks[0] || {}).anchor || "accueil"}` },
   ...blocks.filter((b) => b.menu && b.type !== "hero").flatMap((b) => [
     { label: b.menu, url: `#${ancre(b)}` },
     ...navLinks.filter((l) => l.apres && l.apres === ancre(b)).map((l) => ({ label: l.label, url: safeUrl(l.url) })),
@@ -349,8 +351,7 @@ if (existsSync("public")) cpSync("public", OUT, { recursive: true });
 cpSync("src", OUT, { recursive: true });
 writeFileSync(`${OUT}/index.html`, html);
 // Menu commun lu par la P'tite Boutik : ancres rendues absolues (/#agenda), le logo mène à l'accueil.
-// « Accueil » en premier pour la boutique : revenir au haut de la page, pas sur la rubrique « Découvrir l'association ».
-writeFileSync(`${OUT}/menu.json`, JSON.stringify({ liens: [{ label: "Accueil", url: "/" }, ...menuLiens].map((l) => ({ label: l.label, url: l.url.startsWith("#") ? `/${l.url}` : l.url })) }));
+writeFileSync(`${OUT}/menu.json`, JSON.stringify({ liens: menuLiens.map((l) => ({ label: l.label, url: l.url.startsWith("#") ? `/${l.url}` : l.url })) }));
 // Le domaine sert aussi la boutique sous /boutik/ : robots et plan du site couvrent les deux.
 const SITE_URL = String(s.url || "").replace(/\/+$/, "");
 writeFileSync(`${OUT}/robots.txt`, `User-agent: *\nAllow: /\nDisallow: /inscriptions\nDisallow: /boutik/admin\n${SITE_URL ? `\nSitemap: ${SITE_URL}/sitemap.xml\n` : ""}`);
