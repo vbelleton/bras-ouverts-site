@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Recadrer le favicon · Bras Ouverts</title>
+<style>
+  :root { --ink:#1f2a3a; --accent:#0f6e67; --line:#d9d4c7; --bg:#f6f1e7; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: system-ui, sans-serif; color:var(--ink); background:var(--bg); line-height:1.5; }
+  main { max-width: 640px; margin: 0 auto; padding: 20px 16px 40px; }
+  h1 { font-size: 1.4rem; margin: 0 0 6px; }
+  p { margin: 8px 0; }
+  .etapes { color:#4a5566; font-size:.95rem; }
+  label.fichier { display:inline-block; margin: 12px 0; padding: 10px 16px; border-radius: 999px; background: var(--accent); color:#fff; font-weight:700; cursor:pointer; }
+  input[type=file] { position:absolute; width:1px; height:1px; opacity:0; }
+  input[type=file]:focus-visible + label, label.fichier:focus-within { outline: 3px solid #f0b429; outline-offset: 2px; }
+  #zone { position: relative; width: min(100%, 320px); aspect-ratio: 1; border: 2px dashed var(--line); border-radius: 12px; overflow: hidden; background: #fff; touch-action: none; cursor: grab; }
+  #zone.vide { display: grid; place-items: center; color:#6b7585; }
+  #zone canvas { width: 100%; height: 100%; display: block; }
+  .cadre { position:absolute; inset:0; pointer-events:none; box-shadow: inset 0 0 0 9999px rgba(246,241,231,.0); border-radius: 10px; }
+  .reglages { display:flex; align-items:center; gap:12px; margin: 14px 0; flex-wrap: wrap; }
+  .reglages input[type=range] { flex: 1 1 200px; }
+  .apercus { display:flex; gap: 20px; align-items:flex-end; margin: 16px 0; flex-wrap: wrap; }
+  .apercus canvas { border: 1px solid var(--line); background:#fff; border-radius: 6px; }
+  button.telecharger { padding: 10px 18px; border: 0; border-radius: 999px; background: var(--ink); color:#fff; font-weight:700; font-size: 1rem; cursor: pointer; }
+  button:disabled { opacity:.45; cursor: default; }
+  button:focus-visible, input[type=range]:focus-visible { outline: 3px solid #f0b429; outline-offset: 2px; }
+  .petit { font-size: .85rem; color:#4a5566; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Recadrer le favicon</h1>
+  <p class="etapes">1. Choisissez une image. 2. Glissez-la et réglez le zoom pour que le carré montre ce qui compte. 3. Téléchargez le PNG et téléversez-le dans le champ « Favicon » de Pages CMS.</p>
+
+  <input type="file" id="fichier" accept="image/png,image/jpeg,image/webp" aria-label="Choisir une image">
+  <label class="fichier" for="fichier">Choisir une image</label>
+
+  <div id="zone" class="vide" role="img" aria-label="Zone de recadrage">Aucune image choisie</div>
+
+  <div class="reglages">
+    <label for="zoom">Zoom</label>
+    <input type="range" id="zoom" min="1" max="4" step="0.01" value="1" disabled>
+  </div>
+  <p class="petit">Glissez l’image avec la souris ou le doigt pour la déplacer.</p>
+
+  <div class="apercus">
+    <div><canvas id="apercu256" width="256" height="256" style="width:128px;height:128px" aria-label="Aperçu"></canvas><div class="petit">Aperçu</div></div>
+    <div><canvas id="apercu32" width="32" height="32" style="width:32px;height:32px" aria-label="Aperçu petite taille"></canvas><div class="petit">Petite taille (onglet)</div></div>
+  </div>
+
+  <button class="telecharger" id="telecharger" disabled>Télécharger le PNG (256 × 256)</button>
+  <p class="petit">Rien n’est envoyé sur internet : l’image reste dans votre navigateur.</p>
+</main>
+<script>
+(() => {
+  const TAILLE = 256;
+  const zone = document.getElementById('zone');
+  const zoom = document.getElementById('zoom');
+  const fichier = document.getElementById('fichier');
+  const bouton = document.getElementById('telecharger');
+  const apercu256 = document.getElementById('apercu256');
+  const apercu32 = document.getElementById('apercu32');
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 0;
+  canvas.width = canvas.height = 320;
+  const ctx = canvas.getContext('2d');
+  let img = null, nomFichier = 'favicon';
+  let echelle = 1, decX = 0, decY = 0; // décalage en pixels du canevas d'affichage (320 px)
+  const COTE = 320;
+
+  // Taille de base : l'image couvre le carré (le plus petit côté remplit la zone).
+  const base = () => Math.max(COTE / img.width, COTE / img.height);
+  const bornes = () => {
+    const w = img.width * base() * echelle, h = img.height * base() * echelle;
+    return { maxX: Math.max(0, (w - COTE) / 2), maxY: Math.max(0, (h - COTE) / 2), w, h };
+  };
+  const contraindre = () => { const b = bornes(); decX = Math.min(b.maxX, Math.max(-b.maxX, decX)); decY = Math.min(b.maxY, Math.max(-b.maxY, decY)); };
+
+  function dessiner() {
+    ctx.clearRect(0, 0, COTE, COTE);
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, COTE, COTE);
+    if (!img) return;
+    const b = bornes();
+    ctx.drawImage(img, COTE / 2 - b.w / 2 - decX, COTE / 2 - b.h / 2 - decY, b.w, b.h);
+    rendreApercus();
+  }
+
+  // Le favicon final : même cadrage, rendu à 256 px puis réduit pour les petites tailles.
+  function cadrage(cible, taille) {
+    const c = cible.getContext('2d');
+    c.imageSmoothingQuality = 'high';
+    c.fillStyle = '#fff'; c.fillRect(0, 0, taille, taille);
+    const facteur = taille / COTE;
+    const b = bornes();
+    c.drawImage(img, (COTE / 2 - b.w / 2 - decX) * facteur, (COTE / 2 - b.h / 2 - decY) * facteur, b.w * facteur, b.h * facteur);
+  }
+  function rendreApercus() {
+    cadrage(apercu256, 256);
+    apercu32.getContext('2d').clearRect(0, 0, 32, 32);
+    cadrage(apercu32, 32);
+  }
+
+  fichier.addEventListener('change', () => {
+    const f = fichier.files && fichier.files[0];
+    if (!f) return;
+    nomFichier = (f.name || 'favicon').replace(/\.[^.]+$/, '') || 'favicon';
+    const url = URL.createObjectURL(f);
+    const i = new Image();
+    i.onload = () => {
+      img = i; echelle = 1; decX = 0; decY = 0; zoom.value = 1; zoom.disabled = false; bouton.disabled = false;
+      zone.classList.remove('vide'); zone.replaceChildren(canvas); dessiner(); URL.revokeObjectURL(url);
+    };
+    i.onerror = () => { URL.revokeObjectURL(url); alert('Cette image ne peut pas être lue. Essayez un PNG ou un JPEG.'); };
+    i.src = url;
+  });
+
+  zoom.addEventListener('input', () => { echelle = Number(zoom.value); contraindre(); dessiner(); });
+
+  let glisse = null;
+  zone.addEventListener('pointerdown', (e) => { if (!img) return; glisse = { x: e.clientX, y: e.clientY, dx: decX, dy: decY }; zone.setPointerCapture(e.pointerId); zone.style.cursor = 'grabbing'; });
+  zone.addEventListener('pointermove', (e) => {
+    if (!glisse) return;
+    const r = zone.getBoundingClientRect();
+    const k = COTE / r.width;
+    decX = glisse.dx - (e.clientX - glisse.x) * k;
+    decY = glisse.dy - (e.clientY - glisse.y) * k;
+    contraindre(); dessiner();
+  });
+  const finir = () => { glisse = null; zone.style.cursor = 'grab'; };
+  zone.addEventListener('pointerup', finir);
+  zone.addEventListener('pointercancel', finir);
+
+  bouton.addEventListener('click', () => {
+    if (!img) return;
+    const sortie = document.createElement('canvas');
+    sortie.width = sortie.height = TAILLE;
+    cadrage(sortie, TAILLE);
+    sortie.toBlob((blob) => {
+      if (!blob) return;
+      const lien = document.createElement('a');
+      lien.href = URL.createObjectURL(blob);
+      lien.download = `favicon-${nomFichier}.png`;
+      document.body.append(lien); lien.click(); lien.remove();
+      setTimeout(() => URL.revokeObjectURL(lien.href), 1000);
+    }, 'image/png');
+  });
+})();
+</script>
+</body>
+</html>
