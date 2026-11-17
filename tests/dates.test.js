@@ -107,3 +107,11 @@ test("motif et horaires saisis dans l'admin de la boutique sur un jour habituel 
   assert.equal(le("2026-11-29").motif, "Marché de Noël");
   assert.equal(le("2026-11-18").motif, "");
 });
+
+test("chaque bouton de la barre du bas qui vise une ancre trouve sa cible dans la page", () => {
+  const html = readFileSync("dist/index.html", "utf8");
+  const { barre } = JSON.parse(readFileSync("dist/menu.json", "utf8"));
+  for (const b of barre.filter((x) => x.url.startsWith("/#"))) {
+    assert.ok(html.includes(`id="${b.url.slice(2)}"`), `ancre manquante : ${b.url}`);
+  }
+});

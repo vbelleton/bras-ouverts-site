@@ -73,7 +73,7 @@ const renderers = {
       ${list(b.items).filter(visible).map((i, n) => {
         const href = safeUrl(i.link);
         const ext = /^https?:/i.test(href);
-        return `<article class="porte porte-${["corail", "lagon", "bleu"].includes(i.style) ? i.style : ["corail", "lagon", "bleu"][n % 3]}">
+        return `<article${i.dates === "maraude" ? ' id="maraudes"' : ""} class="porte porte-${["corail", "lagon", "bleu"].includes(i.style) ? i.style : ["corail", "lagon", "bleu"][n % 3]}">
         ${i.image ? `<img src="${esc(i.image)}" alt="" loading="lazy">` : ""}
         ${i.kicker ? `<span class="lab">${esc(i.kicker)}</span>` : ""}
         <h3>${emph(i.title)}</h3>
