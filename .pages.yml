@@ -76,6 +76,18 @@ content:
               - { name: imageEvenement, label: "Image de fond par défaut : événements (facultatif)", type: image, description: "Utilisée quand l'événement n'a pas sa propre image. Sans image : fond coloré." }
               - { name: imageBoutik, label: "Image de fond : ouvertures de la P'tite Boutik (facultatif)", type: image }
               - { name: imageMaraude, label: "Image de fond : maraudes (facultatif)", type: image }
+          - name: jours
+            label: "Jours particuliers de la P'tite Boutik (titre, horaires exceptionnels)"
+            description: "Pour une date d'ouverture de la boutique : un titre (ex. Journée portes ouvertes) et/ou des horaires différents des horaires habituels. Affichés dans l'agenda, le bandeau du haut et les « Prochaines ouvertures ». Une date qui n'est pas un jour d'ouverture est ignorée (les ouvertures se gèrent dans l'admin de la boutique). Les lignes passées peuvent être supprimées."
+            type: object
+            list:
+              collapsible:
+                collapsed: true
+                summary: "{fields.date} {fields.titre}"
+            fields:
+              - { name: date, label: "Date (AAAA-MM-JJ)", type: string, pattern: { regex: "^(\\d{4}-\\d{2}-\\d{2})?$", message: "Format AAAA-MM-JJ, ex. 2026-11-21." } }
+              - { name: titre, label: "Titre du jour (facultatif, ex. Journée portes ouvertes)", type: string }
+              - { name: horaires, label: "Horaires exceptionnels (facultatif, ex. 10h00 – 18h30). Vide : horaires habituels", type: string }
           - name: barre
             label: Boutons du bas de l'écran sur téléphone (5 au plus)
             type: object

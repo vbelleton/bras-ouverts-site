@@ -22,6 +22,13 @@
       "imagesFond": false,
       "texteSurImage": true
     },
+    "jours": [
+      {
+        "date": "2026-11-21",
+        "titre": "Journée portes ouvertes",
+        "horaires": "10h00 – 18h30"
+      }
+    ],
     "barre": [
       {
         "label": "Accueil",

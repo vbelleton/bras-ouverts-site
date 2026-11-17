@@ -79,3 +79,31 @@ test("un événement publié sur les deux sites apparaît dans l'agenda de Bras 
   assert.equal(agendaDe(liste[1]), "les-deux");
   assert.deepEqual(buildEventList(liste, { agenda: "bras-ouverts" }).map((e) => e.titre).sort(), ["Ciné", "Fête"]);
 });
+
+import { appliquerJours } from "../src/boutik-dates.js";
+test("jours particuliers : titre et horaires exceptionnels sur une date d'ouverture, le reste inchangé", () => {
+  const dates = ouvertures({ today: new Date(2026, 10, 14), mois: 1 });
+  const res = appliquerJours(dates, [
+    { date: "2026-11-21", titre: "Journée portes ouvertes", horaires: "10h00 – 18h30" },
+    { date: "2026-11-18", titre: "", horaires: "" },
+    { date: "2026-11-19", titre: "Pas un jour d'ouverture" },
+    { date: "21/11", titre: "Mauvais format" },
+  ]);
+  assert.equal(res.length, dates.length, "aucune date ajoutée");
+  const j21 = res.find((d) => iso(d.date) === "2026-11-21");
+  assert.equal(j21.titre, "Journée portes ouvertes");
+  assert.equal(j21.horaires, "10h00 – 18h30");
+  const j18 = res.find((d) => iso(d.date) === "2026-11-18");
+  assert.equal(j18.titre, undefined);
+  assert.equal(j18.horaires, "");
+  assert.deepEqual(appliquerJours(dates, undefined), dates, "champ absent toléré");
+});
+
+test("les jours particuliers sont posés dans la page, sans HTML possible", () => {
+  const html = readFileSync("dist/index.html", "utf8");
+  const jours = JSON.parse(readFileSync("content/site.json", "utf8")).site.jours || [];
+  if (!jours.some((j) => j.date && (j.titre || j.horaires))) return;
+  const m = html.match(/<script type="application\/json" id="jours-particuliers">([^<]*)<\/script>/);
+  assert.ok(m, "bloc JSON présent");
+  assert.ok(Array.isArray(JSON.parse(m[1])));
+});

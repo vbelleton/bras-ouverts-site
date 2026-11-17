@@ -240,6 +240,12 @@ const pr = prRegle;
 const prImages = pr.imagesFond !== true ? "" : [["evenement", pr.imageEvenement], ["boutik", pr.imageBoutik], ["maraude", pr.imageMaraude]]
   .filter(([, u]) => safeUrl(u)).map(([k, u]) => ` data-img-${k}="${esc(safeUrl(u))}"`).join("")
   + (pr.imagesFond === true ? ' data-images="oui"' : "") + (pr.texteSurImage === false ? ' data-texte-image="non"' : "");
+// Jours particuliers de la P'tite Boutik (titre, horaires exceptionnels), lus par src/agenda.js.
+// JSON dans la page : « < » échappé pour qu'un texte ne puisse pas fermer la balise <script>.
+const jours = list((data.site || {}).jours)
+  .filter((j) => /^\d{4}-\d{2}-\d{2}$/.test(String(j.date || "").trim()) && (j.titre || j.horaires))
+  .map((j) => ({ date: String(j.date).trim(), titre: String(j.titre || "").trim(), horaires: String(j.horaires || "").trim() }));
+const joursHtml = jours.length ? `<script type="application/json" id="jours-particuliers">${JSON.stringify(jours).replace(/</g, "\\u003c")}</script>\n` : "";
 const prochainsHtml = pr.visible === false ? "" : `
 <section class="prochains" data-api="${AGENDA_API}" data-max="${Number(pr.max) || 3}"${maraudeRegle}${prImages} aria-labelledby="pr-titre" aria-roledescription="diaporama">
   <div class="wrap">
@@ -277,7 +283,7 @@ ${s.url ? `<link rel="canonical" href="${esc(String(s.url).replace(/\/+$/, ""))}
 <link rel="stylesheet" href="/style.css">
 <script>${readFileSync("src/theme.js", "utf8").trim()}</script>
 <script src="/forms.js" defer></script>
-${prochainsHtml || /data-dates=|class="agenda"/.test(body) ? `<script type="module" src="/agenda.js"></script>` : ""}
+${joursHtml}${prochainsHtml || /data-dates=|class="agenda"/.test(body) ? `<script type="module" src="/agenda.js"></script>` : ""}
 </head>
 <body${barre.length ? ' class="avec-barre"' : ""}>
 <header class="top">

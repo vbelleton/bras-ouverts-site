@@ -64,6 +64,23 @@ export function ouvertures({ regles = REGLES_DEFAUT, fermetures = [], extras = [
   return [...parIso.entries()].filter(([iso]) => !fermees.has(iso)).map(([, d]) => d).sort((a, b) => a.date - b.date);
 }
 
+// Jours particuliers saisis dans Pages CMS (content/site.json → site.jours) : un titre
+// (ex. « Journée portes ouvertes ») et/ou des horaires exceptionnels pour une date d'ouverture.
+// Une date qui n'est pas un jour d'ouverture est ignorée : les ouvertures se gèrent dans l'admin de la boutique.
+export function appliquerJours(dates, jours = []) {
+  const parIso = new Map();
+  for (const j of Array.isArray(jours) ? jours : []) {
+    if (j && /^\d{4}-\d{2}-\d{2}$/.test(String(j.date || "").trim())) parIso.set(String(j.date).trim(), j);
+  }
+  return dates.map((d) => {
+    const j = parIso.get(isoDate(d.date));
+    if (!j) return d;
+    const titre = String(j.titre || "").trim();
+    const horaires = String(j.horaires || "").trim();
+    return { ...d, ...(titre && { titre }), ...(horaires && { horaires }) };
+  });
+}
+
 async function lire(chemin) {
   const res = await fetch(`${BASE}/${chemin}${chemin.includes("?") ? "&" : "?"}key=${CLE}`, { signal: AbortSignal.timeout(DELAI_MS) });
   if (res.status === 404) return null; // document absent : valeurs par défaut
