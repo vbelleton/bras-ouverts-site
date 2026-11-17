@@ -3,6 +3,8 @@
 // Le calcul reprend src/composables/openingDates.js du dépôt vbelleton/petite_boutik_solidaire
 // (recurringDates + buildOpeningDates) : si la règle change là-bas, la reporter ici.
 
+import { avecMemoire } from "./cache-lecture.js";
+
 const PROJET = "la-petite-boutik";
 // Clé publique du site de la boutique (elle est déjà dans son code, ce n'est pas un secret).
 const CLE = "AIzaSyDaNRFLH7axpTrv8Es16_3gJeWKmUMloIo";
@@ -81,16 +83,21 @@ async function lire(chemin) {
 }
 
 // { dates: [{ date, horaires, motif, exceptionnelle }], plage: "10h00 – 17h30" }
+// Les trois lectures (JSON simple) sont gardées en mémoire par cache-lecture.js ; les dates, elles,
+// sont recalculées à chaque visite à partir du jour même.
 export async function chargerOuvertures() {
+  const { h, fermetures, extras } = await avecMemoire("boutik", lireReseau);
+  return {
+    dates: ouvertures({ regles: Array.isArray(h.regles) && h.regles.length ? h.regles : REGLES_DEFAUT, fermetures, extras }),
+    plage: h.plage || "10h00 – 17h30",
+  };
+}
+async function lireReseau() {
   const [horaires, fermetures, extras] = await Promise.all([
     lire("config/horaires"),
     lire("fermetures?pageSize=300"),
     lire("ouvertures_exceptionnelles?pageSize=300"),
   ]);
-  const h = horaires ? champs(horaires.fields) : {};
   const docs = (r) => ((r && r.documents) || []).map((d) => champs(d.fields));
-  return {
-    dates: ouvertures({ regles: Array.isArray(h.regles) && h.regles.length ? h.regles : REGLES_DEFAUT, fermetures: docs(fermetures), extras: docs(extras) }),
-    plage: h.plage || "10h00 – 17h30",
-  };
+  return { h: horaires ? champs(horaires.fields) : {}, fermetures: docs(fermetures), extras: docs(extras) };
 }
