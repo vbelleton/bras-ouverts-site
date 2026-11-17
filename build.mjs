@@ -73,7 +73,7 @@ const renderers = {
       ${list(b.items).filter(visible).map((i, n) => {
         const href = safeUrl(i.link);
         const ext = /^https?:/i.test(href);
-        return `<article class="porte porte-${["corail", "lagon", "bleu"].includes(i.style) ? i.style : ["corail", "lagon", "bleu"][n % 3]}">
+        return `<article${i.dates === "maraude" ? ' id="maraudes"' : ""} class="porte porte-${["corail", "lagon", "bleu"].includes(i.style) ? i.style : ["corail", "lagon", "bleu"][n % 3]}">
         ${i.image ? `<img src="${esc(i.image)}" alt="" loading="lazy">` : ""}
         ${i.kicker ? `<span class="lab">${esc(i.kicker)}</span>` : ""}
         <h3>${emph(i.title)}</h3>
@@ -354,7 +354,12 @@ if (existsSync("public")) cpSync("public", OUT, { recursive: true });
 cpSync("src", OUT, { recursive: true });
 writeFileSync(`${OUT}/index.html`, html);
 // Menu commun lu par la P'tite Boutik : ancres rendues absolues (/#agenda), le logo mène à l'accueil.
-writeFileSync(`${OUT}/menu.json`, JSON.stringify({ liens: menuLiens.map((l) => ({ label: l.label, url: l.url.startsWith("#") ? `/${l.url}` : l.url })) }));
+// La barre du bas est publiée aussi : la P'tite Boutik la lit pour afficher exactement la même.
+const absolue = (u) => { const v = safeUrl(u); return v.startsWith("#") ? `/${v}` : v; };
+writeFileSync(`${OUT}/menu.json`, JSON.stringify({
+  liens: menuLiens.map((l) => ({ label: l.label, url: l.url.startsWith("#") ? `/${l.url}` : l.url })),
+  barre: barre.map((x) => ({ label: x.label, url: absolue(x.url), icon: ICONES[x.icon] ? x.icon : "coeur" })),
+}));
 // Le domaine sert aussi la boutique sous /boutik/ : robots et plan du site couvrent les deux.
 const SITE_URL = String(s.url || "").replace(/\/+$/, "");
 writeFileSync(`${OUT}/robots.txt`, `User-agent: *\nAllow: /\nDisallow: /inscriptions\nDisallow: /boutik/admin\n${SITE_URL ? `\nSitemap: ${SITE_URL}/sitemap.xml\n` : ""}`);

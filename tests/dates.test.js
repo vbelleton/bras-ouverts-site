@@ -42,6 +42,16 @@ test("le menu commun est publié pour la boutique (menu.json)", () => {
   assert.ok(liens.some((l) => l.url === "/boutik/"));
 });
 
+test("la barre du bas est publiée pour la boutique (menu.json)", () => {
+  const { barre } = JSON.parse(readFileSync("dist/menu.json", "utf8"));
+  assert.ok(barre.length >= 1 && barre.length <= 5);
+  for (const b of barre) {
+    assert.match(b.url, /^(\/|https?:)/, "liens absolus, utilisables depuis /boutik/");
+    assert.ok(b.label && b.icon);
+  }
+  assert.ok(barre.some((b) => b.url === "/boutik/"));
+});
+
 import { choisirProchains, maraudesParRegle, maraudesEntre } from "../src/prochains.js";
 const E = (n) => Array.from({ length: n }, (_, i) => `evenement${i + 1}`);
 const B = ["boutik1", "boutik2", "boutik3"];
@@ -96,4 +106,12 @@ test("motif et horaires saisis dans l'admin de la boutique sur un jour habituel 
   assert.equal(le("2026-11-28").exceptionnelle, true);
   assert.equal(le("2026-11-29").motif, "Marché de Noël");
   assert.equal(le("2026-11-18").motif, "");
+});
+
+test("chaque bouton de la barre du bas qui vise une ancre trouve sa cible dans la page", () => {
+  const html = readFileSync("dist/index.html", "utf8");
+  const { barre } = JSON.parse(readFileSync("dist/menu.json", "utf8"));
+  for (const b of barre.filter((x) => x.url.startsWith("/#"))) {
+    assert.ok(html.includes(`id="${b.url.slice(2)}"`), `ancre manquante : ${b.url}`);
+  }
 });
