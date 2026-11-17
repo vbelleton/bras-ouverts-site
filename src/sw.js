@@ -4,8 +4,8 @@
 // (/inscriptions) ni à la boutique (/boutik/, qui a son propre service worker), ni aux autres sites
 // (agenda, polices) : ces requêtes passent telles quelles.
 // Changer VERSION à chaque changement de stratégie de cache.
-const VERSION = "bo-v5";
-const ESSENTIELS = ["/", "/style.css", "/forms.js", "/agenda.js", "/agenda-moteur.js", "/boutik-dates.js", "/prochains.js", "/logo.png", "/favicon.png"];
+const VERSION = "bo-v6";
+const ESSENTIELS = ["/", "/style.css", "/forms.js", "/agenda.js", "/agenda-moteur.js", "/boutik-dates.js", "/prochains.js", "/cache-lecture.js", "/logo.png", "/favicon.png"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(VERSION).then((c) => c.addAll(ESSENTIELS)).catch(() => {}).then(() => self.skipWaiting()));

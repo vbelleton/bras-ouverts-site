@@ -277,7 +277,10 @@ ${s.url ? `<link rel="canonical" href="${esc(String(s.url).replace(/\/+$/, ""))}
 <link rel="stylesheet" href="/style.css">
 <script>${readFileSync("src/theme.js", "utf8").trim()}</script>
 <script src="/forms.js" defer></script>
-${prochainsHtml || /data-dates=|class="agenda"/.test(body) ? `<script type="module" src="/agenda.js"></script>` : ""}
+${prochainsHtml || /data-dates=|class="agenda"/.test(body) ? `<link rel="modulepreload" href="/agenda-moteur.js"><link rel="modulepreload" href="/boutik-dates.js"><link rel="modulepreload" href="/prochains.js"><link rel="modulepreload" href="/cache-lecture.js">
+<link rel="preconnect" href="https://firestore.googleapis.com">
+<link rel="preconnect" href="${esc(AGENDA_API)}">
+<script type="module" src="/agenda.js"></script>` : ""}
 </head>
 <body${barre.length ? ' class="avec-barre"' : ""}>
 <header class="top">

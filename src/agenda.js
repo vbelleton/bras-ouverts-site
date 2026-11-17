@@ -6,6 +6,7 @@
 // listes « Prochaines dates » des maraudes. Les dates de la boutique viennent de sa propre base.
 import { buildEventList, isoDay, AGENDA_BRAS_OUVERTS, SOURCE_LES_DEUX } from "./agenda-moteur.js";
 import { chargerOuvertures as lireOuvertures } from "./boutik-dates.js";
+import { avecMemoire } from "./cache-lecture.js";
 import { choisirProchains, maraudesParRegle, maraudesEntre } from "./prochains.js";
 // Une seule lecture de la base de la boutique pour toute la page.
 let ouvertures = null;
@@ -112,10 +113,10 @@ let avenir = null;
 // La seconde est facultative : si elle échoue, l'agenda s'affiche avec la première.
 function lire(api, source) {
   const url = `${api.replace(/\/$/, "")}/api/church-events?source=${source}&include_exceptions=1&size=100`;
-  return fetch(url, { signal: AbortSignal.timeout(DELAI_MS) }).then((res) => {
+  return avecMemoire(`evenements:${source}`, () => fetch(url, { signal: AbortSignal.timeout(DELAI_MS) }).then((res) => {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return res.json();
-  });
+  }));
 }
 function chargerBrut(api) {
   if (!brut) {
