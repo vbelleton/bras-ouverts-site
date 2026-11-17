@@ -94,7 +94,7 @@
             "Maraudes dans Morlaix",
             "Écoute et orientation"
           ],
-          "bouton": true,
+          "bouton": false,
           "link": "#agenda",
           "linkLabel": "Prochaines maraudes",
           "dates": "maraude"
