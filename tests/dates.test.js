@@ -79,3 +79,21 @@ test("un événement publié sur les deux sites apparaît dans l'agenda de Bras 
   assert.equal(agendaDe(liste[1]), "les-deux");
   assert.deepEqual(buildEventList(liste, { agenda: "bras-ouverts" }).map((e) => e.titre).sort(), ["Ciné", "Fête"]);
 });
+
+test("motif et horaires saisis dans l'admin de la boutique sur un jour habituel (ex. portes ouvertes)", () => {
+  const res = ouvertures({
+    today: new Date(2026, 10, 14),
+    mois: 1,
+    extras: [
+      { date: "2026-11-21", label: "Journée portes ouvertes", horaires: "10h00 – 18h30" },
+      { date: "2026-11-28", label: "Ouverture exceptionnelle", horaires: "" },
+      { date: "2026-11-29", label: "Marché de Noël", horaires: "14h – 17h" },
+    ],
+  });
+  const le = (j) => res.find((d) => iso(d.date) === j);
+  assert.deepEqual({ ...le("2026-11-21"), date: undefined }, { date: undefined, horaires: "10h00 – 18h30", motif: "Journée portes ouvertes", exceptionnelle: false });
+  assert.equal(le("2026-11-28").motif, "", "« Ouverture exceptionnelle » n'est pas répété comme motif");
+  assert.equal(le("2026-11-28").exceptionnelle, true);
+  assert.equal(le("2026-11-29").motif, "Marché de Noël");
+  assert.equal(le("2026-11-18").motif, "");
+});

@@ -35,7 +35,16 @@ const nthWeekday = (year, month, weekday, n) => {
   return new Date(year, month, 1 + ((weekday - first.getDay() + 7) % 7) + (n - 1) * 7);
 };
 
-// Dates d'ouverture à venir (fermetures retirées), triées.
+// Motif d'une ouverture exceptionnelle (champ « label » de l'admin de la boutique), sans répéter
+// « Ouverture exceptionnelle » : même règle que extraMotif() de openingDates.js.
+export function motif(label) {
+  const t = String(label || "").trim();
+  return t.toLowerCase() === "ouverture exceptionnelle" ? "" : t;
+}
+
+// Dates d'ouverture à venir (fermetures retirées), triées : { date, horaires, motif, exceptionnelle }.
+// Dans l'admin de la boutique (Calendrier), un jour habituel peut recevoir un motif (ex. Journée portes
+// ouvertes) et des horaires particuliers : c'est une « ouverture exceptionnelle » posée sur la même date.
 export function ouvertures({ regles = REGLES_DEFAUT, fermetures = [], extras = [], mois = 3, today = new Date() }) {
   const debut = new Date(today); debut.setHours(0, 0, 0, 0);
   const fin = new Date(debut); fin.setMonth(fin.getMonth() + mois);
@@ -47,7 +56,7 @@ export function ouvertures({ regles = REGLES_DEFAUT, fermetures = [], extras = [
       if (isNaN(jour)) continue;
       for (const n of r.semaines || [1, 3]) {
         const date = nthWeekday(curseur.getFullYear(), curseur.getMonth(), jour, n);
-        if (date >= debut && date <= fin) parIso.set(isoDate(date), { date, horaires: "" });
+        if (date >= debut && date <= fin) parIso.set(isoDate(date), { date, horaires: "", motif: "", exceptionnelle: false });
       }
     }
     curseur.setMonth(curseur.getMonth() + 1);
@@ -57,8 +66,8 @@ export function ouvertures({ regles = REGLES_DEFAUT, fermetures = [], extras = [
     const date = parseIso(e.date);
     if (date < debut || date > fin) continue;
     const deja = parIso.get(e.date);
-    if (deja) deja.horaires = e.horaires || deja.horaires;
-    else parIso.set(e.date, { date, horaires: e.horaires || "" });
+    if (deja) { deja.horaires = e.horaires || deja.horaires; deja.motif = motif(e.label) || deja.motif; }
+    else parIso.set(e.date, { date, horaires: e.horaires || "", motif: motif(e.label), exceptionnelle: true });
   }
   const fermees = new Set(fermetures.map((f) => f.date));
   return [...parIso.entries()].filter(([iso]) => !fermees.has(iso)).map(([, d]) => d).sort((a, b) => a.date - b.date);
@@ -71,7 +80,7 @@ async function lire(chemin) {
   return res.json();
 }
 
-// { dates: [{ date, horaires }], plage: "10h00 – 17h30" }
+// { dates: [{ date, horaires, motif, exceptionnelle }], plage: "10h00 – 17h30" }
 export async function chargerOuvertures() {
   const [horaires, fermetures, extras] = await Promise.all([
     lire("config/horaires"),

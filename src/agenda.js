@@ -10,6 +10,9 @@ import { choisirProchains, maraudesParRegle, maraudesEntre } from "./prochains.j
 // Une seule lecture de la base de la boutique pour toute la page.
 let ouvertures = null;
 const chargerOuvertures = () => (ouvertures ||= lireOuvertures());
+// Titre d'une ouverture : le motif saisi dans l'admin de la boutique (ex. Journée portes ouvertes), sinon le titre habituel.
+const TITRE_BOUTIK = "Ouverture de la P’tite Boutik";
+const titreOuverture = (o) => o.motif || (o.exceptionnelle ? "Ouverture exceptionnelle de la P’tite Boutik" : TITRE_BOUTIK);
 
 const DELAI_MS = 8000; // un Worker muet ne doit pas laisser « Chargement » à l'infini
 
@@ -147,7 +150,7 @@ function carteBoutik(o) {
       el("span", { class: "ag-jour" }, jour(o.date)),
       el("span", { class: "ag-mois" }, moisCourt(o.date))),
     el("div", { class: "ag-corps" },
-      el("h3", {}, "Ouverture de la P’tite Boutik"),
+      el("h3", {}, titreOuverture(o)),
       el("p", { class: "ag-meta" }, el("span", {}, majuscule(dateLongue(o.date))), o.horaires ? el("span", {}, o.horaires) : null),
       el("a", { href: "/boutik/", class: "ag-lien" }, "Découvrir la boutique")));
 }
@@ -173,7 +176,7 @@ async function remplir(bloc) {
   if (bk.status === "fulfilled") {
     for (const o of bk.value.dates) {
       const horaires = o.horaires || bk.value.plage;
-      items.push({ date: o.date, fin: o.date, sorte: "boutik", titre: "P’tite Boutik", carte: () => carteBoutik({ ...o, horaires }) });
+      items.push({ date: o.date, fin: o.date, sorte: "boutik", titre: o.motif || "P’tite Boutik", carte: () => carteBoutik({ ...o, horaires }) });
     }
   }
   items.sort((a, b) => a.date - b.date);
@@ -365,7 +368,7 @@ async function remplirProchains(bloc) {
       detail: [[heure(ev.heure), ev.fin ? heure(ev.fin) : ""].filter(Boolean).join(" – "), ev.lieu].filter(Boolean).join(" · ") }));
   const boutik = bk.status === "fulfilled"
     ? bk.value.dates.map((d) => ({ date: d.date, sorte: "boutik", lien: "/boutik/", lienTxt: "Découvrir la boutique",
-      titre: "Ouverture de la P’tite Boutik", detail: d.horaires || bk.value.plage }))
+      titre: titreOuverture(d), detail: d.horaires || bk.value.plage }))
     : [];
   // Maraude : la date seulement (ni lieu ni heure). Celles de l'agenda, sinon la règle du site (tous les 15 jours…).
   let datesMaraude = tous.filter((ev) => genre(ev) === "maraude").map((ev) => ev.date);
@@ -394,7 +397,7 @@ async function remplirDates(zone) {
     let lignes;
     if (zone.dataset.dates === "boutik") {
       const { dates, plage } = await chargerOuvertures();
-      lignes = dates.slice(0, max).map((d) => [dateJour(d.date), d.horaires || plage]);
+      lignes = dates.slice(0, max).map((d) => [dateJour(d.date), [d.motif, d.horaires || plage].filter(Boolean).join(" · ")]);
     } else if (zone.dataset.dates === "maraude") {
       // Date seule. Si l'agenda ne répond pas, la règle du site suffit.
       const evs = await chargerEvenements(zone.dataset.api).catch(() => []);
