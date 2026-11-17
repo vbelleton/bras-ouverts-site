@@ -95,7 +95,7 @@
             "Écoute et orientation"
           ],
           "bouton": true,
-          "link": "#maraudes",
+          "link": "#agenda",
           "linkLabel": "Prochaines maraudes",
           "dates": "maraude"
         },
