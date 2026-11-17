@@ -42,6 +42,16 @@ test("le menu commun est publié pour la boutique (menu.json)", () => {
   assert.ok(liens.some((l) => l.url === "/boutik/"));
 });
 
+test("la barre du bas est publiée pour la boutique (menu.json)", () => {
+  const { barre } = JSON.parse(readFileSync("dist/menu.json", "utf8"));
+  assert.ok(barre.length >= 1 && barre.length <= 5);
+  for (const b of barre) {
+    assert.match(b.url, /^(\/|https?:)/, "liens absolus, utilisables depuis /boutik/");
+    assert.ok(b.label && b.icon);
+  }
+  assert.ok(barre.some((b) => b.url === "/boutik/"));
+});
+
 import { choisirProchains, maraudesParRegle, maraudesEntre } from "../src/prochains.js";
 const E = (n) => Array.from({ length: n }, (_, i) => `evenement${i + 1}`);
 const B = ["boutik1", "boutik2", "boutik3"];
