@@ -84,12 +84,14 @@ p { margin: 0; max-width: 65ch; }
 @media (max-width: 700px) {
   .top .wrap { gap: 8px 10px; }
   .logo img { height: 38px; }
-  .theme-toggle { width: 40px; height: 40px; }
+  /* Zones tactiles d'au moins 44 px */
+  .theme-toggle { width: 44px; height: 44px; flex: none; }
+  .js .menu-toggle { height: 44px; min-width: 44px; flex: none; }
   .top nav { order: 3; flex-basis: 100%; margin-left: 0; }
   /* Avec JavaScript : menu replié derrière le bouton */
   .js .menu-toggle { display: inline-flex; margin-left: auto; }
   /* Ouvert, le menu occupe tout l'écran sous l'en-tête : toutes les rubriques sont visibles d'un coup. */
-  .js .top nav { display: none; position: absolute; top: 100%; left: 0; right: 0; height: calc(100vh - 61px); height: calc(100dvh - 61px - env(safe-area-inset-top, 0px));
+  .js .top nav { display: none; position: absolute; top: 100%; left: 0; right: 0; height: calc(100vh - 65px); height: calc(100dvh - 65px - env(safe-area-inset-top, 0px));
     flex-direction: column; gap: 0; padding: 8px max(20px, env(safe-area-inset-left)) calc(24px + env(safe-area-inset-bottom)); overflow-y: auto; overscroll-behavior: contain;
     background: var(--bg); border-top: 1px solid var(--line); }
   .js.menu-ouvert .top nav { display: flex; }
