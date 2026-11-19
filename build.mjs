@@ -230,7 +230,7 @@ const ICONES = {
 const barre = list((data.site || {}).barre).filter((x) => x.label && safeUrl(x.url)).slice(0, 5);
 const barreHtml = barre.length ? `
 <nav class="barre" aria-label="Accès rapide">
-  ${barre.map((x) => `<a href="${esc(safeUrl(x.url))}"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONES[x.icon] || ICONES.coeur}</svg><span>${esc(x.label)}</span></a>`).join("\n  ")}
+  ${barre.map((x) => `<a href="${esc(safeUrl(x.url))}" data-ico="${ICONES[x.icon] ? esc(x.icon) : "coeur"}"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONES[x.icon] || ICONES.coeur}</svg><span>${esc(x.label)}</span></a>`).join("\n  ")}
 </nav>` : "";
 // Bandeau « Prochains événements » sous l'en-tête (rempli par src/agenda.js, caché s'il n'y a rien).
 const pr = prRegle;

@@ -65,6 +65,20 @@ function el(tag, attrs = {}, ...enfants) {
   return n;
 }
 
+// « Journée portes ouvertes » (ou « portes ouvertes ») toujours en gras, où que le texte s'affiche.
+const RE_PORTES_OUVERTES = /(?:journ[ée]es?\s+)?portes?[\s-]+ouvertes?/gi;
+export function gras(texte) {
+  const t = String(texte ?? "");
+  const morceaux = [];
+  let fin = 0;
+  for (const m of t.matchAll(RE_PORTES_OUVERTES)) {
+    morceaux.push(t.slice(fin, m.index), el("strong", { class: "po" }, m[0]));
+    fin = m.index + m[0].length;
+  }
+  morceaux.push(t.slice(fin));
+  return morceaux;
+}
+
 function carte(ev) {
   const horaire = [heure(ev.heure), ev.fin ? heure(ev.fin) : ""].filter(Boolean).join(" – ");
   const quand = ev.dateFin
@@ -151,7 +165,7 @@ function carteBoutik(o) {
       el("span", { class: "ag-jour" }, jour(o.date)),
       el("span", { class: "ag-mois" }, moisCourt(o.date))),
     el("div", { class: "ag-corps" },
-      el("h3", {}, titreOuverture(o)),
+      el("h3", {}, gras(titreOuverture(o))),
       el("p", { class: "ag-meta" }, el("span", {}, majuscule(dateLongue(o.date))), o.horaires ? el("span", {}, o.horaires) : null),
       el("a", { href: "/boutik/", class: "ag-lien" }, "Découvrir la boutique")));
 }
@@ -239,7 +253,7 @@ async function remplir(bloc) {
       const passe = d < auj;
       const classes = ["cal-case", passe && "cal-passe", +d === +auj && "cal-auj-case", rdv.length && "cal-plein"].filter(Boolean).join(" ");
       const num = el("span", { class: "cal-num" }, String(j));
-      const pastilles = rdv.map((it) => el("span", { class: `cal-pastille cal-${it.sorte}` }, it.titre));
+      const pastilles = rdv.map((it) => el("span", { class: `cal-pastille cal-${it.sorte}` }, gras(it.titre)));
       const etiquette = `${majuscule(dateLongue(d))}${rdv.length ? ` : ${rdv.map((it) => it.titre).join(", ")}` : ""}`;
       if (rdv.length) {
         const b = el("button", { type: "button", class: classes, "aria-label": etiquette }, num, el("span", { class: "cal-pastilles", "aria-hidden": "true" }, ...pastilles));
@@ -307,7 +321,7 @@ function cartePr({ date, titre, detail, lien, sorte, lienTxt, image }, bloc) {
       el("span", { class: "pr-corps" },
         el("span", { class: "pr-sorte" }, { evenement: "Événement", boutik: "P’tite Boutik", maraude: "Maraude" }[sorte]),
         el("strong", { class: "pr-titre" }, titre),
-        el("span", { class: "pr-quand" }, [majuscule(dateLongue(date)), detail].filter(Boolean).join(" · ")))),
+        el("span", { class: "pr-quand" }, gras([majuscule(dateLongue(date)), detail].filter(Boolean).join(" · "))))),
     lien ? el("a", { class: "pr-lien", href: lien }, lienTxt) : null);
   if (img) li.style.setProperty("--pr-img", `url(${JSON.stringify(img)})`);
   return li;
@@ -417,7 +431,7 @@ async function remplirDates(zone) {
     if (!lignes.length) {
       ul.replaceChildren(el("li", { class: "dt-vide" }, zone.dataset.vide || "Prochaines dates bientôt annoncées."));
     } else {
-      ul.replaceChildren(...lignes.map(([jourTxt, h]) => el("li", {}, el("strong", {}, jourTxt), h ? el("span", {}, h) : null)));
+      ul.replaceChildren(...lignes.map(([jourTxt, h]) => el("li", {}, el("strong", {}, jourTxt), h ? el("span", {}, gras(h)) : null)));
     }
   } catch (e) {
     console.error("dates:", e?.name || "erreur");
