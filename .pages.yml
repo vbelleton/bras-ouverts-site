@@ -77,7 +77,7 @@ content:
               - { name: imageBoutik, label: "Image de fond : ouvertures de la P'tite Boutik (facultatif)", type: image }
               - { name: imageMaraude, label: "Image de fond : maraudes (facultatif)", type: image }
           - name: barre
-            label: Boutons du bas de l'écran sur téléphone (5 au plus)
+            label: Boutons du bas de l'écran sur téléphone (6 au plus)
             type: object
             list: true
             fields:
@@ -95,6 +95,7 @@ content:
                     - { value: agenda, label: Calendrier }
                     - { value: carte, label: Repère sur une carte }
                     - { value: contact, label: Enveloppe }
+                    - { value: soutenir, label: Main qui offre un cœur (Nous soutenir) }
 
       - name: blocks
         label: Blocs de la page (glisser pour changer l'ordre)
@@ -318,6 +319,40 @@ content:
                 fields:
                   - { name: label, label: Nom (ex. Facebook), type: string }
                   - { name: url, label: Adresse, type: string }
+
+      - name: soutenir
+        label: Page « Nous soutenir » (/soutenir/)
+        description: "Page à part, avec le RIB de l'Association. Vérifiez chaque chiffre avant d'enregistrer : une erreur enverrait les dons ailleurs."
+        type: object
+        fields:
+          - { name: visible, label: Afficher la page, type: boolean, default: true, description: "Décochée : la page, son lien dans le menu et son bouton du bas disparaissent." }
+          - { name: menu, label: Libellé dans le menu, type: string }
+          - { name: label, label: Surtitre, type: string }
+          - { name: title, label: Titre, type: string, description: "Entourez un mot d'astérisques (*mot*) pour le mettre en couleur." }
+          - { name: intro, label: Introduction, type: text }
+          - { name: ribTitre, label: Titre de l'encadré du RIB, type: string }
+          - { name: ribIntro, label: Phrase sous ce titre, type: text }
+          - { name: titulaire, label: Titulaire du compte, type: string }
+          - { name: iban, label: IBAN, type: string }
+          - { name: bic, label: BIC, type: string }
+          - { name: banque, label: Banque, type: string }
+          - { name: domiciliation, label: Domiciliation, type: string }
+          - { name: codeBanque, label: "RIB : code banque", type: string }
+          - { name: codeGuichet, label: "RIB : code guichet", type: string }
+          - { name: compte, label: "RIB : numéro de compte", type: string }
+          - { name: cle, label: "RIB : clé", type: string }
+          - { name: libelle, label: Conseil pour le libellé du virement, type: string }
+          - { name: autresTitre, label: Titre « Autres façons d'aider », type: string }
+          - name: autres
+            label: Autres façons d'aider
+            type: object
+            list: true
+            fields:
+              - { name: title, label: Titre, type: string }
+              - { name: text, label: Texte, type: text }
+              - { name: link, label: "Lien (ex. /boutik/ ou /#contact)", type: string }
+              - { name: linkLabel, label: Texte du lien, type: string }
+          - { name: merci, label: Mot de remerciement en bas, type: string }
 
       - name: legal
         label: Mentions légales

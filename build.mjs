@@ -203,6 +203,10 @@ const blocks = list(data.blocks).filter(visible);
 const ancre = (b) => b.anchor || slug(b.title);
 // Menu : les blocs qui ont un libellé, et les liens vers d'autres pages du domaine (ex. la P'tite Boutik
 // sous /boutik/) glissés après le bloc choisi (« apres » = ancre du bloc ; vide = en fin de menu).
+// Page « Nous soutenir » (RIB de l'association), à part : /soutenir/. Masquée = ni page, ni lien, ni bouton.
+const SOUTENIR = "/soutenir/";
+const soutien = data.soutenir || {};
+const soutenirVisible = soutien.visible !== false && !!(soutien.iban || soutien.title);
 const navLinks = list((data.site || {}).navLinks).filter((l) => l.label && safeUrl(l.url));
 // Liste des liens du menu ; la même liste est publiée dans /menu.json pour que la P'tite Boutik
 // (sous /boutik/) affiche exactement le même menu.
@@ -214,10 +218,13 @@ const menuLiens = [
     ...navLinks.filter((l) => l.apres && l.apres === ancre(b)).map((l) => ({ label: l.label, url: safeUrl(l.url) })),
   ]),
   ...navLinks.filter((l) => !l.apres || !blocks.some((b) => b.menu && b.type !== "hero" && ancre(b) === l.apres)).map((l) => ({ label: l.label, url: safeUrl(l.url) })),
+  ...(soutenirVisible ? [{ label: soutien.menu || "Nous soutenir", url: SOUTENIR }] : []),
 ];
-const nav = menuLiens.map((l) => `<a href="${esc(l.url)}">${esc(l.label)}</a>`).join("\n      ");
+// Sur une autre page que l'accueil (ex. /soutenir/), les ancres deviennent absolues (/#agenda).
+const versAccueil = (u, p) => (p && u.startsWith("#") ? `${p}${u}` : u);
+const navPour = (p = "", ici = "") => menuLiens.map((l) => `<a href="${esc(versAccueil(l.url, p))}"${ici && l.url === ici ? ' aria-current="page"' : ""}>${esc(l.label)}</a>`).join("\n      ");
 
-// Barre de boutons en bas de l'écran sur téléphone (site.barre dans Pages CMS) : 5 boutons au plus.
+// Barre de boutons en bas de l'écran sur téléphone (site.barre dans Pages CMS) : 6 boutons au plus.
 const ICONES = {
   accueil: '<path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/>',
   boutique: '<path d="M5 8h14l-1.2 11.5H6.2z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/>',
@@ -225,13 +232,16 @@ const ICONES = {
   agenda: '<rect x="4" y="5.5" width="16" height="14.5" rx="2"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/>',
   carte: '<path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/>',
   contact: '<rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="m4 7 8 6 8-6"/>',
+  soutenir: '<path d="M12 11.2s-3.9-2.3-3.9-5.1A2.2 2.2 0 0 1 12 4.9a2.2 2.2 0 0 1 3.9 1.2c0 2.8-3.9 5.1-3.9 5.1z"/><path d="M3 14h2.8l3.4 2.2h3.6a1.3 1.3 0 0 0 0-2.6H9.6"/><path d="M12.9 15.4l4.6-2.3a1.4 1.4 0 0 1 1.5 2.3l-5.4 3.9H3"/>',
   mains: '<path d="M7 11.5V6.8a1.4 1.4 0 0 1 2.8 0v4.2M9.8 10V5.4a1.4 1.4 0 0 1 2.8 0V10M12.6 10V6.2a1.4 1.4 0 0 1 2.8 0v6.3l1.4-1.6a1.4 1.4 0 0 1 2.1 1.9L15.6 17a5 5 0 0 1-3.8 2H11a5 5 0 0 1-5-5v-2.5a1.4 1.4 0 0 1 2.8 0"/>',
 };
-const barre = list((data.site || {}).barre).filter((x) => x.label && safeUrl(x.url)).slice(0, 5);
-const barreHtml = barre.length ? `
+const barre = list((data.site || {}).barre).filter((x) => x.label && safeUrl(x.url) && (soutenirVisible || safeUrl(x.url) !== SOUTENIR)).slice(0, 6);
+// p = "/" sur une autre page que l'accueil ; le bouton qui mène à la page affichée (ici) est mis en avant.
+const barrePour = (p = "", ici = "") => barre.length ? `
 <nav class="barre" aria-label="Accès rapide">
-  ${barre.map((x) => `<a href="${esc(safeUrl(x.url))}" data-ico="${ICONES[x.icon] ? esc(x.icon) : "coeur"}"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONES[x.icon] || ICONES.coeur}</svg><span>${esc(x.label)}</span></a>`).join("\n  ")}
+  ${barre.map((x) => `<a href="${esc(versAccueil(safeUrl(x.url), p))}"${ici && safeUrl(x.url) === ici ? ' aria-current="true"' : ""} data-ico="${ICONES[x.icon] ? esc(x.icon) : "coeur"}"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONES[x.icon] || ICONES.coeur}</svg><span>${esc(x.label)}</span></a>`).join("\n  ")}
 </nav>` : "";
+const barreHtml = barrePour();
 // Bandeau « Prochains événements » sous l'en-tête (rempli par src/agenda.js, caché s'il n'y a rien).
 const pr = prRegle;
 // Diapos : image de fond par défaut pour chaque sorte de rendez-vous (Pages CMS, facultatives), et
@@ -255,6 +265,38 @@ const s = data.site || {};
 const l = data.legal || {};
 const home = (blocks[0] || {}).anchor || "accueil";
 const faviconUrl = safeUrl((data.site || {}).favicon) || "/favicon.png";
+// En-tête et pied de page communs à l'accueil et aux autres pages (p = "/" hors de l'accueil).
+const headerPour = (p = "", ici = "") => `<header class="top">
+  <div class="wrap">
+    <a class="logo" href="${p ? "/" : `#${esc(home)}`}"><img class="logo-clair" src="/logo.png" alt="${esc(s.name || '')}" width="545" height="160"><img class="logo-sombre" src="/logo-blanc.png" alt="" aria-hidden="true" width="545" height="160"></a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="menu-principal">
+      <span class="menu-ico" aria-hidden="true"><span></span><span></span><span></span></span><span class="menu-txt">Menu</span>
+    </button>
+    <nav id="menu-principal" aria-label="Navigation principale">
+      ${navPour(p, ici)}
+    </nav>
+    <button class="theme-toggle" type="button" aria-label="Changer de thème" aria-pressed="false">
+      <svg class="i-moon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" fill="currentColor"/></svg>
+      <svg class="i-sun" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 1.5v2.5M12 20v2.5M1.5 12H4M20 12h2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8"/></g></svg>
+    </button>
+  </div>
+</header>`;
+const footerHtml = `<footer>
+  <div class="wrap">
+    <div><strong>${esc(s.name)}</strong> · ${esc(s.tagline)}</div>
+    <details class="legal">
+      <summary>Mentions légales</summary>
+      <dl>
+        <div><dt>Éditeur</dt><dd>${txt(l.association)}</dd></div>
+        ${l.address ? `<div><dt>Siège</dt><dd>${txt(l.address)}</dd></div>` : ""}
+        ${l.siret ? `<div><dt>SIRET</dt><dd>${esc(l.siret)}</dd></div>` : ""}
+        ${l.publisher ? `<div><dt>Directeur de la publication</dt><dd>${txt(l.publisher)}</dd></div>` : ""}
+        ${l.host ? `<div><dt>Hébergement</dt><dd>${esc(l.host)}</dd></div>` : ""}
+        <div><dt>Données personnelles</dt><dd>Les messages du formulaire de contact servent uniquement à vous répondre. Ils ne sont lus que par l’équipe de l’Association et sont supprimés une fois traités.${blocks.some((b) => b.type === "alpha") ? ` ${txt(l.retention || "")}` : ""}</dd></div>
+      </dl>
+    </details>
+  </div>
+</footer>`;
 
 const html = `<!doctype html>
 <html lang="fr">
@@ -283,42 +325,13 @@ ${prochainsHtml || /data-dates=|class="agenda"/.test(body) ? `<link rel="modulep
 <script type="module" src="/agenda.js"></script>` : ""}
 </head>
 <body${barre.length ? ' class="avec-barre"' : ""}>
-<header class="top">
-  <div class="wrap">
-    <a class="logo" href="#${esc(home)}"><img class="logo-clair" src="/logo.png" alt="${esc(s.name || '')}" width="545" height="160"><img class="logo-sombre" src="/logo-blanc.png" alt="" aria-hidden="true" width="545" height="160"></a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="menu-principal">
-      <span class="menu-ico" aria-hidden="true"><span></span><span></span><span></span></span><span class="menu-txt">Menu</span>
-    </button>
-    <nav id="menu-principal" aria-label="Navigation principale">
-      ${nav}
-    </nav>
-    <button class="theme-toggle" type="button" aria-label="Changer de thème" aria-pressed="false">
-      <svg class="i-moon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" fill="currentColor"/></svg>
-      <svg class="i-sun" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 1.5v2.5M12 20v2.5M1.5 12H4M20 12h2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8"/></g></svg>
-    </button>
-  </div>
-</header>${prochainsHtml}
+${headerPour()}${prochainsHtml}
 
 <main>
 ${body}
 </main>
 
-<footer>
-  <div class="wrap">
-    <div><strong>${esc(s.name)}</strong> · ${esc(s.tagline)}</div>
-    <details class="legal">
-      <summary>Mentions légales</summary>
-      <dl>
-        <div><dt>Éditeur</dt><dd>${txt(l.association)}</dd></div>
-        ${l.address ? `<div><dt>Siège</dt><dd>${txt(l.address)}</dd></div>` : ""}
-        ${l.siret ? `<div><dt>SIRET</dt><dd>${esc(l.siret)}</dd></div>` : ""}
-        ${l.publisher ? `<div><dt>Directeur de la publication</dt><dd>${txt(l.publisher)}</dd></div>` : ""}
-        ${l.host ? `<div><dt>Hébergement</dt><dd>${esc(l.host)}</dd></div>` : ""}
-        <div><dt>Données personnelles</dt><dd>Les messages du formulaire de contact servent uniquement à vous répondre. Ils ne sont lus que par l’équipe de l’Association et sont supprimés une fois traités.${blocks.some((b) => b.type === "alpha") ? ` ${txt(l.retention || "")}` : ""}</dd></div>
-      </dl>
-    </details>
-  </div>
-</footer>${barreHtml}
+${footerHtml}${barreHtml}
 </body>
 </html>
 `;
@@ -348,6 +361,74 @@ const equipePage = `<!doctype html>
 </html>
 `;
 
+// Page « Nous soutenir » : coordonnées bancaires recopiées telles quelles du RIB (content/site.json → soutenir).
+// Boutons « Copier » (src/copier.js) : l'IBAN est copié sans espaces. Aucun montant n'est affiché (jamais de prix sur le site).
+const copier = (valeur, quoi) => `<button class="copier" type="button" data-copier="${esc(String(valeur).replace(/\s+/g, ""))}" data-quoi="${esc(quoi)}">Copier</button>`;
+const ligneRib = (lab, valeur, cls = "", quoi = "") => valeur ? `<div class="rib-ligne${cls ? ` ${cls}` : ""}"><dt>${lab}</dt><dd><span class="rib-val">${esc(valeur)}</span>${quoi ? copier(valeur, quoi) : ""}</dd></div>` : "";
+const ribNational = [["Code banque", soutien.codeBanque], ["Code guichet", soutien.codeGuichet], ["N° de compte", soutien.compte], ["Clé RIB", soutien.cle]].filter(([, v]) => v);
+const soutenirPage = `<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>${esc(soutien.menu || "Nous soutenir")} · ${esc(s.name)}</title>
+<meta name="description" content="${esc(soutien.intro || "")}">
+${s.url ? `<link rel="canonical" href="${esc(String(s.url).replace(/\/+$/, ""))}${SOUTENIR}">` : ""}
+<link rel="icon" href="${esc(faviconUrl)}">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="theme-color" content="#f6efe3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#131a22" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,400;0,6..12,700;1,6..12,400&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap">
+<link rel="stylesheet" href="/style.css">
+<script>${readFileSync("src/theme.js", "utf8").trim()}</script>
+<script src="/copier.js" defer></script>
+</head>
+<body class="page-soutenir${barre.length ? " avec-barre" : ""}">
+${headerPour("/", SOUTENIR)}
+
+<main>
+  <section class="soutenir">
+    <div class="wrap">
+      <div class="sec-head">${soutien.label ? `<span class="lab">${esc(soutien.label)}</span>` : ""}<h1>${emph(soutien.title || "Nous soutenir")}</h1>${soutien.intro ? `\n        <p>${txt(soutien.intro)}</p>` : ""}</div>
+      <div class="soutenir-grille">
+        <article class="rib" aria-labelledby="rib-titre">
+          <span class="rib-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONES.soutenir}</svg></span>
+          <h2 id="rib-titre">${esc(soutien.ribTitre || "Faire un don par virement")}</h2>
+          ${soutien.ribIntro ? `<p class="rib-intro">${txt(soutien.ribIntro)}</p>` : ""}
+          <dl class="rib-liste">
+            ${ligneRib("Titulaire du compte", soutien.titulaire)}
+            ${ligneRib("IBAN", soutien.iban, "rib-iban", "IBAN")}
+            ${ligneRib("BIC", soutien.bic, "", "BIC")}
+            ${ligneRib("Banque", soutien.banque)}
+            ${ligneRib("Domiciliation", soutien.domiciliation)}
+          </dl>
+          ${ribNational.length ? `<div class="rib-national">
+            <span class="rib-sous">Relevé d’identité bancaire</span>
+            <dl>${ribNational.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>
+          </div>` : ""}
+          ${soutien.libelle ? `<p class="rib-libelle">${txt(soutien.libelle)}</p>` : ""}
+          <p class="rib-statut" role="status" aria-live="polite"></p>
+        </article>
+        ${list(soutien.autres).length ? `<div class="soutenir-autres">
+          <h2>${esc(soutien.autresTitre || "D’autres façons de nous aider")}</h2>
+          ${list(soutien.autres).filter((a) => a.title).map((a) => `<article class="aide">
+            <h3>${txt(a.title)}</h3>
+            ${paras(a.text)}
+            ${safeUrl(a.link) ? `<a class="btn" href="${esc(safeUrl(a.link))}">${esc(a.linkLabel || "En savoir plus")}</a>` : ""}
+          </article>`).join("\n          ")}
+        </div>` : ""}
+      </div>
+      ${soutien.merci ? `<p class="soutenir-merci">${txt(soutien.merci)}</p>` : ""}
+    </div>
+  </section>
+</main>
+
+${footerHtml}${barrePour("/", SOUTENIR)}
+</body>
+</html>
+`;
+
 rmSync(OUT, { recursive: true, force: true });
 mkdirSync(OUT, { recursive: true });
 if (existsSync("public")) cpSync("public", OUT, { recursive: true });
@@ -363,7 +444,7 @@ writeFileSync(`${OUT}/menu.json`, JSON.stringify({
 // Le domaine sert aussi la boutique sous /boutik/ : robots et plan du site couvrent les deux.
 const SITE_URL = String(s.url || "").replace(/\/+$/, "");
 writeFileSync(`${OUT}/robots.txt`, `User-agent: *\nAllow: /\nDisallow: /inscriptions\nDisallow: /boutik/admin\n${SITE_URL ? `\nSitemap: ${SITE_URL}/sitemap.xml\n` : ""}`);
-if (SITE_URL) writeFileSync(`${OUT}/sitemap.xml`, `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>${esc(SITE_URL)}/</loc></url>\n  <url><loc>${esc(SITE_URL)}/boutik/</loc></url>\n</urlset>\n`);
+if (SITE_URL) writeFileSync(`${OUT}/sitemap.xml`, `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>${esc(SITE_URL)}/</loc></url>\n  <url><loc>${esc(SITE_URL)}/boutik/</loc></url>\n${soutenirVisible ? `  <url><loc>${esc(SITE_URL)}${SOUTENIR}</loc></url>\n` : ""}</urlset>\n`);
 // Appli installable (PWA). La portée « / » englobe /boutik/ : installée, l'appli Bras Ouverts ouvre aussi la boutique.
 writeFileSync(`${OUT}/manifest.webmanifest`, JSON.stringify({
   name: s.name || "Bras Ouverts",
@@ -382,6 +463,7 @@ writeFileSync(`${OUT}/manifest.webmanifest`, JSON.stringify({
   ],
   shortcuts: barre.filter((x) => /^\/[^/]/.test(safeUrl(x.url))).map((x) => ({ name: x.label, url: safeUrl(x.url) })),
 }, null, 2));
+if (soutenirVisible) { mkdirSync(`${OUT}/soutenir`, { recursive: true }); writeFileSync(`${OUT}/soutenir/index.html`, soutenirPage); }
 mkdirSync(`${OUT}/inscriptions`, { recursive: true });
 writeFileSync(`${OUT}/inscriptions/index.html`, equipePage);
 console.log(`dist/index.html généré (${blocks.length} blocs).`);

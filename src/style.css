@@ -321,7 +321,9 @@ body.equipe section { border-top: 0; }
   /* Chaque icône sur une pastille vive (turquoise, corail, bleu), texte bleu nuit dessus : contraste ≥ 7:1 dans les deux thèmes */
   .barre svg { box-sizing: content-box; width: 22px; height: 22px; padding: 4px 13px; border-radius: 999px; background: var(--vif); color: var(--vif-ink); transition: transform .15s; }
   .barre a[data-ico="boutique"] svg, .barre a[data-ico="contact"] svg { background: var(--vif-corail); }
-  .barre a[data-ico="agenda"] svg { background: var(--vif-bleu); }
+  .barre a[data-ico="agenda"] svg, .barre a[data-ico="soutenir"] svg { background: var(--vif-bleu); }
+  /* 6 boutons sur un téléphone étroit : pastilles un peu moins larges */
+  .barre:has(> a:nth-child(6)) svg { padding-inline: 9px; }
   .barre a[aria-current="true"] svg { transform: translateY(-1px); stroke-width: 2.2; box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--ink); }
   .barre a:active { background: var(--soft); }
   .barre a:active svg { transform: scale(.94); }
@@ -509,3 +511,46 @@ button.cal-case:hover { background: var(--soft); }
   .cal-auj { margin-left: 0; }
 }
 @media (prefers-reduced-motion: reduce) { .ag-vu { animation: none; outline: 3px solid var(--accent); } }
+
+/* Page « Nous soutenir » (/soutenir/) : bleu doux des icônes de la barre du bas, comme les événements */
+.soutenir { border-top: 0; }
+.soutenir h1 { font-size: clamp(2.2rem, 6vw, 3.6rem); letter-spacing: -0.02em; }
+.soutenir h1 em { font-style: italic; color: var(--bleu); }
+.soutenir .sec-head .lab { color: var(--bleu); }
+.soutenir .sec-head p { font-size: 1.12rem; max-width: 62ch; }
+.soutenir-grille { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+.rib { display: grid; gap: 16px; padding: clamp(22px, 4vw, 40px); border-radius: calc(var(--r) + 8px); border: 1px solid var(--line); border-top: 6px solid var(--bleu);
+  background: linear-gradient(150deg, var(--bleu-doux), var(--surface) 70%); min-width: 0; }
+.rib-ico { display: inline-grid; place-items: center; justify-self: start; padding: 8px 16px; border-radius: 999px; background: var(--vif-bleu); color: var(--vif-ink); }
+.rib h2 { font-size: clamp(1.5rem, 3.2vw, 2rem); }
+.rib-intro { margin: 0; color: var(--muted); }
+.rib-liste { display: grid; gap: 10px; margin: 0; }
+.rib-ligne { display: grid; gap: 2px; padding: 12px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+.rib-ligne dt, .rib-national dt { font-size: 0.76rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+.rib-ligne dd { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; font-weight: 700; }
+.rib-val { overflow-wrap: anywhere; }
+.rib-iban .rib-val { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: clamp(1.02rem, 3.6vw, 1.35rem); letter-spacing: 0.02em; color: var(--bleu); }
+.rib-ligne:has([data-quoi="BIC"]) .rib-val { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; letter-spacing: 0.04em; }
+.copier { margin-left: auto; min-height: 40px; padding: 6px 16px; border: 0; border-radius: 999px; background: var(--vif-bleu); color: var(--vif-ink); font: inherit; font-size: 0.9rem; font-weight: 700; cursor: pointer; }
+.copier.copie { background: var(--vif); }
+.rib-national { display: grid; gap: 8px; }
+.rib-sous { font-size: 0.76rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; color: var(--bleu); }
+.rib-national dl { display: grid; grid-template-columns: repeat(4, auto); gap: 8px; margin: 0; }
+.rib-national dl div { display: grid; gap: 2px; padding: 10px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; min-width: 0; }
+.rib-national dd { margin: 0; font-weight: 700; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+.rib-libelle { margin: 0; padding: 12px 16px; border-radius: 12px; background: var(--surface); border-left: 4px solid var(--vif-bleu); }
+.rib-statut { margin: 0; min-height: 1.2em; font-weight: 700; color: var(--ok); }
+.rib-statut:empty { display: none; }
+.soutenir-autres { display: grid; gap: 16px; }
+.soutenir-autres h2 { font-size: clamp(1.4rem, 3vw, 1.8rem); }
+.aide { display: grid; gap: 10px; padding: 22px 24px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); }
+.aide h3 { font-size: 1.3rem; }
+.aide p { margin: 0; color: var(--muted); }
+.aide .btn { background: var(--vif-bleu); color: var(--vif-ink); }
+.soutenir-merci { margin: 36px 0 0; font-family: var(--display); font-size: clamp(1.3rem, 3vw, 1.7rem); font-weight: 700; color: var(--bleu); text-align: center; }
+@media (max-width: 900px) { .soutenir-grille { grid-template-columns: 1fr; } }
+@media (max-width: 520px) {
+  .rib-national dl { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rib-national dl div:nth-child(3) { grid-column: 1 / -1; } /* le numéro de compte tient sur une ligne */
+}
+.rib-national dd { white-space: nowrap; }
