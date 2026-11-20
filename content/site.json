@@ -74,7 +74,7 @@
           "style": "corail",
           "kicker": "Boutique solidaire",
           "title": "La P’tite Boutik *Solidaire*",
-          "text": "Au 2, rue Jean-Monnet à Morlaix, la P’tite Boutik propose des vêtements d’enfants de seconde main à prix mini. Elle encourage le recyclage, aide les familles et fait de chaque passage un moment convivial.",
+          "text": "Au 2, rue Jean-Monnet à Morlaix, la P’tite Boutik propose des vêtements d’enfants de seconde main. Elle encourage le recyclage, aide les familles et fait de chaque passage un moment convivial.",
           "points": [
             "Vêtements enfants de 0 à 10 ans",
             "Chaussures, puériculture, vêtements de maternité"
@@ -154,7 +154,7 @@
       "menu": "Contact",
       "label": "Contact",
       "title": "Nous *écrire*",
-      "intro": "Une question sur la boutique, les maraudes ou un don ? Écrivez-nous.",
+      "intro": "Une question sur la boutik, les maraudes ou un don ? Écrivez-nous.",
       "subjects": [
         "La P’tite Boutik (dons, horaires)",
         "Les maraudes",
