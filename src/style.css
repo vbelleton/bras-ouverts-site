@@ -262,7 +262,7 @@ body.equipe section { border-top: 0; }
 .porte-bleu { background: linear-gradient(150deg, var(--bleu-doux), var(--surface) 70%); }
 .porte-bleu .lab, .porte.porte-bleu h3 em, .porte-bleu .dates .lab { color: var(--bleu); }
 .porte-bleu .porte-points li::before { background: var(--bleu); }
-.porte-bleu .btn { background: var(--bleu); color: var(--accent-ink); }
+.porte-bleu .btn { background: var(--vif-bleu); color: var(--vif-ink); }
 .porte .lab { font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; }
 .porte-corail .lab, .porte-corail h3 em { color: var(--corail); }
 .porte-lagon .lab { color: var(--accent); }
@@ -420,7 +420,8 @@ body.equipe section { border-top: 0; }
    Couleurs fixes : le texte blanc reste lisible dans les deux thèmes. */
 .pr-evenement, .pr-boutik, .pr-maraude { position: relative; overflow: hidden; isolation: isolate; flex-direction: column; justify-content: flex-end; align-items: flex-start; gap: 16px;
   min-height: clamp(210px, 26vw, 320px); padding: clamp(20px, 4vw, 44px); border: 0; border-radius: 22px; color: #fff; background: var(--pr-fond); }
-.pr-evenement { --pr-fond: linear-gradient(135deg, #2a5aa6, #17325f); }
+/* Événement : bleu doux des icônes de la barre du bas, texte bleu nuit (contraste ≥ 7:1) */
+.pr-evenement { --pr-fond: linear-gradient(135deg, #bcd3f8, #8db4f2); }
 /* P'tite Boutik : corail vif, texte bleu nuit (contraste ≥ 7:1) */
 .pr-boutik { --pr-fond: linear-gradient(135deg, #ffa58f, #ff7f63); }
 /* Maraude : turquoise vif des icônes de la barre, texte bleu nuit (contraste ≥ 7:1) */
@@ -441,12 +442,13 @@ body.equipe section { border-top: 0; }
 .pr-item > .pr-lien { margin: 0; padding: 8px 18px; border-radius: 999px; background: #fff; color: #1f2a3a; text-decoration: none; }
 .pr-item > .pr-lien:hover { text-decoration: underline; }
 .pr-image-seule > .pr-lien { position: absolute; right: 16px; bottom: 16px; }
-.pr-boutik:not(.pr-avec-image), .pr-maraude:not(.pr-avec-image) { color: #10222b; }
-.pr-boutik:not(.pr-avec-image) .pr-texte .pr-titre, .pr-maraude:not(.pr-avec-image) .pr-texte .pr-titre { color: #10222b; }
+.pr-boutik:not(.pr-avec-image), .pr-maraude:not(.pr-avec-image), .pr-evenement:not(.pr-avec-image) { color: #10222b; }
+.pr-boutik:not(.pr-avec-image) .pr-texte .pr-titre, .pr-maraude:not(.pr-avec-image) .pr-texte .pr-titre, .pr-evenement:not(.pr-avec-image) .pr-texte .pr-titre { color: #10222b; }
 .pr-boutik:not(.pr-avec-image) .pr-texte .pr-quand, .pr-item.pr-boutik:not(.pr-avec-image) .pr-texte .pr-sorte,
-.pr-maraude:not(.pr-avec-image) .pr-texte .pr-quand, .pr-item.pr-maraude:not(.pr-avec-image) .pr-texte .pr-sorte { color: #10222b; }
-.pr-item.pr-boutik:not(.pr-avec-image) .pr-texte .pr-date, .pr-item.pr-maraude:not(.pr-avec-image) .pr-texte .pr-date { background: rgba(255, 255, 255, .45); border-color: rgba(16, 34, 43, .25); color: #10222b; }
-.pr-boutik:not(.pr-avec-image) > .pr-lien, .pr-maraude:not(.pr-avec-image) > .pr-lien { background: #10222b; color: #fff; }
+.pr-maraude:not(.pr-avec-image) .pr-texte .pr-quand, .pr-item.pr-maraude:not(.pr-avec-image) .pr-texte .pr-sorte,
+.pr-evenement:not(.pr-avec-image) .pr-texte .pr-quand, .pr-item.pr-evenement:not(.pr-avec-image) .pr-texte .pr-sorte { color: #10222b; }
+.pr-item.pr-boutik:not(.pr-avec-image) .pr-texte .pr-date, .pr-item.pr-maraude:not(.pr-avec-image) .pr-texte .pr-date, .pr-item.pr-evenement:not(.pr-avec-image) .pr-texte .pr-date { background: rgba(255, 255, 255, .45); border-color: rgba(16, 34, 43, .25); color: #10222b; }
+.pr-boutik:not(.pr-avec-image) > .pr-lien, .pr-maraude:not(.pr-avec-image) > .pr-lien, .pr-evenement:not(.pr-avec-image) > .pr-lien { background: #10222b; color: #fff; }
 /* « Journée portes ouvertes » toujours en gras */
 .po { font-weight: 900; }
 .cal-pastille:has(.po) { white-space: normal; }
