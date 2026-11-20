@@ -47,6 +47,11 @@
         "label": "Contact",
         "url": "#contact",
         "icon": "contact"
+      },
+      {
+        "label": "Soutenir",
+        "url": "/soutenir/",
+        "icon": "soutenir"
       }
     ]
   },
@@ -240,5 +245,40 @@
     "publisher": "Bras Ouverts",
     "host": "Cloudflare, Inc., 101 Townsend St, San Francisco, CA 94107, États-Unis",
     "retention": "Les inscriptions au Parcours Alpha (nom, e-mail, téléphone et, si vous la donnez, adresse postale) sont conservées jusqu’à la fin du parcours, puis supprimées dans les trois mois. Pour consulter ou supprimer vos données, écrivez-nous via le formulaire de contact."
+  },
+  "soutenir": {
+    "visible": true,
+    "menu": "Nous soutenir",
+    "label": "Nous soutenir",
+    "title": "Soutenir *Bras Ouverts*",
+    "intro": "Bras Ouverts vit grâce à ses bénévoles et à la générosité de chacun. Votre don aide à faire vivre la P’tite Boutik, les maraudes et les moments partagés à Morlaix.",
+    "ribTitre": "Faire un don par virement",
+    "ribIntro": "Vous pouvez faire un virement, ponctuel ou régulier, sur le compte de l’Association.",
+    "titulaire": "BRAS OUVERTS",
+    "iban": "FR43 3000 2058 3500 0007 0683 F16",
+    "bic": "CRLYFRPPXXX",
+    "banque": "LCL (Le Crédit Lyonnais)",
+    "domiciliation": "RWE MORLAIX",
+    "codeBanque": "30002",
+    "codeGuichet": "05835",
+    "compte": "0000070683F",
+    "cle": "16",
+    "libelle": "Indiquez par exemple « Don Bras Ouverts » dans le libellé du virement.",
+    "autresTitre": "D’autres façons de nous aider",
+    "autres": [
+      {
+        "title": "Donner des vêtements",
+        "text": "La P’tite Boutik accueille les vêtements d’enfants, chaussures et articles de puériculture en bon état.",
+        "link": "/boutik/",
+        "linkLabel": "Découvrir la P’tite Boutik"
+      },
+      {
+        "title": "Nous écrire",
+        "text": "Une question sur un don ? Écrivez-nous, nous répondons à tous les messages.",
+        "link": "/#contact",
+        "linkLabel": "Nous écrire"
+      }
+    ],
+    "merci": "Merci pour votre soutien !"
   }
 }

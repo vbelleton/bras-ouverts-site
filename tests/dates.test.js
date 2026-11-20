@@ -44,7 +44,7 @@ test("le menu commun est publié pour la boutique (menu.json)", () => {
 
 test("la barre du bas est publiée pour la boutique (menu.json)", () => {
   const { barre } = JSON.parse(readFileSync("dist/menu.json", "utf8"));
-  assert.ok(barre.length >= 1 && barre.length <= 5);
+  assert.ok(barre.length >= 1 && barre.length <= 6);
   for (const b of barre) {
     assert.match(b.url, /^(\/|https?:)/, "liens absolus, utilisables depuis /boutik/");
     assert.ok(b.label && b.icon);
